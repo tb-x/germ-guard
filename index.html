@@ -184,6 +184,7 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 .tip-strip .arrow{font-size:22px;color:#d58aa4}
 .tip-strip .fx{font-size:28px;line-height:1}
 .tip-strip .y{font:900 30px/1 var(--title);color:#ff9f1c}
+.tip-strip .y.gold{color:#ffd23f;text-shadow:0 0 6px #ffb000}
 .tip-cap{font:16px/1.35 var(--plain);margin:0 0 16px;color:var(--ink)}
 .tip-rows{display:flex;flex-direction:column;gap:7px;margin:8px 0 16px;text-align:left}
 .tip-row{display:flex;align-items:center;gap:9px;background:#fff4f7;border-radius:14px;padding:5px 10px}
@@ -194,6 +195,38 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 .credit{font:12px/1.3 var(--plain);color:#b07a8e;margin:12px 0 0}
 .credit a{color:inherit}
 .row .round.toggle{font-size:24px;box-shadow:0 4px 0 var(--shade)}
+/* the book, dress-up and party buttons under Play */
+.row.extras{margin-top:10px}
+.row .round.extra{width:54px;height:54px;font-size:26px;box-shadow:0 4px 0 var(--shade);position:relative}
+.row .round.extra small{position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:var(--gold);color:#5a3a00;font:bold 11px/20px var(--plain);padding:0 4px}
+.row .round.extra.locked{filter:grayscale(1);opacity:.5}
+.partywave{font:bold 20px/1 var(--plain);color:#8a4a62;white-space:nowrap}
+/* the germ book */
+.bookcard{max-width:420px;max-height:calc(100vh - 40px);overflow:auto;padding:20px 16px 22px}
+.bookcard h3{font:700 20px/1 var(--title);margin:10px 0 6px;color:var(--heart);text-align:left}
+.book-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.book-item{border:0;background:#fff4f7;border-radius:16px;padding:6px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;touch-action:manipulation}
+.book-item svg{width:46px;height:46px}
+.book-item .emo{font-style:normal;font-size:34px;line-height:46px}
+.book-item span{font:12px/1.15 var(--plain);color:var(--ink)}
+.book-item.unmet svg,.book-item.unmet .emo{filter:brightness(0);opacity:.18}
+.book-item.on{background:#fff0b8;box-shadow:0 0 0 3px var(--gold)}
+.book-cap{font:15px/1.35 var(--plain);min-height:2.7em;margin:12px 0 14px;color:var(--ink)}
+/* dress up */
+.dress-preview{position:relative;width:120px;height:120px;margin:0 auto}
+.dress-preview svg{width:100%;height:100%}
+.dress-on{position:absolute;font-style:normal;font-size:46px;line-height:1;left:50%;top:-6px;transform:translateX(-50%)}
+.dress-on.glasses{top:38px;font-size:40px}
+.dress-on.bow{left:22%;top:4px;font-size:36px}
+.dress-on.flower{left:20%;top:12px;font-size:34px}
+.dress-on.phones{top:24px;font-size:44px}
+.dress-stars{font:bold 20px/1 var(--plain);margin:4px 0 10px;color:#8a4a62}
+.dress-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.dress-item{position:relative;border:0;background:#fff4f7;border-radius:16px;height:58px;font-size:30px;touch-action:manipulation}
+.dress-item i{display:block;width:30px;height:30px;border-radius:50%;margin:0 auto;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.dress-item small{position:absolute;right:2px;bottom:2px;font:bold 10px/1 var(--plain);color:#8a4a62}
+.dress-item.on{background:#fff0b8;box-shadow:0 0 0 3px var(--gold)}
+.dress-item.locked{opacity:.45;filter:grayscale(1)}
 .toggle.off{filter:grayscale(1);opacity:.45}
 .title-card h1{font-size:46px}
 .title-card p{margin-bottom:6px}
@@ -211,7 +244,7 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 @keyframes glow{50%{box-shadow:0 3px 0 #e0a800,0 0 0 12px rgba(255,210,63,.4)}}
 @media (orientation:landscape) and (max-height:620px){   /* a phone on its side: words and Play on the left, the body on the right */
   .title-card{max-width:600px;display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:20px;padding:16px 22px}
-  .title-card .bodymap{grid-column:2;grid-row:1 / span 3;width:auto;height:calc(100vh - 90px);max-height:330px;margin:0}
+  .title-card .bodymap{grid-column:2;grid-row:1 / span 5;width:auto;height:calc(100vh - 90px);max-height:330px;margin:0}
   .title-card h1{font-size:40px}
 }
 .row{display:flex;gap:10px;justify-content:center;align-items:center}
@@ -284,7 +317,29 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
       <button class="round toggle" id="music" aria-label="Music on or off">🎵</button>
       <button class="round toggle" id="vibe" aria-label="Vibration on or off" hidden>📳</button>
     </div>
+    <div class="row extras">
+      <button class="round extra" id="bookBtn" aria-label="Germ book">📖</button>
+      <button class="round extra" id="dressBtn" aria-label="Dress up the heart">🎀</button>
+      <button class="round extra" id="partyBtn" aria-label="Germ party">🎉<small id="partyBest"></small></button>
+    </div>
     <p class="credit">Voices and sounds: <a href="https://elevenlabs.io" target="_blank" rel="noopener">elevenlabs.io</a></p>
+  </div>
+</div>
+<div class="overlay" id="book" hidden>
+  <div class="card bookcard">
+    <h2>📖 Germ Book</h2>
+    <div id="bookGrid"></div>
+    <p class="book-cap" id="bookCap"></p>
+    <button class="go" id="bookOk" aria-label="Close the book">OK 👍</button>
+  </div>
+</div>
+<div class="overlay" id="dress" hidden>
+  <div class="card dresscard">
+    <h2>Dress up!</h2>
+    <div class="dress-preview" id="dressPreview"></div>
+    <p class="dress-stars" id="dressStars"></p>
+    <div class="dress-grid" id="dressGrid"></div>
+    <button class="go" id="dressOk" aria-label="Done">OK 👍</button>
   </div>
 </div>
 <div class="overlay" id="tip" hidden>
@@ -331,6 +386,10 @@ const BUILDS = {                // what can go on a pad: its cost in drops, and 
     speed: { label: 'Speed', badge: '⚡', pip: '⚡', costs: [6, 9], steps: [   // seconds between throws, germs per throw
       { reload: 1.4, multi: 1 }, { reload: 1.0, multi: 1 }, { reload: 0.9, multi: 2 }] },
   } },
+  memory: { cost: 6, grow: 'speed', tracks: {   // remembers germs already beaten, and marks every one of them it sees
+    reach: { label: 'Reach', badge: '◎', pip: '🔵', costs: [5, 8], steps: [{ range: 2.8 }, { range: 3.1 }, { range: 3.4 }] },
+    speed: { label: 'Speed', badge: '⚡', pip: '⚡', costs: [6, 9], steps: [{ reload: 0.9, multi: 2 }, { reload: 0.7, multi: 2 }, { reload: 0.55, multi: 3 }] },   // seconds between marks, germs marked at once
+  } },
 };
 const TAG_SLOW = 0.7;           // a germ with an antibody stuck on walks at this fraction of its speed...
 const TAG_DAMAGE = 1.5;         // ...and takes this much more damage
@@ -339,6 +398,30 @@ const MUCUS_COST = 4;           // a snot puddle on the vessel
 const MUCUS_MAX = 3;            // snot puddles per level
 const MUCUS_R = 0.6;            // how far a puddle reaches, in tiles
 const MUCUS_SLOW = 0.4;         // germs in snot walk at this fraction of their speed
+const PLUG_COST = 5;            // a platelet plug on the vessel (Cut Finger): germs have to stop and chew through it
+const PLUG_MAX = 2;             // plugs at a time
+const PLUG_HP = 36;             // how much chewing a plug takes before it crumbles
+const PLUG_CHEW = 2;            // chewing per second by each of the two germs at the front, times the germ's bite
+const TONSIL_R = 1.7;           // how far a tonsil reaches, in tiles (Sore Throat; tonsils are 't' on the map)
+const TONSIL_RELOAD = 2;        // seconds between squeezes
+const TONSIL_DAMAGE = 1.5;      // damage to every germ in reach per squeeze
+const PARTY_POINTS = 10;        // Germ Party: how big the first wave is (a bloop is 1 point, a big germ 3)...
+const PARTY_GROW = 7;           // ...and how many points each wave adds
+const PARTY_TOUGH = 0.1;        // germs get this much tougher every wave (on top of 1)
+const PARTY_KING_EVERY = 5;     // a King Germ joins every this many waves
+const PARTY_KINDS = [           // what can come to the party: kind, points, first wave (0 = the first) it can turn up in
+  ['bloop', 1, 0], ['wiggler', 1, 1], ['big', 3, 2], ['corkscrew', 1.2, 2], ['chunky', 3, 3], ['spiky', 2, 4],
+];
+const DRESS = [                 // things the heart can wear, and the stars needed for each (10 levels x 3 stars = 30)
+  { id: 'none', emoji: '❌', need: 0 }, { id: 'party', emoji: '🥳', need: 3 }, { id: 'bow', emoji: '🎀', need: 6 },
+  { id: 'glasses', emoji: '😎', need: 10 }, { id: 'flower', emoji: '🌸', need: 14 }, { id: 'crown', emoji: '👑', need: 18 }, { id: 'phones', emoji: '🎧', need: 22 },
+];
+const HEART_COLOURS = [         // and its colour
+  { id: 'red', hex: 0xff3b5c, css: '#ff3b5c', need: 0 }, { id: 'pink', hex: 0xff7eb6, css: '#ff7eb6', need: 8 },
+  { id: 'purple', hex: 0xa070f0, css: '#a070f0', need: 16 }, { id: 'gold', hex: 0xffc23a, css: '#ffc23a', need: 26 },
+];
+const MEMORY_KILLS = 3;         // memory cells (Chickenpox) remember every kind of germ ever beaten, and learn a new kind after this many pops
+const MEMORY_DAMAGE = 2.2;      // a germ with a memory cell's gold antibody takes this much more damage (an orange one: TAG_DAMAGE)
 const SNEEZE_COOLDOWN = 40;     // seconds before the sneeze button works again
 const SNEEZE_PUSH = 5;          // tiles every germ gets blown back
 const FAST_SPEED = 2;           // how much faster waves run with the speed button on
@@ -379,7 +462,7 @@ const DRAG_START = 12;          // how far (pixels) a finger moves before a tap 
 // Map key: ' ' nothing, '.' tissue, '#' blood vessel, '1'-'9' where germs get in, 'H' the heart, 'o' build pad.
 // The board is seen corner-on, so the map's top-left to bottom-right diagonal runs down the screen.
 // Waves are lists of groups: germ kind, how many, seconds apart, optional start delay, and which entry ('from', 0 = '1').
-const LEVELS = [
+const LEVELS = [   // the story levels in order, then the Germ Party (endless, opened by beating the Big Fever)
   {
     id: 'knee', spot: [78, 222], name: 'Scraped Knee', icon: '🦵', seed: 7, entry: 'scratch', startEnergy: 10, toughness: 1.35, builds: ['zapper'],
     map: [
@@ -629,12 +712,12 @@ const LEVELS = [
        { kind: 'spiky', n: 3, gap: 3, delay: 12, from: 1 }],
     ],
     intro: 'Oh no, a big fever! Germs are coming from the nose, the mouth and a scratch, all at once. Use everything you have!',
-    win: 'You did it! The fever is gone. You beat all the germs!', winTitle: 'Fever gone! You beat them all!',
+    win: 'You did it! The fever is gone, and the heart feels great!', winTitle: 'Fever gone!',
     fact: "Did you know? A fever is your body turning up the heat to make it hard for germs to grow. Rest and drink water to help!",
   },
   {
     id: 'finger', spot: [38, 152], name: 'Cut Finger', icon: '✋', seed: 31, entry: 'scratch', startEnergy: 18, toughness: 2.15,
-    builds: ['zapper', 'nest', 'antibody'], sneeze: true,
+    builds: ['zapper', 'nest', 'antibody'], plug: true, sneeze: true, hint: [12, 9, 'plug'],
     map: [
       ' .....              ',
       ' ..1..              ',
@@ -681,7 +764,7 @@ const LEVELS = [
       '..#o.......o#..         ',
       '..#.....o...#..         ',
       '..###########..         ',
-      '.....o.#.......         ',
+      '.....ot#t.......         ',
       '.......#e..........     ',
       '     ..#...........     ',
       '     ..##########..     ',
@@ -718,7 +801,7 @@ const LEVELS = [
   },
   {
     id: 'pox', spot: [150, 134], name: 'Chickenpox', icon: '🐔', seed: 59, entry: 'scratch', startEnergy: 28, toughness: 1.4,
-    builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true,
+    builds: ['zapper', 'nest', 'antibody', 'memory'], mucus: true, sneeze: true,
     map: [
       '.....                   .....',
       '..1..                   ..2..',
@@ -766,7 +849,16 @@ const LEVELS = [
     win: 'You did it! The spots are gone, and you beat the biggest germ army ever!', winTitle: 'Spots gone!',
     fact: "Did you know? After your body beats chickenpox, it remembers that germ. So if it comes back, your body knows how to beat it straight away!",
   },
+  {
+    id: 'party', party: true, name: 'Germ Party', icon: '🎉', seed: 77, entry: ['scratch', 'nostril', 'mouth', 'airway'], palette: 'tummy', startEnergy: 30,
+    builds: ['zapper', 'nest', 'antibody', 'memory'], mucus: true, plug: true, sneeze: true,
+    map: null,   // the Chickenpox board, filled in below
+    waves: [],   // made up as it goes (partyWave)
+    intro: "It's a germ party! The germs keep on coming. How many waves can you stop?",
+  },
 ];
+const PARTY = LEVELS.findIndex(L => L.party), STORY = LEVELS.filter(L => !L.party).length;
+LEVELS[PARTY].map = LEVELS.find(L => L.id === 'pox').map;
 
 /* ======== helpers ======== */
 const $ = id => document.getElementById(id);
@@ -783,7 +875,7 @@ const stats = s => Object.assign({}, BUILDS[s.kind].base,   // a defender's numb
   ...Object.entries(BUILDS[s.kind].tracks).map(([k, tr]) => tr.steps[(s.ups && s.ups[k]) || 0]));
 const upgradesOf = t => Object.values(t.ups).reduce((a, b) => a + b, 0);
 const growOf = t => t.ups[BUILDS[t.kind].grow];   // steps on the path that makes it physically bigger
-const NAMES = { zapper: 'Neutrophil', nest: 'Macrophage', antibody: 'B cell', mucus: 'Mucus' };   // the real names, shown on the build cards
+const NAMES = { zapper: 'Neutrophil', nest: 'Macrophage', antibody: 'B cell', mucus: 'Mucus', plug: 'Platelets', tonsil: 'Tonsils', memory: 'Memory cell' };   // the real names, shown on the build cards
 const germIcon = (kind, cls = '') => (SVG[kind] || SVG.bloop)(kind === 'big' ? (cls + ' big').trim() : cls);
 
 const SVG = {
@@ -799,6 +891,9 @@ const SVG = {
   spiky: (cls = '') => `<svg class="${cls}" viewBox="0 0 40 40"><g stroke="#7a3fc4" stroke-width="2.6">${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<line x1="20" y1="21" x2="${20 + 17 * Math.cos(a * Math.PI / 180)}" y2="${21 + 17 * Math.sin(a * Math.PI / 180)}"/>`).join('')}</g><g fill="#ffd23f">${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<circle cx="${20 + 17 * Math.cos(a * Math.PI / 180)}" cy="${21 + 17 * Math.sin(a * Math.PI / 180)}" r="3"/>`).join('')}</g><circle cx="20" cy="21" r="11" fill="#9b5de5" stroke="#7a3fc4" stroke-width="2"/><circle cx="16" cy="19" r="3.6" fill="#fff"/><circle cx="24" cy="19" r="3.6" fill="#fff"/><circle cx="16.4" cy="20" r="1.9" fill="#222"/><circle cx="24.4" cy="20" r="1.9" fill="#222"/></svg>`,
   antibody: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="41" rx="16" ry="5.5" fill="#f2b3c3"/><g stroke="#ff9f1c" stroke-width="3" stroke-linecap="round" fill="none"><path d="M16 15V8M16 8l-4-4M16 8l4-4"/><path d="M32 15V8M32 8l-4-4M32 8l4-4"/></g><circle cx="24" cy="26" r="14" fill="#ffe066" stroke="#e8b923" stroke-width="2"/><circle cx="18.5" cy="24" r="4" fill="#fff" stroke="#e0d3a0"/><circle cx="29.5" cy="24" r="4" fill="#fff" stroke="#e0d3a0"/><circle cx="19" cy="25" r="2.2" fill="#2a2140"/><circle cx="30" cy="25" r="2.2" fill="#2a2140"/><path d="M20 32q4 3 8 0" stroke="#7a5a10" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
   mucus: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><path d="M6 32c0-6 6-8 11-8 2-5 12-6 15-1 6-1 11 2 10 8 4 2 2 8-4 8H10c-5 0-7-4-4-7z" fill="#b8de4a" stroke="#86a92a" stroke-width="2"/><circle cx="18" cy="31" r="3" fill="#fff" opacity=".7"/><circle cx="31" cy="29" r="2" fill="#fff" opacity=".7"/><circle cx="26" cy="35" r="1.6" fill="#fff" opacity=".7"/></svg>`,
+  plug: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="38" rx="19" ry="6" fill="#c42a48"/><g fill="#ffe9a8" stroke="#e0b252" stroke-width="2"><ellipse cx="15" cy="31" rx="9" ry="5"/><ellipse cx="33" cy="31" rx="9" ry="5"/><ellipse cx="24" cy="24" rx="10" ry="5.5"/><ellipse cx="17" cy="17" rx="8" ry="4.5"/><ellipse cx="31" cy="17" rx="8" ry="4.5"/></g><circle cx="21" cy="23" r="2.4" fill="#fff"/><circle cx="27" cy="23" r="2.4" fill="#fff"/><circle cx="21.4" cy="23.5" r="1.3" fill="#222"/><circle cx="27.4" cy="23.5" r="1.3" fill="#222"/></svg>`,
+  tonsil: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="41" rx="17" ry="5.5" fill="#f2b3c3"/><path d="M8 36c-3-14 6-26 16-26s19 12 16 26z" fill="#ff8fa8" stroke="#e0607e" stroke-width="2"/><circle cx="16" cy="22" r="2.4" fill="#ffb3c4"/><circle cx="31" cy="28" r="3" fill="#ffb3c4"/><circle cx="18.5" cy="27" r="3.6" fill="#fff"/><circle cx="29.5" cy="27" r="3.6" fill="#fff"/><circle cx="19" cy="28" r="2" fill="#222"/><circle cx="30" cy="28" r="2" fill="#222"/><path d="M20 34q4 3 8 0" stroke="#8a2040" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  memory: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="41" rx="16" ry="5.5" fill="#f2b3c3"/><path d="M24 15V6" stroke="#b58ae8" stroke-width="3" stroke-linecap="round"/><path d="M24 0l2.4 5 5.4.6-4 3.6 1.1 5.3L24 11.8l-4.9 2.7 1.1-5.3-4-3.6 5.4-.6z" fill="#ffd23f" stroke="#e0a800"/><circle cx="24" cy="27" r="14" fill="#d7bfff" stroke="#a37be0" stroke-width="2"/><circle cx="18.5" cy="25" r="4" fill="#fff" stroke="#c7b3ea"/><circle cx="29.5" cy="25" r="4" fill="#fff" stroke="#c7b3ea"/><circle cx="19" cy="26" r="2.2" fill="#2a2140"/><circle cx="30" cy="26" r="2.2" fill="#2a2140"/><path d="M20 33q4 3 8 0" stroke="#5a3a8a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
   play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="#fff"/></svg>',
   map: (fill = '#fff') => `<svg viewBox="0 0 24 24"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z" fill="${fill}"/><path d="M9 4v13.5M15 6.5V20" stroke="#fff" stroke-width="1.6"/></svg>`,
   home: (fill = '#fff') => `<svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="${fill}"/></svg>`,
@@ -841,6 +936,7 @@ const MAT = {
   bcell: toon(0xffe066), spike: toon(0xc9a2f5), steam: toon(0xffffff, { transparent: true, opacity: 0.45 }), ab: toon(0xff9f1c), spark: basic(0xfff2a0), puff: toon(0xffffff, { transparent: true, opacity: 0.85 }),
   mucus: toon(0xb8de4a, { transparent: true, opacity: 0.88 }), bubble: toon(0xf4ffd8, { transparent: true, opacity: 0.8 }),
   lips: toon(0xe8506a), tooth: toon(0xfffdf4), airway: toon(0xf8cfdc),
+  platelet: toon(0xffe9a8), tonsil: toon(0xff8fa8), tonsilSpot: toon(0xffb3c4), memory: toon(0xd7bfff), memoryStalk: toon(0xb58ae8),
 };
 MAT.gold.side = THREE.DoubleSide;   // the king's crown is an open band
 Object.values(MAT).forEach(shared);
@@ -881,7 +977,7 @@ const view = {
 };
 
 function parseBoard(map) {
-  const b = { cells: new Map(), land: [], pads: [], entries: [], heart: null };
+  const b = { cells: new Map(), land: [], pads: [], entries: [], heart: null, tonsils: [] };
   map.forEach((row, r) => [...row].forEach((ch, c) => {
     if (ch === ' ') return;
     const cell = { c, r, ch, x: c, z: r, top: 0 };
@@ -891,6 +987,7 @@ function parseBoard(map) {
     }
     if (isEntry(ch)) b.entries[+ch - 1] = cell;
     if (ch === 'H') b.heart = cell;
+    if (ch === 't') { cell.ch = '.'; b.tonsils.push({ cell, cool: 0, squeeze: 0 }); }   // a tonsil: tissue with a guard on it
   }));
   for (const e of b.entries) {
     e.path = findPath(b, e, b.heart);
@@ -967,6 +1064,10 @@ function loadLevel(i) {
     disc(2.4, 0x5aa9e6, 0.075); disc(2.1, 0x7cc4f5, 0.08); disc(1.05, 0x22223a, 0.085);
     const glint = new THREE.Mesh(new THREE.CircleGeometry(0.35, 20).rotateX(-Math.PI / 2), basic(0xffffff)); glint.position.set(-0.45, 0.09, -0.45); eye.add(glint);
     eye.position.set(ix, 0, iz); world.add(eye);
+  }
+
+  for (const to of board.tonsils) {   // the throat's tonsils: big pink lumps that squeeze germs going past
+    to.mesh = makeTonsil(); to.mesh.position.set(to.cell.x, to.cell.top, to.cell.z); world.add(to.mesh);
   }
 
   // build pads
@@ -1073,6 +1174,36 @@ const heart = { sneeze: 0, group: new THREE.Group(), body: null, mat: toon(0xff3
   }
   heart.fever.visible = false;
   heart.body.add(heart.fever);
+  // things to wear (Dress up): one group each, only the chosen one shows
+  const party = new THREE.Group(), cone = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 18), toon(0x6cc8ff));
+  cone.position.y = 0.25; party.add(cone, ball(MAT.gold, 0.075, 0, 0.52, 0, false));
+  for (const y of [0.1, 0.25]) { const band = new THREE.Mesh(new THREE.TorusGeometry(0.2 - y * 0.4, 0.022, 6, 20).rotateX(Math.PI / 2), toon(0xffd23f)); band.position.y = y; party.add(band); }
+  party.position.set(0.3, 0.52, 0.16); party.rotation.set(0.35, 0, -0.4);
+  const bow = new THREE.Group(), bowMat = toon(0xff5ab4);
+  for (const side of [-1, 1]) { const loop = ball(bowMat, 1, side * 0.17, 0, 0, false); loop.scale.set(0.17, 0.12, 0.08); loop.rotation.z = side * 0.4; bow.add(loop); }
+  bow.add(ball(bowMat, 0.075, 0, 0, 0.04, false)); bow.position.set(-0.3, 0.5, 0.3); bow.rotation.set(-0.3, 0, 0.3);
+  const glasses = new THREE.Group(), lensMat = toon(0x221a2c);
+  for (const side of [-1, 1]) { const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.03, 20).rotateX(Math.PI / 2), lensMat); lens.position.set(side * 0.13, 0, 0); glasses.add(lens); }
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.025, 0.025), lensMat); glasses.add(bridge); glasses.position.set(0, 0.12, 0.42);
+  const flower = new THREE.Group(), petal = toon(0xffa6c9);
+  for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; flower.add(ball(petal, 0.07, Math.cos(a) * 0.09, Math.sin(a) * 0.09, 0, false)); }
+  flower.add(ball(MAT.gold, 0.055, 0, 0, 0.03, false)); flower.position.set(-0.4, 0.42, 0.24);
+  const crown = new THREE.Group(), band = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.32, 0.16, 24, 1, true), MAT.gold); crown.add(band);
+  for (let i = 0; i < 7; i++) {   // points round the top, each with a little ball
+    const a = i / 7 * Math.PI * 2, tip = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.16, 8), MAT.gold);
+    tip.position.set(Math.cos(a) * 0.3, 0.15, Math.sin(a) * 0.3); crown.add(tip, ball(MAT.gold, 0.03, Math.cos(a) * 0.3, 0.24, Math.sin(a) * 0.3, false));
+  }
+  for (const [x, z] of [[0, 0.31], [-0.22, 0.22], [0.22, 0.22]]) crown.add(ball(toon(0xff5a6e), 0.04, x, 0, z, false));
+  crown.position.set(0, 0.7, 0.02); crown.rotation.x = 0.25;
+  const phones = new THREE.Group(), phoneMat = toon(0x4a4f7a), cushion = toon(0x9fd8ff);
+  const headband = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.05, 8, 32, Math.PI), phoneMat); headband.position.y = 0; phones.add(headband);   // the band over the top
+  for (const side of [-1, 1]) {
+    const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.14, 20), phoneMat); cup.rotation.z = Math.PI / 2; cup.position.set(side * 0.9, 0, 0); phones.add(cup);
+    const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.04, 20), cushion); pad.rotation.z = Math.PI / 2; pad.position.set(side * 0.83, 0, 0); phones.add(pad);
+  }
+  phones.position.set(0, 0.05, 0.05); phones.rotation.x = -0.15;
+  heart.outfit = { party, bow, glasses, flower, crown, phones };
+  for (const m of Object.values(heart.outfit)) { m.visible = false; heart.body.add(m); }
   heart.body.add(face, ...heart.plasters);
   heart.group.add(heart.body);
   heart.plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.68, 0.2, 32), MAT.plinth);
@@ -1231,6 +1362,37 @@ function makeTrap() {   // a snot puddle with a couple of bubbles
   for (const [x, z, r] of [[0.12, 0.05, 0.06], [-0.15, -0.08, 0.045], [0.02, -0.22, 0.035]]) g.add(ball(MAT.bubble, r, x, 0.07, z, false));
   return g;
 }
+const DISC_GEO = shared(new THREE.CylinderGeometry(1, 1, 1, 18));
+function makePlug() {   // a platelet plug: a heap of cream-coloured discs filling the vessel, with a cheeky face on top
+  const g = new THREE.Group(), heap = new THREE.Group(), disc = DISC_GEO;
+  for (const [x, y, z, r, rot] of [[-0.18, 0.06, 0.1, 0.2, 0.2], [0.18, 0.06, 0.08, 0.2, -0.3], [0, 0.06, -0.2, 0.21, 0.1], [-0.1, 0.17, -0.02, 0.19, -0.25],
+    [0.12, 0.18, -0.05, 0.18, 0.35], [0, 0.29, 0.02, 0.17, 0]]) {
+    const m = new THREE.Mesh(disc, MAT.platelet); m.scale.set(r, 0.07, r); m.position.set(x, y, z); m.rotation.set(rot, 0, rot * 0.6); m.castShadow = true; heap.add(m);
+  }
+  addEyes(heap, 0.05, 0.36, 0.1, 0.07);
+  heap.scale.setScalar(1.35); g.add(heap);
+  return g;
+}
+function makeTonsil() {   // a tonsil: a soft pink lump with spots and a face
+  const g = new THREE.Group(), inner = new THREE.Group();
+  const lump = ball(MAT.tonsil, 1, 0, 0.26, 0); lump.scale.set(0.4, 0.34, 0.36); inner.add(lump);
+  for (const [x, y, z, r] of [[-0.22, 0.4, 0.12, 0.06], [0.24, 0.3, 0.16, 0.07], [0.05, 0.52, -0.1, 0.05], [-0.28, 0.22, -0.1, 0.05]]) inner.add(ball(MAT.tonsilSpot, r, x, y, z, false));
+  addEyes(inner, 0.07, 0.33, 0.3, 0.11);
+  const mouth = ball(MAT.mouth, 1, 0, 0.2, 0.34, false); mouth.scale.set(0.07, 0.035, 0.03); inner.add(mouth);
+  g.add(inner); g.inner = inner;
+  return g;
+}
+function makeMemory() {   // the memory cell: a lilac B cell with a gold star on a stalk, for remembering
+  const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
+  const mound = makeMound(group);
+  aim.position.y = 0.24; group.add(aim); aim.add(body);
+  const cell = ball(MAT.memory, 1, 0, 0.32, 0); cell.scale.set(0.35, 0.33, 0.35); body.add(cell);
+  const stalk = new THREE.Mesh(POLE_GEO, MAT.memoryStalk); stalk.scale.set(2.5, 0.8, 2.5); stalk.position.y = 0.6; body.add(stalk);
+  const star = new THREE.Mesh(STAR_GEO, MAT.star); star.scale.setScalar(1.6); star.position.y = 0.9; body.add(star);
+  addEyes(body, 0.085, 0.4, 0.27, 0.13);
+  const mouth = ball(MAT.mouth, 1, 0, 0.25, 0.33, false); mouth.scale.set(0.07, 0.035, 0.03); body.add(mouth);
+  return { group, aim, body, mound, star };
+}
 function makeTroop() {   // a macrophage blob: big, soft, hungry
   const mesh = new THREE.Group(), inner = new THREE.Group();
   const body = ball(MAT.troop, 1, 0, 0.2, 0); body.scale.set(0.25, 0.21, 0.25); inner.add(body);
@@ -1383,7 +1545,7 @@ const Haptics = (() => {
 // Spoken lines and six sound effects are ElevenLabs clips in assets/ (see the README's audio credits); every other
 // sound is synthesized with Web Audio. Each line falls back to the browser's speech voice and each effect to its
 // synthesized version when a clip can't load (for example when the game is opened straight from disk).
-const ASSET_V = 1;              // bump after replacing any file in assets/
+const ASSET_V = 2;              // bump after replacing any file in assets/
 const CLIP_VOL = 0.8;           // sound effect clips
 const VOICE_VOL = 1;            // spoken lines
 const CLIP_TRIM = { 'sfx-sneeze': 0.54, 'sfx-chomp': 0.58, 'sfx-king': 0.83, 'sfx-win': 0.52 };   // measured, to even out the clips' loudness
@@ -1398,12 +1560,21 @@ const LINES = {                 // everything the voice says: key -> words; the 
   'meet-antibody': 'This is a B cell. B cells make antibodies, little Y shapes that stick to germs, so they slow down and pop more easily!',
   'meet-mucus': "That's mucus. Grown-ups call it snot! It's sticky, so germs get stuck in it. That's why your nose runs when you have a cold.",
   'meet-sneeze': 'Achoo! A sneeze blows germs out of your nose. Remember to sneeze into your elbow!',
+  'meet-plug': 'These are platelets! They stick together like a plug to stop bleeding. Germs have to stop and chew through them!',
+  'meet-tonsil': 'These are your tonsils! They guard the back of your throat and squeeze the germs that go past.',
+  'meet-memory': 'This is a memory cell. It remembers germs you have beaten before, and marks them with gold antibodies, so they pop fast!',
+  'memory-remember': 'The memory cell remembers that germ now!',
+  'party-over': 'What a party! You did so well!',
+  'book-hello': 'This is your germ book. Tap a picture to hear about it!', 'book-bloop': 'This is a Bloop, the everyday germ. One bubble pops it!',
+  'dress-hello': 'Dress up your heart! Win more stars to get more things to wear.', 'dress-locked': 'Win more stars to get this one!',
   'upgrade-reach': 'Now it can reach further!', 'upgrade-power': 'Now it zaps harder!',
+  'upgrade-bite': 'Now its blobs bite harder!', 'upgrade-energy': 'Now its blobs can keep going for longer!',
+  'upgrade-speed': 'Now it makes antibodies faster!', 'new-spot': 'Look, a new building spot!',
   nope: 'Pop germs to get more drops!', 'sneeze-hint': 'Quick! Press the sneeze button!',
   bonk: 'Bonk! Spiky germs need an antibody maker!', 'bonk-wait': 'Bonk! Wait for an antibody to stick on the spiky germ.',
   sell: 'Tap again to sell it.',
 };
-for (const L of LEVELS) { LINES['intro-' + L.id] = L.intro; LINES['win-' + L.id] = L.win; LINES['fact-' + L.id] = L.fact; }
+for (const L of LEVELS) for (const key of ['intro', 'win', 'fact']) if (L[key]) LINES[key + '-' + L.id] = L[key];
 for (const [kind, words] of Object.entries(GERM_HELLO)) LINES['hello-' + kind] = words;
 const SFX = ['sfx-sneeze', 'sfx-chomp', 'sfx-pop', 'sfx-ouch', 'sfx-king', 'sfx-win'];
 const CLIPS = [...SFX, ...Object.keys(LINES).map(k => 'say-' + k)];
@@ -1470,6 +1641,9 @@ const Sound = {
   clink() { this.tone(2200, 0.08, 'triangle', 0.05); this.tone(3100, 0.06, 'sine', 0.03, 0.03); },
   stick() { this.tone(900, 0.06, 'sine', 0.06, 0, 500); this.tone(500, 0.08, 'triangle', 0.04, 0.05); },
   puff() { this.noise(0.1, 0.12, 1600); },
+  squeeze() { this.tone(320, 0.18, 'sine', 0.12, 0, 150); this.tone(200, 0.12, 'triangle', 0.06, 0.06, 120); },
+  crumble() { this.noise(0.18, 0.25, 900); [520, 390, 300].forEach((f, i) => this.tone(f, 0.08, 'triangle', 0.06, i * 0.05)); },
+  remember() { [784, 988, 1319, 1568].forEach((f, i) => this.tone(f, 0.25, 'sine', 0.07, i * 0.09)); },
   splat() { this.noise(0.25, 0.35, 500); this.tone(180, 0.2, 'sine', 0.12, 0, 90); },
   vowel(f, d, delay) {   // a buzzy "ah"
     if (this.muted || !this.ctx) return;
@@ -1624,7 +1798,7 @@ const Music = {
     this.mood = mood;
     if (!mood) { this.stop(); return; }
     const [kind, id] = mood.split(':');
-    this.song = SONGS[kind === 'boss' ? 'king' : kind === 'map' ? 'map' : id] || SONGS.knee;
+    this.song = SONGS[kind === 'boss' ? 'king' : kind === 'map' || id === 'party' ? 'map' : id] || SONGS.knee;
     this.busy = kind === 'wave' || kind === 'boss';
     if (this.on) this.step = 0; else this.start();   // a new tune starts from its first bar
   },
@@ -1711,8 +1885,8 @@ function loadStars() {
   store.set('stars', stars);
   return stars;
 }
-const isOpen = i => game.cheat || i === 0 || !!game.stars[LEVELS[i - 1].id] || !!game.stars[LEVELS[i].id];
-const newestOpen = () => { let i = 0; while (i + 1 < LEVELS.length && isOpen(i + 1)) i++; return i; };
+const isOpen = i => game.cheat || i === 0 || (i === PARTY ? !!game.stars.fever : !!game.stars[LEVELS[i - 1].id] || !!game.stars[LEVELS[i].id]);
+const newestOpen = () => { let i = 0; while (i + 1 < STORY && isOpen(i + 1)) i++; return i; };
 
 /* ======== game state ======== */
 const game = {
@@ -1737,7 +1911,8 @@ function clearStructures() {
   game.towers = []; game.troops = [];
 }
 function resetLevelState() {
-  Object.assign(game, { run: game.run + 1, energy: LEVEL.startEnergy, sparkles: HEART_SPARKLES, wave: 0, state: 'build', sneezeCd: 0, sneezeAt: 0, sneezeHint: 0 });
+  if (LEVEL.party) LEVEL.waves = [partyWave(0)];
+  Object.assign(game, { run: game.run + 1, energy: LEVEL.startEnergy, sparkles: HEART_SPARKLES, wave: 0, state: 'build', sneezeCd: 0, sneezeAt: 0, sneezeHint: 0, beaten: {}, knew: { ...everBeaten } });
   for (const p of board.pads) {   // later building spots stay hidden until their wave comes round
     p.tower = null; p.locked = p.unlock > 0; p.born = 1;
     p.plate.visible = p.plus.visible = p.ring.visible = !p.locked;
@@ -1745,6 +1920,19 @@ function resetLevelState() {
   }
   showHeartHealth();
   updateHud(); showPreview();
+}
+function partyWave(n) {   // wave n (0 = the first): more germs and more kinds every time, and now and then a King
+  const kinds = PARTY_KINDS.filter(k => n >= k[2]), groups = [], entries = board.entries.length;
+  let points = PARTY_POINTS + n * PARTY_GROW, delay = 0;
+  if (n % PARTY_KING_EVERY === PARTY_KING_EVERY - 1) { groups.push({ kind: 'king', n: 1, gap: 1, from: n % entries }); points -= 15; delay = 3; }
+  while (points > 0) {
+    const [kind, cost] = kinds[Math.floor(Math.random() * kinds.length)];
+    const count = Math.max(2, Math.min(14, Math.round(points / cost / 2)));
+    const from = (n + groups.length) % entries;   // the groups take turns at the entries, so no side gets them all
+    groups.push({ kind, n: count, gap: kind === 'wiggler' ? 0.45 : cost >= 3 ? 2.6 : 0.8, delay: Math.round(delay * 10) / 10, from });
+    points -= count * cost; delay += 2 + Math.random() * 3;
+  }
+  return groups;
 }
 function startLevel() {   // play the loaded level from the beginning
   clearField(); clearStructures(); closeMenu();
@@ -1756,20 +1944,25 @@ function startWave() {
   game.queue = groups.flatMap(gr => Array.from({ length: gr.n }, (_, i) => ({ t: (gr.delay || 0) + i * gr.gap, kind: gr.kind, from: gr.from || 0 })))
     .sort((a, b) => a.t - b.t);
   game.waveT = 0; game.state = 'wave'; game.tutorial = false;
+  if (LEVEL.party) LEVEL.toughness = 1 + PARTY_TOUGH * game.wave;   // the party gets harder every wave
   closeMenu(); updateHud(); showPreview();
   Sound.go();
-  Speech.say(game.wave === LEVEL.waves.length - 1 ? 'go-last' : 'go');
+  Speech.say(game.wave === LEVEL.waves.length - 1 && !LEVEL.party ? 'go-last' : 'go');
 }
 function waveCleared() {
+  if (LEVEL.party) {   // the party never ends: line up the next wave, and keep the best
+    LEVEL.waves.push(partyWave(LEVEL.waves.length));
+    if (game.wave + 1 > store.get('partyBest', 0)) store.set('partyBest', game.wave + 1);
+  }
   game.wave++;
-  if (game.wave < LEVEL.waves.length) for (const p of board.pads) if (p.locked && p.unlock <= game.wave) openSpot(p);
   for (let i = 0; i < WAVE_BONUS; i++) spawnDrop(heartPos, 1.4 + i * 0.15);
   if (game.wave >= LEVEL.waves.length) {
     game.state = 'won'; Sound.win(); Speech.say('win-' + LEVEL.id);
     if (starsFor(game.sparkles) > (game.stars[LEVEL.id] || 0)) { game.stars[LEVEL.id] = starsFor(game.sparkles); store.set('stars', game.stars); }
     const run = game.run; setTimeout(() => run === game.run && showEnd('won'), 2600);
   } else {
-    game.state = 'build'; Sound.cleared(); Speech.say('cleared');
+    game.state = 'build'; Sound.cleared(); Speech.say('cleared');   // before any new spot, whose line queues after it
+    for (const p of board.pads) if (p.locked && p.unlock <= game.wave) openSpot(p);
     showPreview();
   }
   updateHud();
@@ -1778,7 +1971,7 @@ function openSpot(p) {   // a new building spot pops up between waves, and the h
   p.locked = false; p.born = 0;
   p.plate.visible = p.plus.visible = p.ring.visible = true;
   burst(new THREE.Vector3(p.x, p.top + 0.3, p.z), 14, 0.35, [MAT.gold, MAT.star], 3);
-  Sound.newSpot(); game.spotHint = { pad: p, t: 6 }; showSpot(p.x, p.top, p.z);
+  Sound.newSpot(); Speech.say('new-spot', true); game.spotHint = { pad: p, t: 6 }; showSpot(p.x, p.top, p.z);
 }
 function showHeartHealth() {   // plasters and a face that match how many hearts are left
   const lost = HEART_SPARKLES - game.sparkles;
@@ -1800,8 +1993,8 @@ function heartHit(amount = 1) {
   showHeartHealth(); floatDamage(amount);
   updateHud();
   if (game.sparkles <= 0) {
-    game.state = 'lost'; Sound.lose(); Speech.say('lost');
-    const run = game.run; setTimeout(() => run === game.run && showEnd('lost'), 1600);
+    game.state = 'lost'; Sound.lose(); Speech.say(LEVEL.party ? 'party-over' : 'lost');
+    const run = game.run; setTimeout(() => run === game.run && showEnd(LEVEL.party ? 'party' : 'lost'), 1600);
   }
 }
 function retryWave() {   // keep every defender and the drops, refill the heart, and go back to building
@@ -1815,6 +2008,7 @@ function retryWave() {   // keep every defender and the drops, refill the heart,
 /* ======== germs ======== */
 function spawnGerm(kind, path, dist = 0, at = null) {   // at: start above ground at this point (germs that split off), else rise out of the entry
   const k = GERMS[kind], m = makeGerm(k);
+  meet(kind);
   if (k.hurts > 1 && !at) { Sound.boss(); view.shake = 0.7; }
   const maxHp = k.hp * (LEVEL.toughness || 1);   // some levels have tougher germs
   const g = { k, ...m, hp: maxHp, maxHp, path, end: path.length - 1.6, dist, off: (Math.random() - 0.5) * 0.26, heldBy: null, tagged: false, abIncoming: false, blow: null,
@@ -1826,7 +2020,7 @@ function spawnGerm(kind, path, dist = 0, at = null) {   // at: start above groun
 }
 function inMucus(g) {
   const p = g.mesh.position;
-  return game.traps.some(tr => Math.hypot(tr.cell.x - p.x, tr.cell.z - p.z) < MUCUS_R);
+  return game.traps.some(tr => tr.kind === 'mucus' && Math.hypot(tr.cell.x - p.x, tr.cell.z - p.z) < MUCUS_R);
 }
 function pathPoint(g, out) {   // position along the path, nudged sideways by the germ's lane offset; returns the heading
   const p = g.path, i = Math.min(Math.floor(g.dist), p.length - 2), f = g.dist - i, a = p[i], b = p[i + 1];
@@ -1836,7 +2030,9 @@ function pathPoint(g, out) {   // position along the path, nudged sideways by th
 }
 function updateGerms(dt) {
   const moving = game.state === 'wave';
-  for (const g of [...game.germs]) {
+  for (const tr of game.traps) tr.queue = 0;
+  for (const g of [...game.germs].sort((a, b) => b.dist - a.dist)) {   // front ones first, so they queue up in order at a plug
+    g.chewing = false;
     if (g.heldBy && g.heldBy.foe !== g) g.heldBy = null;
     g.phase += dt * 10 * g.k.speed;
     g.flash = Math.max(0, g.flash - dt * 6); g.mat.emissiveIntensity = g.flash * 0.7;
@@ -1856,7 +2052,17 @@ function updateGerms(dt) {
       g.inner.rotation.x = -g.blow.t * Math.PI * 4;
       if (g.blow.t >= 1) { g.blow = null; g.inner.rotation.x = 0; }
     } else if (moving && !g.heldBy) {
-      g.dist += g.k.speed * (g.tagged ? TAG_SLOW : 1) * (inMucus(g) ? MUCUS_SLOW : 1) * dt;
+      let next = g.dist + g.k.speed * (g.tagged ? TAG_SLOW : 1) * (inMucus(g) ? MUCUS_SLOW : 1) * dt;
+      const plug = plugAhead(g);
+      if (plug) {   // a platelet plug in the way: queue up behind it, and the two at the front chew
+        const stop = plug.at - 0.32 * plug.tr.queue;
+        if (next >= stop) {
+          next = Math.max(g.dist, stop);
+          if (plug.tr.queue < 2 && g.rise >= 1) { g.chewing = true; plug.tr.hp -= PLUG_CHEW * g.k.bite * dt; plug.tr.chewed = 1; }
+          plug.tr.queue++;
+        }
+      }
+      g.dist = next;
       if (g.dist >= g.end) { g.leaving = 0; g.from.copy(g.mesh.position); continue; }
     }
     g.rise = Math.min(1, g.rise + dt * 1.8);
@@ -1867,7 +2073,7 @@ function updateGerms(dt) {
     g.mesh.rotation.y = lerpAngle(g.mesh.rotation.y, moving ? heading : view.yaw, damp(8, dt));
     const hop = g.heldBy ? 0.3 : Math.abs(Math.sin(g.phase)), sq = 1 - 0.14 * Math.cos(g.phase * 2);
     g.inner.position.y = hop * 0.1;
-    g.inner.rotation.z = g.heldBy ? Math.sin(game.time * 28) * 0.18 : 0;   // struggling in a blob's grip
+    g.inner.rotation.z = g.heldBy || g.chewing ? Math.sin(game.time * (g.chewing ? 18 : 28)) * 0.18 : 0;   // struggling in a blob's grip, or chewing a plug
     g.inner.rotation.y = g.k.shape === 'rod' ? Math.sin(g.phase * 1.6) * 0.35 : 0;   // wigglers wiggle
     if (g.spin) g.spin.rotation.y += dt * 9;
     if (g.shell) { const sh = g.tagged ? 0.5 : 1; g.shell.scale.setScalar(g.shell.scale.x + (sh - g.shell.scale.x) * damp(6, dt)); g.shell.rotation.y += dt; }
@@ -1885,26 +2091,39 @@ function damageGerm(g, dmg) {
     }
     return;
   }
-  g.hp -= dmg * (g.tagged ? TAG_DAMAGE : 1); g.flash = 1;
+  g.hp -= dmg * (g.tagged === 'gold' ? MEMORY_DAMAGE : g.tagged ? TAG_DAMAGE : 1); g.flash = 1;
   if (g.hp <= 0) popGerm(g);
 }
-function tagGerm(g) {   // an antibody sticks: the germ slows down, takes more damage, and loses its armour
-  if (g.tagged || g.hp <= 0) return;
-  g.tagged = true; g.flash = 0.6;
-  const y = makeY(MAT.ab, 1.6); y.position.set((Math.random() - 0.5) * g.k.size * 0.6, g.top, (Math.random() - 0.5) * g.k.size * 0.4);
+function tagGerm(g, gold = false) {   // an antibody sticks: the germ slows down, takes more damage, and loses its armour
+  if (g.hp <= 0 || g.tagged === 'gold' || (g.tagged && !gold)) return;
+  if (g.tagY) g.inner.remove(g.tagY);   // a memory cell's gold one replaces an orange one
+  g.tagged = gold ? 'gold' : true; g.flash = 0.6;
+  const y = g.tagY = makeY(gold ? MAT.star : MAT.ab, 1.6); y.position.set((Math.random() - 0.5) * g.k.size * 0.6, g.top, (Math.random() - 0.5) * g.k.size * 0.4);
   y.rotation.set((Math.random() - 0.5) * 0.6, 0, (Math.random() - 0.5) * 0.8); g.inner.add(y);
   Sound.stick();
   if (g.k.armour) burst(g.mesh.position.clone().setY(g.mesh.position.y + g.k.size * 1.4), 8, 0.35, [g.bumpMat], 2.5);
 }
 function removeGerm(g) { scene.remove(g.mesh); g.mat.dispose(); game.germs.splice(game.germs.indexOf(g), 1); }
+const everBeaten = store.get('beaten', {});   // every kind of germ ever popped, saved: what memory cells remember
+const remembered = kind => !!game.knew[kind] || (game.beaten[kind] || 0) >= MEMORY_KILLS;   // game.knew: everBeaten when the level started
 function popGerm(g) {
   const p = g.mesh.position.clone(); p.y += g.k.size;
   removeGerm(g);
+  const kind = g.k.kind, knew = remembered(kind);
+  game.beaten[kind] = (game.beaten[kind] || 0) + 1;
+  if (!everBeaten[kind]) { everBeaten[kind] = 1; store.set('beaten', everBeaten); }
+  const mems = game.towers.filter(t => t.kind === 'memory');
+  if (!knew && remembered(kind) && mems.length) {   // a new kind of germ just became remembered: the memory cells light up
+    Sound.remember();
+    for (const t of mems) { t.kick = 1; burst(t.group.position.clone().setY(t.pad.top + 1.1), 8, 0.25, [MAT.star], 2.5); }
+    firstTime('memory-remember', () => Speech.say('memory-remember', true));
+  }
   Sound.pop(g.k.size > 0.4);
   burst(p, 10, g.k.size, [GERM_MAT[g.k.kind].body, GERM_MAT[g.k.kind].body, g.bumpMat]);
   for (let i = 0; i < g.k.drops; i++) spawnDrop(p, DROP_AUTOCOLLECT_S);
+  const plug = plugAhead(g), most = plug ? plug.at : Infinity;   // pieces of a germ popped at a plug stay behind it
   for (let i = 0; i < (g.k.splits || 0); i++) {   // chunky breaks into little bloops
-    const off = (i - (g.k.splits - 1) / 2) * 0.45, kid = spawnGerm('bloop', g.path, Math.max(0, g.dist + off), g.mesh.position);
+    const off = (i - (g.k.splits - 1) / 2) * 0.45, kid = spawnGerm('bloop', g.path, Math.max(0, Math.min(most, g.dist + off)), g.mesh.position);
     kid.mesh.position.x += (Math.random() - 0.5) * 0.4; kid.mesh.position.z += (Math.random() - 0.5) * 0.4;
   }
 }
@@ -1926,7 +2145,8 @@ function updateFx(dt) {
 
 /* ======== defenders: zappers and nests ======== */
 function buildStruct(pad, kind) {
-  const m = kind === 'nest' ? makeNest() : kind === 'antibody' ? makeFactory() : makeZapper();
+  meet(kind);
+  const m = kind === 'nest' ? makeNest() : kind === 'antibody' ? makeFactory() : kind === 'memory' ? makeMemory() : makeZapper();
   const t = { kind, ups: Object.fromEntries(Object.keys(BUILDS[kind].tracks).map(k => [k, 0])), pad, ...m, extras: null, halo: null, chimney: null, cool: 0.4, born: 0, kick: 0, trainQ: 0, trainT: 0, spent: BUILDS[kind].cost };
   t.group.position.set(pad.x, pad.top + 0.08, pad.z);
   t.aim.rotation.y = view.yaw; t.group.scale.setScalar(0.01);
@@ -1977,6 +2197,14 @@ function dressUp(t) {   // every upgrade shows: the base turns silver then gold,
     if (u.speed === 2) ys.push([-0.3, 0.5, -0.04, 0.6], [0.3, 0.5, -0.04, -0.6]);
     for (const [px, py, pz, rz] of ys) { const y = makeY(MAT.ab, 1.4); y.position.set(px, py, pz); y.rotation.z = rz; x.add(y); }
     if (u.speed === 2) { const aura = ball(MAT.auraGold, 1, 0, 0.36, 0, false); aura.scale.set(0.5, 0.48, 0.5); x.add(aura); }
+  } else if (t.kind === 'memory') {   // Speed: more stars on stalks, then a golden glow
+    const stalks = u.speed ? [[-0.24, -0.5]] : [];
+    if (u.speed === 2) stalks.push([0.24, 0.5]);
+    for (const [px, rz] of stalks) {
+      const st = new THREE.Mesh(POLE_GEO, MAT.memoryStalk); st.scale.set(2, 0.7, 2); st.position.set(px, 0.52, -0.04); st.rotation.z = rz; x.add(st);
+      const star = new THREE.Mesh(STAR_GEO, MAT.star); star.scale.setScalar(1.1); star.position.set(px - Math.sin(rz) * 0.22, 0.74, -0.04); x.add(star);
+    }
+    if (u.speed === 2) { const aura = ball(MAT.auraGold, 1, 0, 0.36, 0, false); aura.scale.set(0.5, 0.48, 0.5); x.add(aura); }
   }
 }
 function choosePosts(t) {   // the vessel tiles the nest's blobs guard, one per blob, spread over different stretches
@@ -2005,11 +2233,31 @@ function setDoor(t) {   // the nest's door faces the viewer; blobs come out and 
   t.aim.rotation.y = view.yaw;
   t.door = new THREE.Vector3(t.pad.x + Math.sin(view.yaw) * 0.45, 0, t.pad.z + Math.cos(view.yaw) * 0.45);
 }
-function buildTrap(cell) {
-  const mesh = makeTrap(); mesh.position.set(cell.x, ROAD_Y, cell.z); mesh.scale.setScalar(0.01);
-  const tr = { cell, mesh, born: 0, spent: MUCUS_COST }; cell.trap = tr;
+function buildTrap(cell, kind = 'mucus') {   // something on the vessel itself: a snot puddle, or a platelet plug
+  meet(kind);
+  const plug = kind === 'plug', mesh = plug ? makePlug() : makeTrap(); mesh.position.set(cell.x, ROAD_Y, cell.z); mesh.scale.setScalar(0.01);
+  if (plug) { const a = cell.lanes ? board.entries.find((e, i) => cell.lanes & (1 << i)).path : null; if (a) { const i = a.findIndex(p => p.x === cell.x && p.z === cell.z), n = a[Math.min(i + 1, a.length - 1)]; mesh.rotation.y = Math.atan2(n.x - cell.x, n.z - cell.z); } }
+  const tr = { kind, cell, mesh, born: 0, spent: plug ? PLUG_COST : MUCUS_COST, hp: PLUG_HP, chewed: 0, idx: new Map() }; cell.trap = tr;
   scene.add(mesh); game.traps.push(tr);
-  burst(new THREE.Vector3(cell.x, ROAD_Y + 0.3, cell.z), 8, 0.3, [MAT.mucus], 2);
+  burst(new THREE.Vector3(cell.x, ROAD_Y + 0.3, cell.z), 8, 0.3, [plug ? MAT.platelet : MAT.mucus], 2);
+}
+const trapsOf = kind => game.traps.filter(tr => tr.kind === kind);
+function plugAhead(g) {   // the nearest platelet plug ahead of a germ on its path: where it has to stop
+  let best = null;
+  for (const tr of game.traps) {
+    if (tr.kind !== 'plug') continue;
+    let i = tr.idx.get(g.path);
+    if (i === undefined) { i = g.path.findIndex(p => p.x === tr.cell.x && p.z === tr.cell.z); tr.idx.set(g.path, i); }
+    const at = i - 0.55;
+    if (i > 0 && g.dist <= at + 0.05 && (!best || at < best.at)) best = { tr, at };
+  }
+  return best;
+}
+function crumblePlug(tr) {   // chewed right through: the platelets scatter
+  const at = new THREE.Vector3(tr.cell.x, ROAD_Y + 0.3, tr.cell.z);
+  scene.remove(tr.mesh); game.traps.splice(game.traps.indexOf(tr), 1); tr.cell.trap = null;
+  burst(at, 12, 0.35, [MAT.platelet], 2.5); Sound.crumble();
+  if (game.menuSpot === tr.cell) closeMenu();
 }
 function sellStruct(t) {   // poof: it's gone, and most of its drops pop back out
   for (const b of game.troops.filter(b => b.nest === t)) {
@@ -2026,7 +2274,7 @@ function sellTrap(tr) {
   const at = new THREE.Vector3(tr.cell.x, ROAD_Y + 0.4, tr.cell.z);
   for (let i = 0; i < refund(tr); i++) spawnDrop(at, 0.9 + i * 0.08);
   scene.remove(tr.mesh); game.traps.splice(game.traps.indexOf(tr), 1); tr.cell.trap = null;
-  burst(at, 8, 0.3, [MAT.mucus], 2); Sound.sell();
+  burst(at, 8, 0.3, [tr.kind === 'plug' ? MAT.platelet : MAT.mucus], 2); Sound.sell();
 }
 const TROOP_SLOTS = [[0, 0], [0.34, 0.2], [-0.28, 0.3]];
 const troopScale = nest => 1.3 * (1 + 0.12 * growOf(nest));
@@ -2118,8 +2366,11 @@ function updateTowers(dt) {
     }
     const st = stats(t), R2 = st.range * st.range;
     t.cool -= dt;
-    if (t.kind === 'antibody') {   // pick germs without an antibody yet: armoured ones first, then the one furthest along
-      const near = game.germs.filter(g => !g.tagged && !g.abIncoming && g.leaving < 0 && g.rise >= 0.6 && g.hp > 0
+    if (t.kind === 'antibody' || t.kind === 'memory') {   // antibodies: armoured germs first, then the one furthest along
+      // a maker wants germs with none yet; a memory cell wants remembered germs without a gold one
+      const memory = t.kind === 'memory', wants = g => (memory ? g.tagged !== 'gold' && remembered(g.k.kind) : !g.tagged);
+      if (memory) t.star.rotation.y += dt * 2;
+      const near = game.germs.filter(g => wants(g) && !g.abIncoming && g.leaving < 0 && g.rise >= 0.6 && g.hp > 0
         && (g.mesh.position.x - t.group.position.x) ** 2 + (g.mesh.position.z - t.group.position.z) ** 2 <= R2)
         .sort((a, b) => (b.k.armour ? 1 : 0) - (a.k.armour ? 1 : 0) || b.dist - a.dist);
       const first = near[0];
@@ -2143,11 +2394,11 @@ function fire(t, target, damage) {
   scene.add(mesh); game.shots.push({ mesh, target, damage });
   Sound.shoot();
 }
-function fireAb(t, target) {
-  const from = t.body.localToWorld(new THREE.Vector3(0, 0.62, 0));
-  const mesh = makeY(MAT.ab, 2); mesh.position.copy(from);
+function fireAb(t, target) {   // a memory cell's are gold
+  const gold = t.kind === 'memory', from = t.body.localToWorld(new THREE.Vector3(0, 0.62, 0));
+  const mesh = makeY(gold ? MAT.star : MAT.ab, 2); mesh.position.copy(from);
   target.abIncoming = true;
-  scene.add(mesh); game.shots.push({ mesh, target, ab: true });
+  scene.add(mesh); game.shots.push({ mesh, target, ab: true, gold });
   Sound.puff();
 }
 function updateShots(dt) {
@@ -2159,10 +2410,26 @@ function updateShots(dt) {
     const d = aim.sub(s.mesh.position), len = d.length(), step = (s.ab ? AB_SPEED : SHOT_SPEED) * dt;
     if (s.ab) { s.mesh.rotation.x += dt * 10; s.mesh.rotation.y += dt * 7; }
     if (len <= Math.max(0.15, step)) {
-      if (s.ab) { g.abIncoming = false; tagGerm(g); } else { Sound.hit(); damageGerm(g, s.damage); }
+      if (s.ab) { g.abIncoming = false; tagGerm(g, s.gold); } else { Sound.hit(); damageGerm(g, s.damage); }
       scene.remove(s.mesh); game.shots.splice(game.shots.indexOf(s), 1); continue;
     }
     s.mesh.position.addScaledVector(d, step / len);
+  }
+}
+
+/* ======== tonsils ======== */
+function updateTonsils(dt) {   // they fight by themselves: a squeeze hurts every germ in reach
+  for (const to of board.tonsils) {
+    to.cool -= dt; to.squeeze = Math.max(0, to.squeeze - dt * 3);
+    const q = to.squeeze, bob = Math.sin(game.time * 2 + to.cell.c) * 0.03;
+    to.mesh.inner.scale.set(1 + 0.22 * q, 1 - 0.25 * q + bob, 1 + 0.22 * q);
+    if (game.state !== 'wave' || to.cool > 0) continue;
+    const near = game.germs.filter(g => g.leaving < 0 && g.rise >= 0.6 && g.hp > 0 && Math.hypot(g.mesh.position.x - to.cell.x, g.mesh.position.z - to.cell.z) <= TONSIL_R);
+    if (!near.length) continue;
+    to.cool = TONSIL_RELOAD; to.squeeze = 1; Sound.squeeze(); meet('tonsil');
+    burst(new THREE.Vector3(to.cell.x, to.cell.top + 0.4, to.cell.z), 6, 0.25, [MAT.tonsilSpot], 2);
+    for (const g of near) damageGerm(g, TONSIL_DAMAGE);
+    firstTime('meet-tonsil', () => { Speech.say('meet-tonsil'); nameTag(NAMES.tonsil, to.cell.x, to.cell.top + 1.1, to.cell.z); });
   }
 }
 
@@ -2170,6 +2437,7 @@ function updateShots(dt) {
 function sneeze() {
   if (!LEVEL.sneeze || game.state !== 'wave' || game.sneezeCd > 0) return;
   const peak = Sound.clips['sfx-sneeze'] && !Sound.muted ? SNEEZE_PEAK : 0.75;
+  meet('sneeze');
   game.sneezeCd = SNEEZE_COOLDOWN; game.sneezeAt = game.time + peak; game.sneezeHint = 0; heart.sneeze = 0.001; heart.sneezeIn = peak;
   Sound.sneeze(); updateHud();
 }
@@ -2241,7 +2509,7 @@ function updateHud() {
   $('hearts').innerHTML = $('heartTagBody').innerHTML = hearts;
   $('hearts').classList.toggle('low', low); $('heartTagBody').classList.toggle('low', low);
   $('heartTag').hidden = game.state === 'title';
-  $('waves').innerHTML = LEVEL.waves.map((_, i) => `<i class="${i < game.wave ? 'done' : i === game.wave && game.state !== 'won' ? 'now' : ''}"></i>`).join('');
+  $('waves').innerHTML = LEVEL.party ? `<b class="partywave">🎉 ${game.wave + 1}</b>` : LEVEL.waves.map((_, i) => `<i class="${i < game.wave ? 'done' : i === game.wave && game.state !== 'won' ? 'now' : ''}"></i>`).join('');
   $('go').classList.toggle('off', game.state !== 'build');
   $('sneeze').classList.toggle('off', !(game.state === 'wave' && LEVEL.sneeze));
   $('speed').hidden = game.state !== 'wave';   // only matters while germs are moving
@@ -2265,6 +2533,72 @@ function showPreview() {   // which germs come next out of each entry, shown whi
     fx.label.firstElementChild.innerHTML = Object.entries(counts).map(([k, n]) => `${germIcon(k)}<span>×${n}</span>`).join('&nbsp;');
   });
 }
+/* ======== germ book ======== */
+// Every germ and defender met (ever, saved), with a picture, a few words and its voice line. Unmet ones are silhouettes.
+const BOOK = {
+  germs: ['bloop', 'big', 'wiggler', 'corkscrew', 'chunky', 'spiky', 'king'],
+  defenders: ['zapper', 'nest', 'antibody', 'mucus', 'sneeze', 'plug', 'tonsil', 'memory'],
+};
+const book = new Set(store.get('book', []));
+function meet(kind) { if (game.state !== 'title' && !book.has(kind)) { book.add(kind); store.set('book', [...book]); } }
+const bookPic = kind => kind === 'sneeze' ? '<i class="emo">🤧</i>' : SVG[kind] && !GERMS[kind] ? SVG[kind]() : germIcon(kind);
+const bookName = kind => GERMS[kind] ? (GERM_TIP[kind] ? GERM_TIP[kind].name : 'Bloop') : kind === 'sneeze' ? 'Sneeze' : NAMES[kind];
+const bookText = kind => GERMS[kind] ? (GERM_TIP[kind] ? GERM_TIP[kind].text : 'The everyday germ. One bubble pops it.')
+  : kind === 'sneeze' ? 'Tap 🤧 to blow every germ back the way it came.' : DEFENDER_TIP[kind].text;
+const bookLine = kind => kind === 'bloop' ? 'book-bloop' : GERMS[kind] ? 'hello-' + kind : 'meet-' + kind;
+function openBook() {
+  for (const L of LEVELS) if (game.stars[L.id]) {   // levels won before the book existed still count
+    for (const k of [...germsOf(L), ...defendersOf(L), ...(L.sneeze ? ['sneeze'] : [])]) book.add(k);
+  }
+  store.set('book', [...book]);
+  const cell = kind => book.has(kind) || game.cheat
+    ? `<button class="book-item" data-k="${kind}">${bookPic(kind)}<span>${bookName(kind)}</span></button>`
+    : `<button class="book-item unmet" data-k="${kind}">${bookPic(kind)}<span>?</span></button>`;
+  $('bookGrid').innerHTML = `<h3>Germs</h3><div class="book-row">${BOOK.germs.map(cell).join('')}</div>`
+    + `<h3>Defenders</h3><div class="book-row">${BOOK.defenders.map(cell).join('')}</div>`;
+  $('bookCap').textContent = 'Tap a picture to hear about it.';
+  $('book').hidden = false; Speech.say('book-hello');
+}
+$('bookGrid').addEventListener('click', e => {
+  const b = e.target.closest('.book-item'); if (!b) return;
+  Sound.init(); Sound.tap();
+  for (const o of $('bookGrid').querySelectorAll('.book-item')) o.classList.toggle('on', o === b);
+  if (b.classList.contains('unmet')) { $('bookCap').textContent = "You haven't met this one yet!"; return; }
+  const k = b.dataset.k; $('bookCap').innerHTML = `<b>${bookName(k)}</b>: ${bookText(k)}`;
+  Speech.say(bookLine(k));
+});
+$('bookOk').addEventListener('click', () => { Sound.init(); Sound.tap(); Speech.stop(); $('book').hidden = true; });
+
+/* ======== dress up the heart ======== */
+const totalStars = () => Object.entries(game.stars).reduce((n, [id, s]) => n + (LEVELS.some(L => L.id === id) ? s : 0), 0);
+const dress = Object.assign({ hat: 'none', colour: 'red' }, store.get('dress', {}));
+function wearDress() {   // what the 3D heart wears
+  for (const [id, m] of Object.entries(heart.outfit)) m.visible = id === dress.hat;
+  heart.mat.color.setHex((HEART_COLOURS.find(c => c.id === dress.colour) || HEART_COLOURS[0]).hex);
+}
+function dressPreview() {
+  const c = (HEART_COLOURS.find(x => x.id === dress.colour) || HEART_COLOURS[0]).css, hat = DRESS.find(d => d.id === dress.hat);
+  return `<svg viewBox="0 0 24 24"><path d="M12 21s-8.5-5.3-8.5-11.3A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 3.1C20.5 15.7 12 21 12 21z" fill="${c}" stroke="rgba(0,0,0,.18)" stroke-width="1.2"/>`
+    + `<circle cx="9.5" cy="11.5" r="1.1" fill="#1d1626"/><circle cx="14.5" cy="11.5" r="1.1" fill="#1d1626"/><path d="M10 14.5q2 1.6 4 0" stroke="#3a1020" stroke-width="1" fill="none" stroke-linecap="round"/></svg>`
+    + (hat && hat.id !== 'none' ? `<i class="dress-on ${hat.id}">${hat.emoji}</i>` : '');
+}
+function openDress() {
+  const stars = totalStars();
+  $('dressStars').textContent = `⭐ ${stars}`;
+  $('dressPreview').innerHTML = dressPreview();
+  $('dressGrid').innerHTML = DRESS.map(d => `<button class="dress-item ${dress.hat === d.id ? 'on' : ''} ${stars < d.need ? 'locked' : ''}" data-hat="${d.id}" data-need="${d.need}">${d.emoji}${stars < d.need ? `<small>⭐${d.need}</small>` : ''}</button>`).join('')
+    + HEART_COLOURS.map(c => `<button class="dress-item colour ${dress.colour === c.id ? 'on' : ''} ${stars < c.need ? 'locked' : ''}" data-colour="${c.id}" data-need="${c.need}"><i style="background:${c.css}"></i>${stars < c.need ? `<small>⭐${c.need}</small>` : ''}</button>`).join('');
+  $('dress').hidden = false; Speech.say('dress-hello');
+}
+$('dressGrid').addEventListener('click', e => {
+  const b = e.target.closest('.dress-item'); if (!b) return;
+  Sound.init();
+  if (totalStars() < +b.dataset.need && !game.cheat) { Sound.nope(); Speech.say('dress-locked'); return; }
+  if (b.dataset.hat) dress.hat = b.dataset.hat; else dress.colour = b.dataset.colour;
+  store.set('dress', dress); wearDress(); Sound.upgrade(); openDress();
+});
+$('dressOk').addEventListener('click', () => { Sound.init(); Sound.tap(); Speech.stop(); $('dress').hidden = true; });
+
 /* ======== tip cards ======== */
 // A picture card the first time (each visit) a level brings a new defender or a new germ, shown between waves only.
 // Defender cards show what it does; germ cards show, for each defender on this level, whether it works on that germ.
@@ -2273,6 +2607,9 @@ const DEFENDER_TIP = {
   nest:     { strip: () => `${SVG.nest()}<i class="arrow">➜</i>${SVG.troop()}<i class="arrow">➜</i>${SVG.bloop()}<i class="fx">😋</i>`, text: 'Its blobs walk to the vessel, grab germs and gobble them up.' },
   antibody: { strip: () => `${SVG.antibody()}<i class="arrow">➜</i><i class="y">Y</i><i class="arrow">➜</i>${SVG.bloop()}<i class="fx">🐢</i>`, text: 'Throws antibodies that stick on germs. Then they slow down and pop faster.' },
   mucus:    { strip: () => `${SVG.mucus()}<i class="arrow">➜</i>${SVG.bloop()}<i class="fx">🐢</i>`, text: 'Tap the vessel to drop sticky snot. Germs get stuck in it and slow down.' },
+  plug:     { strip: () => `${SVG.bloop()}<i class="arrow">➜</i>${SVG.plug()}<i class="fx">✋</i>`, text: 'Tap the vessel to make a platelet plug. Germs have to stop and chew through it!' },
+  tonsil:   { strip: () => `${SVG.tonsil()}<i class="fx">💪</i>${SVG.bloop()}<i class="fx">💥</i>`, text: 'Your tonsils guard the throat. They squeeze germs that go past, all by themselves.' },
+  memory:   { strip: () => `${SVG.memory()}<i class="arrow">➜</i><i class="y gold">Y</i><i class="arrow">➜</i>${SVG.bloop()}<i class="fx">💥</i>`, text: 'It remembers every germ you have beaten before, and marks them with gold antibodies. Then they pop much faster!' },
 };
 const GERM_TIP = {   // the germ's name, what's special, and any extra picture
   big:       { name: 'Big Bloop', text: 'Big and tough: it takes lots of hits.' },
@@ -2288,10 +2625,13 @@ const HOW = {   // what each defender does to each germ: mark (yes, no, star) an
               big: ['yes', 'grabs it, but gets tired fast'], king: ['yes', 'grabs it, but gets tired very fast'] },
   antibody: { any: ['yes', 'slows it down and makes it weaker'], spiky: ['star', 'breaks its armour!'] },
   mucus:    { any: ['yes', 'slows it down'] },
+  plug:     { any: ['yes', 'stops it until it chews through'], king: ['yes', 'stops it, but it chews through fast'] },
+  tonsil:   { any: ['yes', 'squeezes it'], spiky: ['no', 'bounces off, until an antibody sticks'] },
+  memory:   { any: ['star', 'marks it with gold, once beaten before'], spiky: ['star', 'breaks its armour too!'] },
 };
 const MARK = { yes: '✓', no: '✗', star: '⭐' };
 // what each level brings that no earlier level had: only those get a card (so a child who jumps ahead isn't buried in cards)
-const defendersOf = L => [...L.builds, ...(L.mucus ? ['mucus'] : [])];
+const defendersOf = L => [...L.builds, ...(L.mucus ? ['mucus'] : []), ...(L.plug ? ['plug'] : []), ...(L.map.some(r => r.includes('t')) ? ['tonsil'] : [])];
 const germsOf = L => new Set(L.waves.flat().map(g => g.kind));
 const NEW_IN = LEVELS.map((L, i) => {
   const before = LEVELS.slice(0, i);
@@ -2325,9 +2665,11 @@ $('tipOk').addEventListener('click', () => { Sound.init(); Sound.tap(); nextTip(
 
 function menuOptions(pad) {   // the choices for a pad: build something, or improve what's there; on a vessel tile, snot
   if (pad.ch !== 'o') {
-    if (pad.trap) return [{ act: 'sell', kind: '', cost: 0, gain: refund(pad.trap), pic: SVG.mucus('pic'), badge: '✕' }];
-    const left = MUCUS_MAX - game.traps.length;
-    return LEVEL.mucus && left > 0 ? [{ act: 'build', kind: 'mucus', cost: MUCUS_COST, pic: SVG.mucus('pic'), pips: '🟢'.repeat(left), name: NAMES.mucus }] : [];
+    if (pad.trap) return [{ act: 'sell', kind: '', cost: 0, gain: refund(pad.trap), pic: SVG[pad.trap.kind]('pic'), badge: '✕' }];
+    const opts = [], snot = MUCUS_MAX - trapsOf('mucus').length, plugs = PLUG_MAX - trapsOf('plug').length;
+    if (LEVEL.mucus && snot > 0) opts.push({ act: 'build', kind: 'mucus', cost: MUCUS_COST, pic: SVG.mucus('pic'), pips: '🟢'.repeat(snot), name: NAMES.mucus });
+    if (LEVEL.plug && plugs > 0) opts.push({ act: 'build', kind: 'plug', cost: PLUG_COST, pic: SVG.plug('pic'), pips: '🟡'.repeat(plugs), name: NAMES.plug });
+    return opts;
   }
   const t = pad.tower;
   if (!t) return LEVEL.builds.map(kind => ({ act: 'build', kind, cost: BUILDS[kind].cost, pic: SVG[kind]('pic'), name: NAMES[kind] }));
@@ -2358,7 +2700,7 @@ function openMenu(pad, refresh = false) {
   $('opts').classList.toggle('many', opts.length > 2);
   $('opts').classList.toggle('tight', opts.length > 3);   // a nest can show Train, Bite, Energy and Sell
   const t = pad.tower;
-  if (pad.ch !== 'o') showRing(pad.x, ROAD_Y + 0.03, pad.z, MUCUS_R);
+  if (pad.ch !== 'o') showRing(pad.x, ROAD_Y + 0.03, pad.z, pad.trap && pad.trap.kind === 'plug' ? 0.5 : MUCUS_R);
   else if (t && t.kind === 'nest') showRing(pad.x, pad.top + 0.06, pad.z, stats(t).reach + TROOP_GUARD_R * 0.5);   // where its blobs go
   else showRing(pad.x, pad.top + 0.06, pad.z, stats(t || { kind: 'zapper' }).range);
   updateHud(); if (!refresh) Sound.tap();
@@ -2380,9 +2722,9 @@ function act(button) {
     closeMenu(); updateHud(); return;
   }
   game.energy -= cost;
-  if (action === 'build' && kind === 'mucus') {
-    buildTrap(pad); closeMenu(); Sound.splat();
-    firstTime('meet-mucus', () => { Speech.say('meet-mucus'); nameTag(NAMES.mucus, pad.x, ROAD_Y + 0.9, pad.z); });
+  if (action === 'build' && (kind === 'mucus' || kind === 'plug')) {
+    buildTrap(pad, kind); closeMenu(); if (kind === 'plug') Sound.build(); else Sound.splat();
+    firstTime('meet-' + kind, () => { Speech.say('meet-' + kind); nameTag(NAMES[kind], pad.x, ROAD_Y + 0.9, pad.z); });
   } else if (action === 'build') {
     buildStruct(pad, kind); closeMenu(); Sound.build();
     firstTime('meet-' + kind, () => { Speech.say('meet-' + kind); nameTag(NAMES[kind], pad.x, pad.top + 1.5, pad.z); });
@@ -2399,8 +2741,17 @@ $('opts').addEventListener('click', e => { const b = e.target.closest('.opt'); i
 
 const starsFor = hearts => hearts >= HEART_SPARKLES ? 3 : hearts >= 3 ? 2 : 1;
 function showEnd(kind) {
+  if (kind === 'party') {   // the party's over: how many waves, and the best ever
+    $('endArt').innerHTML = SVG.heart.replace('<svg', '<svg class="mid"');
+    $('endTitle').textContent = `You stopped ${game.wave} wave${game.wave === 1 ? '' : 's'}!`;
+    $('stars').hidden = true; $('endFact').hidden = false;
+    $('endFact').innerHTML = `<b>🏆 Best:</b> ${store.get('partyBest', 0)} waves`;
+    $('endBtn').innerHTML = SVG.again() + 'Again'; $('endBtn').dataset.do = 'again';
+    $('againBtn').hidden = true; $('mapBtn').hidden = false; $('end').hidden = false;
+    return;
+  }
   const won = kind === 'won', stars = starsFor(game.sparkles);
-  const next = won && levelIndex + 1 < LEVELS.length;
+  const next = won && levelIndex + 1 < STORY;
   $('endArt').innerHTML = won ? SVG.heart.replace('<svg', '<svg class="mid"') : SVG.bloop('mid');
   $('endTitle').textContent = won ? LEVEL.winTitle : 'Achoo! Germs got through.';
   $('stars').hidden = !won;
@@ -2422,11 +2773,12 @@ const BODY_SVG = `<svg class="body" viewBox="0 0 200 260" aria-hidden="true">
   <rect x="62" y="80" width="76" height="96" rx="30" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
   <circle cx="100" cy="44" r="34" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
   <path d="M112 104s-9-6-9-12a5 5 0 0 1 9-2 5 5 0 0 1 9 2c0 6-9 12-9 12z" fill="#ff8fa6" opacity=".55"/>
-  ${LEVELS.filter(L => L.link).map(L => `<path d="M${L.link[0]} ${L.link[1]}L${L.spot[0]} ${L.spot[1]}" stroke="#e9a48c" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/>`).join('')}
+  ${LEVELS.filter(L => L.link && L.spot).map(L => `<path d="M${L.link[0]} ${L.link[1]}L${L.spot[0]} ${L.spot[1]}" stroke="#e9a48c" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/>`).join('')}
 </svg>`;
 function renderMap() {
-  const next = newestOpen();
+  const next = newestOpen(); showExtras();
   $('bodymap').innerHTML = BODY_SVG + LEVELS.map((L, i) => {
+    if (L.party) return '';
     const [x, y] = L.spot, locked = !isOpen(i), got = game.stars[L.id] || 0;
     const stars = locked ? '' : `<span class="st">${[0, 1, 2].map(k => k < got ? '⭐' : '<i>⭐</i>').join('')}</span>`;
     return `<button class="spot ${locked ? 'locked' : ''} ${i === next && !got ? 'next' : ''}" style="left:${x / 2}%;top:${y / 2.6}%" data-i="${i}" aria-label="Level ${i + 1}: ${L.name}">`
@@ -2476,15 +2828,17 @@ function updateAnchors() {
     if (fx.label.hidden) continue;
     const p = toScreen(fx.cell.x, 1.75, fx.cell.z), box = fx.label.firstElementChild, r = view.fit.r;
     const minY = (document.body.classList.contains('wide') ? 0 : $('bar').getBoundingClientRect().bottom) + box.offsetHeight + 6;
-    tags.push({ fx, x: p.x, y: Math.max(minY, Math.min(r.y + r.h, p.y)), w: box.offsetWidth + 8, h: box.offsetHeight + 6 });
+    const w = box.offsetWidth + 8;   // pulled inside the free space first, so labels pushed to the same edge still get spread apart
+    tags.push({ fx, x: Math.max(w / 2 + 2, Math.min(r.x + r.w - w / 2, p.x)), y: Math.max(minY, Math.min(r.y + r.h, p.y)), w, h: box.offsetHeight + 6 });
   }
   for (let pass = 0; pass < 3; pass++) for (const a of tags) for (const b of tags) {   // entries close together: push their labels apart sideways
     if (a === b || Math.abs(a.y - b.y) >= (a.h + b.h) / 2) continue;
     const need = (a.w + b.w) / 2 + 12 - Math.abs(a.x - b.x);
     if (need > 0) { const dir = a.x <= b.x ? -1 : 1; a.x += dir * need / 2; b.x -= dir * need / 2; }
   }
+  const corner = Math.max($('home').getBoundingClientRect().bottom, $('fit').getBoundingClientRect().bottom) + 4;   // under the home and zoom buttons
   for (const t of tags) {   // keep it on screen, clear of the HUD
-    const r = view.fit.r, left = t.y - t.h < Math.max($('home').getBoundingClientRect().bottom, $('fit').getBoundingClientRect().bottom) + 4 ? 62 : 2;   // clear of the home and zoom buttons
+    const r = view.fit.r, left = t.y - t.h < corner ? 62 : 2;
     const x = Math.max(t.w / 2 + left, Math.min(r.x + r.w - t.w / 2, t.x));
     t.fx.label.style.transform = `translate(${x}px,${t.y}px)`;
   }
@@ -2575,7 +2929,7 @@ function onTap(x, y) {
     const p = toScreen(pad.x, pad.top + 0.2, pad.z), d = Math.hypot(p.x - x, p.y - y);
     if (d < bestD) { best = pad; bestD = d; }
   }
-  if (!best && LEVEL.mucus) {   // no pad: maybe a vessel tile, for a snot puddle
+  if (!best && (LEVEL.mucus || LEVEL.plug)) {   // no pad: maybe a vessel tile, for a snot puddle or a platelet plug
     const g = groundAt(x, y), cell = g && board.cells.get(Math.round(g.x) + ',' + Math.round(g.z));
     if (cell && cell.paths && cell.ch === '#') {
       if (game.menuSpot === cell) { closeMenu(); return; }
@@ -2591,6 +2945,17 @@ $('go').addEventListener('click', () => { Sound.init(); startWave(); });
 $('speed').addEventListener('click', () => { Sound.init(); game.fast = !game.fast; store.set('fast', game.fast); Sound.tap(); updateHud(); });
 $('sneeze').addEventListener('click', () => { Sound.init(); if (game.sneezeCd > 0) Sound.nope(); else sneeze(); });
 $('play').addEventListener('click', () => playLevel(newestOpen()));
+$('bookBtn').addEventListener('click', () => { Sound.init(); Sound.tap(); openBook(); });
+$('dressBtn').addEventListener('click', () => { Sound.init(); Sound.tap(); openDress(); });
+$('partyBtn').addEventListener('click', () => {
+  if (!isOpen(PARTY)) { Sound.init(); Sound.nope(); return; }
+  playLevel(PARTY);
+});
+function showExtras() {   // the party button is locked until the Big Fever is beaten, and shows the best so far
+  $('partyBtn').classList.toggle('locked', !isOpen(PARTY));
+  const best = store.get('partyBest', 0); $('partyBest').textContent = isOpen(PARTY) ? (best ? best : '') : '🔒';
+  $('partyBest').hidden = !$('partyBest').textContent;
+}
 $('mapHome').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
 $('mapBtn').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
 $('endBtn').addEventListener('click', () => {
@@ -2644,7 +3009,16 @@ function updateWorld(dt) {
       game.fx.push({ mesh: m, vel: new THREE.Vector3((Math.random() - 0.5) * 0.2, 0.7, (Math.random() - 0.5) * 0.2), life: 1.6, t: 0, s: m.scale.x, grav: 0 }); scene.add(m);
     }
   }
-  for (const tr of game.traps) { tr.born = Math.min(1, tr.born + dt * 2); tr.mesh.scale.set(elasticOut(tr.born), 1 + 0.08 * Math.sin(game.time * 3 + tr.cell.c), elasticOut(tr.born)); }
+  for (const tr of [...game.traps]) {
+    tr.born = Math.min(1, tr.born + dt * 2);
+    if (tr.kind === 'plug') {   // a plug shrinks as it's chewed, shakes while chewing, and crumbles at the end
+      if (tr.hp <= 0) { crumblePlug(tr); continue; }
+      tr.chewed = Math.max(0, tr.chewed - dt * 3);
+      const left = 0.45 + 0.55 * tr.hp / PLUG_HP, wob = Math.sin(game.time * 30) * 0.06 * tr.chewed;
+      tr.mesh.scale.set(elasticOut(tr.born) * (1 + wob), Math.max(0.01, elasticOut(tr.born)) * left, elasticOut(tr.born) * (1 - wob));
+    } else tr.mesh.scale.set(elasticOut(tr.born), 1 + 0.08 * Math.sin(game.time * 3 + tr.cell.c), elasticOut(tr.born));
+  }
+  updateTonsils(dt);
   updateGerms(dt); updateTowers(dt); updateTroops(dt); updateShots(dt); updateDrops(dt); updateFx(dt);
   if (game.state === 'wave' && !game.queue.length && !game.germs.length) waveCleared();
 
@@ -2712,7 +3086,7 @@ function frame(now) {
 
 /* ======== boot ======== */
 addEventListener('resize', () => placeCamera());
-loadLevel(newestOpen()); game.state = 'title'; showPreview(); updateHud(); renderMap();
+loadLevel(newestOpen()); game.state = 'title'; showPreview(); updateHud(); renderMap(); wearDress();
 requestAnimationFrame(frame);
 // #debug exposes a console handle for testing: gg.build(padIndex, kind), gg.step(seconds) runs the game without waiting for frames
 if (location.hash === '#debug') window.gg = {
@@ -2724,7 +3098,7 @@ if (location.hash === '#debug') window.gg = {
     if (t.ups[k] < 2) upgradeTrack(t, k, BUILDS[t.kind].tracks[k].costs[t.ups[k]]);
   },
   train: i => { const t = board.pads[i].tower; if (t && t.kind === 'nest') t.trainQ++; },
-  trap: (c, r) => { const cell = board.cells.get(c + ',' + r); if (cell && cell.ch === '#' && !cell.trap) buildTrap(cell); },
+  trap: (c, r, kind = 'mucus') => { const cell = board.cells.get(c + ',' + r); if (cell && cell.ch === '#' && !cell.trap) buildTrap(cell, kind); },
   sneeze, goHome, Music, Haptics, Sound, Speech, openMenu, BUILDS, LEVELS, view, get level() { return LEVEL; },
   unlockAll: () => { game.cheat = true; renderMap(); },
   spawn: (kind, entry = 0, dist = 0) => spawnGerm(kind, board.entries[entry].path, dist, dist ? board.entries[entry].path[Math.floor(dist)] : null),

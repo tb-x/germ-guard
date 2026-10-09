@@ -4,9 +4,10 @@ A tower defence game set inside the body, for young kids (around age 5). Germs s
 and wiggle along blood vessels towards the heart. Your child builds white blood cells beside the
 vessels to stop them before they get there.
 
-It has ten levels on a body-shaped map, four ways to defend, a sneeze, and seven kinds of germ, including
-a King Germ boss. A friendly recorded voice explains everything as you go. It has music and vibration, and it
-can be added to the Home Screen and played offline.
+It has ten levels on a body-shaped map, an endless Germ Party, seven ways to defend, a sneeze, and seven kinds of
+germ, including a King Germ boss. A Germ Book collects everything your child meets, and stars dress up the heart.
+A friendly recorded voice explains everything as you go. It has music and vibration, and it can be added to the
+Home Screen and played offline.
 
 ## The levels
 
@@ -24,10 +25,12 @@ can be added to the Home Screen and played offline.
    The heart is sweating and heat shimmers off the tissue. The last wave brings the **King Germ**.
 8. **Cut Finger** ✋: a bigger board. Germs get in through two little cuts whose vessels join, then zigzag a long
    way to the heart, with spots in the bends that reach two stretches at once. Every kind of germ except the King.
+   Adds the **platelet plug**: tap the vessel to block it.
 9. **Sore Throat** 😮: bigger again. Two ways in from the mouth join and wind down; from wave 2 germs also come in
-   through the nose, which joins further down. Snot puddles help.
+   through the nose, which joins further down. Snot puddles help, and two **tonsils** guard the throat by themselves.
 10. **Chickenpox** 🐔: the biggest board, with the heart in the middle. Germs come from four itchy spots, two above
-   and two below, each pair joining and winding in from its side. The last wave brings **two King Germs**.
+   and two below, each pair joining and winding in from its side. Adds the **memory cell**. The last wave brings
+   **two King Germs**.
 
 Levels 8 to 10 are big enough that on a small phone they start a little zoomed in; pinch or scroll to see the rest.
 The first seven boards were also made a little bigger: each entry's vessel is three tiles longer (except the eye,
@@ -44,8 +47,20 @@ thermometer for the fever). Tap a spot to play it. **Play** jumps to the newest 
 - The best stars for each level (1 to 3, from the hearts left at the end) show under its spot.
 - Progress is saved in the browser (`localStorage`): `germguard.stars` keeps the best stars per level name, so
   levels can be added or reordered later. A level opens once the one before it is won. The sound and vibration
-  settings are saved too.
+  settings are saved too, and so are the Germ Book (`germguard.book`), what the heart wears (`germguard.dress`) and
+  the best Germ Party (`germguard.partyBest`).
 - The map button in the corner during a level, and on the end card, goes back to the map.
+
+Under **Play** are three more buttons:
+
+- **📖 Germ Book**: a page for every germ and every defender, with a picture and a few words. Tap one to hear the
+  voice say what it is. Ones your child hasn't met yet are dark shadows with a "?". Levels already won count as met.
+- **🎀 Dress up**: stars won on the levels unlock things for the heart to wear in every level: a party hat (3 stars),
+  a bow (6), sunglasses (10), a flower (14), a crown (18) and headphones (22), and colours: pink (8), purple (16)
+  and gold (26). There are 30 stars in all. Locked things show how many stars they need.
+- **🎉 Germ Party**: opens once the Big Fever is won. An endless game on the Chickenpox board with every defender:
+  the waves never stop, each one bigger and tougher than the last, with a King Germ every fifth wave. When the heart
+  runs out, the card says how many waves your child stopped, and the best ever shows on the 🎉 button.
 
 ## The defenders
 
@@ -61,6 +76,16 @@ thermometer for the fever). Tap a spot to play it. **Play** jumps to the newest 
   antibody yet, Spikies first.
 - **Snot puddle** (4 drops, up to 3 per level, Lungs level): tap the vessel itself to drop one. Every germ that
   wades through it slows right down.
+- **Platelet plug** (5 drops, up to 2 at a time, Cut Finger and the Germ Party): tap the vessel itself. Germs have
+  to stop at it and chew; the two at the front chew it away, faster for big germs and the King, and then it crumbles
+  and can be built again. Germs queue up behind it, which makes them easy to zap.
+- **Tonsils** (Sore Throat): two pink lumps beside the throat that you don't build. Every 2 seconds they squeeze, which
+  hurts every germ near them. They can't hurt a Spiky until an antibody sticks on it.
+- **Memory cell** (6 drops, Chickenpox and the Germ Party): it remembers every kind of germ your child has ever
+  beaten (saved as `germguard.beaten`), and a brand-new kind after 3 of them pop on the level. It throws gold
+  antibodies at remembered germs, two at a time: like an orange one, it slows the germ down and breaks a Spiky's
+  armour, but the germ takes more than twice the damage instead of one and a half. It can swap an orange antibody for
+  a gold one. Its two upgrade paths are Reach and Speed (faster, then three at a time).
 - **Sneeze** 🤧 (from Runny Nose on): during a wave the Go button turns into a sneeze button. It blows every germ
   back down the vessels. Then it needs 40 seconds to recharge, shown as a shadow sweeping round the button.
   The first time germs get close, a pointing hand and a voice remind your child it's there.
@@ -90,6 +115,8 @@ The game names the real body parts and cells, and says what they do:
   the voice explains what it does. For example: "This is a neutrophil, a kind of white blood cell. Neutrophils rush to
   germs first and zap them!" The build cards also show the real names, for a parent to read out.
 - **First sneeze:** "A sneeze blows germs out of your nose. Remember to sneeze into your elbow!"
+- **Platelets, tonsils and memory cells** each get a voice line the first time they're used: platelets plug a cut
+  to stop the bleeding, tonsils guard the back of the throat, and memory cells remember germs your body has beaten.
 - **Every win card** shows and reads out a "Did you know?" fact about that body part: why a cut goes red and warm,
   how snot traps germs, stomach acid and hand washing, the tiny hairs that sweep mucus out of the airways, the germ
   fighters in tears, what earwax is for, and why a fever helps (plus "rest and drink water").
@@ -216,6 +243,12 @@ These are at the top of the script in `index.html`:
 | `TAG_SLOW`, `TAG_DAMAGE` | speed and extra damage for a germ with an antibody on it | 0.7, 1.5 |
 | `AB_SPEED` | antibody flying speed, tiles per second | 6 |
 | `MUCUS_COST`, `MUCUS_MAX`, `MUCUS_R`, `MUCUS_SLOW` | snot price, puddles per level, reach in tiles, speed inside it | 4, 3, 0.6, 0.4 |
+| `PLUG_COST`, `PLUG_MAX`, `PLUG_HP`, `PLUG_CHEW` | platelet plug price, plugs at a time, how much chewing it takes, chewing per second per germ (times its bite) | 5, 2, 36, 2 |
+| `TONSIL_R`, `TONSIL_RELOAD`, `TONSIL_DAMAGE` | tonsil reach in tiles, seconds between squeezes, damage per squeeze (tonsils are `t` on a map) | 1.7, 2, 1.5 |
+| `MEMORY_KILLS`, `MEMORY_DAMAGE` | pops of a never-beaten kind before memory cells remember it; extra damage with a gold antibody | 3, 2.2 |
+| `PARTY_POINTS`, `PARTY_GROW`, `PARTY_TOUGH`, `PARTY_KING_EVERY` | Germ Party: first wave size (a bloop is 1 point), points added per wave, extra toughness per wave, a King every this many waves | 10, 7, 0.1, 5 |
+| `PARTY_KINDS` | which germs come to the party, their points, and the first wave each can turn up in | Spikies from wave 5 |
+| `DRESS`, `HEART_COLOURS` | what the heart can wear and its colours, with the stars each needs | |
 | `SNEEZE_COOLDOWN`, `SNEEZE_PUSH` | seconds to recharge the sneeze, tiles germs get blown back | 40, 5 |
 | `FAST_SPEED` | how much faster waves run with the 2× button on | 2 |
 | `TROOP_COST`, `TROOPS_PER_NEST` | drops per extra blob, most blobs per nest | 2, 3 |
@@ -235,7 +268,7 @@ These are at the top of the script in `index.html`:
 | `MUSIC_VOL`, `MUSIC_DUCK` | music level, and how far it dips under the voice | 0.22, 0.35 |
 | `SONGS` | each tune: key, scale, tempo, lead sound, bass and drum pattern, a chord per bar and the melody written as scale degrees (8 eighths a bar) | 96–120 bpm |
 | `LEADS`, `BASSES`, `DRUMS` | the lead sounds, bass patterns and drum patterns the tunes pick from | |
-| `ASSET_V` | bump after replacing any file in `assets/`, so phones fetch the new clips | 1 |
+| `ASSET_V` | bump after replacing any file in `assets/`, so phones fetch the new clips | 2 |
 | `CLIP_VOL`, `VOICE_VOL` | sound-effect clip level and voice level | 0.8, 1 |
 | `CLIP_TRIM` | per-clip volume trims, measured to even out the clips; lower one if a sound is too loud | |
 | `SNEEZE_PEAK` | seconds into the sneeze clip where the "CHOO" lands, when the germs get blown back | 1.0 |
@@ -272,7 +305,7 @@ The numbers are hearts left after each wave; ✗ is a lost wave that was tried a
 | 5 Itchy Eye | won, 5 4 4 4 4 | lost at wave 3 | lost at wave 4 (Spikies) |
 | 6 Earache | won, 5 5 5 5 5 | lost at wave 2 | lost at wave 4 |
 | 7 Big Fever | won, 4 4 4 4 4 | lost at wave 2 | lost at wave 3 (Spikies) |
-| 8 Cut Finger | won, 5 5 5 4 4 | lost at wave 2 | lost at wave 4 |
+| 8 Cut Finger | won, 5 5 5 5 4 | lost at wave 2 | lost at wave 4 |
 | 9 Sore Throat | won, 5 5 4 4 3 | lost at wave 2 | lost at wave 3 |
 | 10 Chickenpox | won, 5 5 5 5 2 | lost at wave 1 | lost at wave 3 |
 
@@ -282,6 +315,12 @@ Tummy Ache's Wigglers now come out of the short second entry a little later. In 
 about 71% of the way to the heart. In Chickenpox one of the two Kings nearly makes it (98%), and that wave usually
 costs the heart 3. The Knee is still easy on purpose, as the tutorial; stopping early loses everywhere, and the
 Spiky levels can't be won without antibodies.
+
+With the platelet plug, the tonsils and the memory cell added, the thoughtful player also drops plugs on the Cut
+Finger once germs are coming, and builds a memory cell on Chickenpox from wave 2. The first memory cell only
+remembered germs popped on the same level, so on Chickenpox it was worse than the zapper it replaced and the King
+wave was lost; now it remembers every germ ever beaten (the King too, from the Big Fever) and throws gold antibodies.
+The Germ Party lasted 4 to 14 waves in six simulated runs, usually ending at the first King (wave 5) or around wave 14.
 
 The new big levels first had long, separate vessels with spots that each reached only one of them, and even the
 thoughtful player lost there. Joining the entries into a shared vessel that zigzags, with spots in the bends,
@@ -304,7 +343,7 @@ covered by any licence on this game's code.
 
 Every clip is listed below.
 
-**Spoken lines** (55 clips): ElevenLabs Text to Speech, stock voice "Jessica" (Playful, Bright, Warm), model Eleven
+**Spoken lines** (69 clips): ElevenLabs Text to Speech, stock voice "Jessica" (Playful, Bright, Warm), model Eleven
 Multilingual v2, free plan, made 2026-10-09. The words are also in `LINES`, `GERM_HELLO` and each level's `intro`,
 `win` and `fact`.
 
@@ -323,7 +362,7 @@ Multilingual v2, free plan, made 2026-10-09. The words are also in `LINES`, `GER
 | `say-intro-ear.mp3` | "Ouch, an earache! The germs go round and round the ear to reach the heart. Build in between the rings to zap two at once!" |
 | `say-win-ear.mp3` | "Hooray! The earache is gone!" |
 | `say-intro-fever.mp3` | "Oh no, a big fever! Germs are coming from the nose, the mouth and a scratch, all at once. Use everything you have!" |
-| `say-win-fever.mp3` | "You did it! The fever is gone. You beat all the germs!" |
+| `say-win-fever.mp3` | "You did it! The fever is gone, and the heart feels great!" (re-recorded once levels came after it) |
 | `say-intro-finger.mp3` | "Ouch, a cut on the finger! Germs are getting in through two little cuts. The way to the heart is long, so build all along it!" |
 | `say-win-finger.mp3` | "Hooray! The finger is all healed!" |
 | `say-intro-throat.mp3` | "Ow, a sore throat! Germs are coming in through the mouth, and soon through the nose too. Sticky snot helps here as well!" |
@@ -353,8 +392,22 @@ Multilingual v2, free plan, made 2026-10-09. The words are also in `LINES`, `GER
 | `say-meet-antibody.mp3` | "This is a B cell. B cells make antibodies, little Y shapes that stick to germs, so they slow down and pop more easily!" |
 | `say-meet-mucus.mp3` | "That's mucus. Grown-ups call it snot! It's sticky, so germs get stuck in it. That's why your nose runs when you have a cold." |
 | `say-meet-sneeze.mp3` | "Achoo! A sneeze blows germs out of your nose. Remember to sneeze into your elbow!" |
+| `say-meet-plug.mp3` | "These are platelets! They stick together like a plug to stop bleeding. Germs have to stop and chew through them!" |
+| `say-meet-tonsil.mp3` | "These are your tonsils! They guard the back of your throat and squeeze the germs that go past." |
+| `say-meet-memory.mp3` | "This is a memory cell. It remembers germs you have beaten before, and marks them with gold antibodies, so they pop fast!" |
+| `say-memory-remember.mp3` | "The memory cell remembers that germ now!" |
 | `say-upgrade-reach.mp3` | "Now it can reach further!" |
 | `say-upgrade-power.mp3` | "Now it zaps harder!" |
+| `say-upgrade-bite.mp3` | "Now its blobs bite harder!" |
+| `say-upgrade-energy.mp3` | "Now its blobs can keep going for longer!" |
+| `say-upgrade-speed.mp3` | "Now it makes antibodies faster!" |
+| `say-new-spot.mp3` | "Look, a new building spot!" |
+| `say-intro-party.mp3` | "It's a germ party! The germs keep on coming. How many waves can you stop?" |
+| `say-party-over.mp3` | "What a party! You did so well!" |
+| `say-book-hello.mp3` | "This is your germ book. Tap a picture to hear about it!" |
+| `say-book-bloop.mp3` | "This is a Bloop, the everyday germ. One bubble pops it!" |
+| `say-dress-hello.mp3` | "Dress up your heart! Win more stars to get more things to wear." |
+| `say-dress-locked.mp3` | "Win more stars to get this one!" |
 | `say-fact-knee.mp3` | "Did you know? When you scrape your knee, white blood cells rush there to fight the germs. That's why a cut gets a bit red and warm." |
 | `say-fact-nose.mp3` | "Did you know? Snot traps germs before they can get inside you. A runny nose is your body cleaning itself!" |
 | `say-fact-tummy.mp3` | "Did you know? Your tummy has acid that kills lots of germs in your food. Washing your hands before you eat helps too!" |
