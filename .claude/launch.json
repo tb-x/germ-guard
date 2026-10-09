@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "germ-guard",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5209"],
+      "port": 5209
+    }
+  ]
+}

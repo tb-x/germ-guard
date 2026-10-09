@@ -1,0 +1,1883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Germ Guard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f9bfd0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Germ Guard">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap">
+<style>
+/* Layout: full-screen isometric board; portrait has the HUD bar on top and the Go button below, wide screens put both in a right-hand column */
+:root{
+  --ink:#5a1733;
+  --panel:rgba(255,255,255,.9);
+  --shade:rgba(150,40,80,.2);
+  --drop:#39c2ff;
+  --heart:#ff3b5c;
+  --go:#3fcf6a;
+  --go-dark:#23a14b;
+  --gold:#ffd23f;
+  --title:"Fredoka","Trebuchet MS",sans-serif;
+  --plain:Verdana,Tahoma,sans-serif;
+  --col:164px;
+}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{
+  font-family:var(--plain);color:var(--ink);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(255,255,255,.55) 0 38px,transparent 40px),
+    radial-gradient(circle at 86% 30%,rgba(255,255,255,.35) 0 26px,transparent 28px),
+    radial-gradient(circle at 78% 84%,rgba(255,255,255,.3) 0 46px,transparent 48px),
+    radial-gradient(circle at 20% 76%,rgba(255,255,255,.25) 0 20px,transparent 22px),
+    radial-gradient(120% 90% at 50% 30%,#ffeef3 0%,#f9bfd0 55%,#e07f9f 100%);
+  background-color:#f9bfd0;
+}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-appearance:none;appearance:none;margin:0}
+#safe{position:fixed;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);visibility:hidden;pointer-events:none}
+
+/* ======== HUD ======== */
+.bar{
+  position:fixed;left:0;right:0;top:0;z-index:5;pointer-events:none;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) calc(env(safe-area-inset-right,0px) + 10px) 0 calc(env(safe-area-inset-left,0px) + 10px);
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;
+}
+.pill,.round{
+  pointer-events:auto;height:48px;border-radius:24px;background:var(--panel);
+  box-shadow:0 4px 0 var(--shade),0 8px 18px rgba(150,40,80,.15);
+  display:flex;align-items:center;gap:6px;padding:0 12px;box-sizing:border-box;
+}
+.energy b{font:bold 24px/1 var(--plain);min-width:1.3em;text-align:left}
+.energy svg{width:26px;height:26px}
+.energy.bump{animation:bump .25s ease-out}
+.hearts{gap:2px}
+.hearts svg{width:20px;height:20px;transition:transform .2s,opacity .3s,filter .3s}
+.hearts .lost{opacity:.3;filter:grayscale(1);transform:scale(.8)}
+.waves{gap:5px}
+.waves i{width:13px;height:13px;border-radius:50%;border:3px solid #e9a3b9;box-sizing:border-box}
+.waves i.done{background:var(--go);border-color:var(--go-dark)}
+.waves i.now{background:var(--gold);border-color:#e0a800;animation:pulse 1s ease-in-out infinite}
+.round{width:48px;padding:0;justify-content:center;border:0;font-size:22px}
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:5;pointer-events:none;
+  height:calc(env(safe-area-inset-bottom,0px) + 104px);
+  display:flex;justify-content:center;align-items:flex-start;padding-top:10px;box-sizing:border-box;
+}
+.go{
+  pointer-events:auto;height:78px;min-width:176px;padding:0 30px;border-radius:39px;border:0;
+  background:var(--go);color:#fff;font:700 36px/1 var(--title);letter-spacing:.02em;
+  box-shadow:0 7px 0 var(--go-dark),0 12px 26px rgba(30,120,60,.3);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.go:active{transform:translateY(4px);box-shadow:0 3px 0 var(--go-dark),0 6px 14px rgba(30,120,60,.3)}
+.go.off{display:none}
+.go.sneeze{min-width:0;width:112px;padding:0;font-size:46px;position:relative;overflow:hidden;background:#6cc8ff;box-shadow:0 7px 0 #2e8fd0,0 12px 26px rgba(30,100,160,.3)}
+.go.sneeze::after{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(rgba(20,40,90,.5) calc(var(--cd,0) * 360deg),transparent 0)}
+.go.sneeze.ready{animation:ready 1.1s ease-in-out infinite}
+@keyframes ready{50%{transform:scale(1.07)}}
+.go svg{width:30px;height:30px}
+.dock .round{position:absolute;left:calc(env(safe-area-inset-left,0px) + 14px);top:24px;font-size:20px}
+body.wide .bar{
+  left:auto;bottom:0;width:var(--col);box-sizing:content-box;
+  flex-direction:column;flex-wrap:nowrap;justify-content:flex-start;align-items:stretch;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) calc(env(safe-area-inset-right,0px) + 12px) 0 0;
+}
+body.wide .pill{justify-content:center}
+body.wide .dock{
+  left:auto;width:var(--col);height:auto;top:auto;flex-direction:column-reverse;align-items:center;gap:14px;
+  padding:0 calc(env(safe-area-inset-right,0px) + 12px) calc(env(safe-area-inset-bottom,0px) + 16px) 0;box-sizing:content-box;
+}
+body.wide .dock .round{position:static}
+body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
+
+/* ======== world labels, build menu, hint hand ======== */
+.anchor{position:fixed;left:0;top:0;z-index:4;pointer-events:none;will-change:transform}
+.preview{
+  transform:translate(-50%,-100%);display:flex;gap:6px;align-items:center;white-space:nowrap;
+  background:var(--panel);border-radius:18px;padding:5px 12px 5px 8px;
+  box-shadow:0 3px 0 var(--shade);font:bold 20px/1 var(--plain);
+}
+.preview svg{width:30px;height:30px}
+.preview svg.big{width:40px;height:40px}
+.menu{z-index:6}
+.opts{position:absolute;left:0;top:0;transform:translate(-50%,calc(-100% - 34px));display:flex;gap:10px}
+.opts::after{content:"";position:absolute;left:50%;bottom:-11px;margin-left:-11px;border:11px solid transparent;border-bottom:0;border-top-color:#fff;filter:drop-shadow(0 4px 0 #e7a9bc)}
+.opt{
+  pointer-events:auto;position:relative;width:96px;min-height:108px;padding:8px 6px;border-radius:26px;border:0;background:#fff;
+  box-shadow:0 5px 0 #e7a9bc,0 12px 26px rgba(120,30,60,.28);box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;animation:popin .18s ease-out;
+}
+.opt .pic{width:66px;height:66px}
+.opt .cost{display:flex;flex-wrap:wrap;justify-content:center;gap:1px;max-width:82px}
+.opt .cost svg{width:14px;height:14px}
+.opt .badge{
+  position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:50%;
+  background:var(--go);color:#fff;font:bold 20px/30px var(--plain);box-shadow:0 2px 0 var(--go-dark);
+}
+.opt .pips{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:2px;font-size:12px;line-height:1}
+.opt.poor .pic,.opt.poor .cost,.opt.poor .badge{filter:grayscale(.85);opacity:.6}
+.opt.shake{animation:shake .4s}
+.opts.many .opt{width:84px;min-height:100px}
+.opts.many .opt .pic{width:56px;height:56px}
+.hand{z-index:7}
+.hand span{display:block;font-size:46px;line-height:1;transform:translate(-50%,0);animation:bob .7s ease-in-out infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.2))}
+.hand.down span{transform:translate(-50%,-100%);animation-name:bobdown}
+.fly{position:fixed;left:-15px;top:-15px;width:30px;height:30px;z-index:20;pointer-events:none;transition:transform .55s cubic-bezier(.45,-.35,.7,1)}
+.fly svg{width:100%;height:100%}
+
+/* ======== title and end cards ======== */
+.overlay{
+  position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);
+  background:rgba(255,226,236,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+}
+.card{
+  background:#fff;border-radius:32px;padding:26px 22px 30px;text-align:center;max-width:340px;width:100%;
+  box-shadow:0 8px 0 #eaa9bd,0 20px 50px rgba(120,30,60,.25);animation:popin .35s cubic-bezier(.3,1.6,.6,1);
+}
+.card h1{font:700 52px/1 var(--title);margin:4px 0 6px;color:var(--heart);text-shadow:0 4px 0 #ffd0dc}
+.card h2{font:700 30px/1.15 var(--title);margin:6px 0 14px}
+.card p{font:16px/1.4 var(--plain);margin:0 0 18px;color:#8a4a62}
+.card .art{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin:6px 0 10px}
+.card .art svg{width:70px;height:70px}
+.card .art svg.mid{width:88px;height:88px}
+.stars{font-size:46px;letter-spacing:4px;margin:-4px 0 16px}
+.stars .off{filter:grayscale(1);opacity:.3}
+.card .go{margin:0 auto}
+/* the level map: a body with a glowing spot per level */
+.title-card{padding-top:20px;position:relative}
+.row .round.vibe{font-size:24px;box-shadow:0 4px 0 var(--shade)}
+.vibe.off{filter:grayscale(1);opacity:.45}
+.title-card h1{font-size:46px}
+.title-card p{margin-bottom:6px}
+.bodymap{position:relative;width:min(270px,70vw);aspect-ratio:200/260;margin:0 auto 12px}
+.bodymap svg.body{position:absolute;inset:0;width:100%;height:100%}
+.spot{
+  position:absolute;transform:translate(-50%,-50%);width:48px;height:48px;padding:0;border-radius:50%;
+  border:3px solid #fff;background:#fff6c9;box-shadow:0 3px 0 #e0a800;font-size:24px;line-height:1;display:grid;place-items:center;
+}
+.spot b{position:absolute;right:-8px;top:-8px;width:22px;height:22px;border-radius:50%;background:var(--heart);color:#fff;font:bold 13px/22px var(--plain)}
+.spot .st{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;font-size:12px;letter-spacing:-1px;white-space:nowrap}
+.spot .st i{font-style:normal;filter:grayscale(1);opacity:.35}
+.spot.locked{background:#f1e6ea;box-shadow:0 3px 0 #cdb5be;filter:grayscale(1);opacity:.7}
+.spot.next{animation:glow 1.3s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 3px 0 #e0a800,0 0 0 12px rgba(255,210,63,.4)}}
+@media (orientation:landscape) and (max-height:620px){   /* a phone on its side: words and Play on the left, the body on the right */
+  .title-card{max-width:600px;display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:20px;padding:16px 22px}
+  .title-card .bodymap{grid-column:2;grid-row:1 / span 3;width:auto;height:calc(100vh - 90px);max-height:330px;margin:0}
+  .title-card h1{font-size:40px}
+}
+.row{display:flex;gap:10px;justify-content:center;align-items:center}
+.row .go{margin:0;min-width:0;padding:0 22px;font-size:30px;white-space:nowrap;flex:0 1 auto}
+.row .round{width:58px;height:58px;font-size:0;flex:none}
+.row .round svg{width:30px;height:30px}
+.dock .round.home{left:auto;right:calc(env(safe-area-inset-right,0px) + 14px)}
+.dock .round.home svg{width:24px;height:24px}
+
+@keyframes pulse{50%{transform:scale(1.3)}}
+@keyframes bump{50%{transform:scale(1.18)}}
+@keyframes bob{to{transform:translate(-50%,12px)}}
+@keyframes bobdown{to{transform:translate(-50%,calc(-100% - 12px))}}
+@keyframes popin{from{transform:scale(.6);opacity:0}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="safe"></div>
+
+<div class="bar" id="bar">
+  <div class="pill energy" id="energyPill" aria-label="Energy drops"><span id="energyIcon"></span><b id="energy">0</b></div>
+  <div class="pill hearts" id="hearts" aria-label="Heart sparkles"></div>
+  <div class="pill waves" id="waves" aria-label="Waves"></div>
+</div>
+<div class="dock" id="dock">
+  <button class="go" id="go" aria-label="Send the next wave">Go!</button>
+  <button class="go sneeze off" id="sneeze" aria-label="Sneeze the germs away">🤧</button>
+  <button class="round" id="mute" aria-label="Sound on or off">🔊</button>
+  <button class="round home" id="home" aria-label="Back to the map"></button>
+</div>
+
+<div id="labels"></div>
+<div class="anchor menu" id="menu" hidden><div class="opts" id="opts"></div></div>
+<div class="anchor hand" id="hand" hidden><span>👆</span></div>
+
+<div class="overlay" id="title">
+  <div class="card title-card">
+    <h1>Germ Guard</h1>
+    <p>Build white blood cells. Stop the germs before they reach the heart!</p>
+    <div class="bodymap" id="bodymap"></div>
+    <div class="row">
+      <button class="go" id="play" aria-label="Play"></button>
+      <button class="round vibe" id="vibe" aria-label="Vibration on or off" hidden>📳</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="end" hidden>
+  <div class="card">
+    <div class="art" id="endArt"></div>
+    <h2 id="endTitle"></h2>
+    <div class="stars" id="stars"></div>
+    <div class="row">
+      <button class="round" id="mapBtn" aria-label="Back to the map"></button>
+      <button class="round" id="againBtn" aria-label="Play this level again"></button>
+      <button class="go" id="endBtn"></button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js';
+
+/* ======== tuning knobs ======== */
+const HEART_SPARKLES = 5;       // germs that may reach the heart before the wave has to be tried again
+const WAVE_BONUS = 3;           // drops that pop out of the heart after each cleared wave
+const DROP_AUTOCOLLECT_S = 4;   // a drop nobody taps flies to the counter on its own after this long
+const SHOT_SPEED = 9;           // zapper shots, tiles per second
+const BUILDS = {                // what can go on a pad: cost in drops, then the stats for levels 1, 2 and 3
+  zapper: { cost: 5, levels: [   // shoots: reach in tiles, seconds between shots, damage per shot
+    { range: 2.7, reload: 0.85, damage: 1 },
+    { range: 2.9, reload: 0.6,  damage: 1 },
+    { range: 3.1, reload: 0.8,  damage: 2 },
+  ] },
+  nest: { cost: 6, levels: [     // trains blobs: how far from the nest they stand guard, damage per second, how long they can hold germs
+    { reach: 2.3, dps: 1.8, stamina: 8 },
+    { reach: 2.5, dps: 2.4, stamina: 11 },
+    { reach: 2.7, dps: 3.0, stamina: 14 },
+  ] },
+};
+BUILDS.antibody = { cost: 6, levels: [   // sticks antibodies on germs: reach in tiles, seconds between shots, germs per shot
+  { range: 2.8, reload: 1.4, multi: 1 },
+  { range: 3.0, reload: 1.0, multi: 1 },
+  { range: 3.2, reload: 0.9, multi: 2 },
+] };
+const TAG_SLOW = 0.7;           // a germ with an antibody stuck on walks at this fraction of its speed...
+const TAG_DAMAGE = 1.5;         // ...and takes this much more damage
+const AB_SPEED = 6;             // antibody flying speed, tiles per second
+const MUCUS_COST = 4;           // a snot puddle on the vessel
+const MUCUS_MAX = 3;            // snot puddles per level
+const MUCUS_R = 0.6;            // how far a puddle reaches, in tiles
+const MUCUS_SLOW = 0.4;         // germs in snot walk at this fraction of their speed
+const SNEEZE_COOLDOWN = 40;     // seconds before the sneeze button works again
+const SNEEZE_PUSH = 5;          // tiles every germ gets blown back
+const UPGRADE_COSTS = [6, 9];   // drops to go to level 2, then level 3
+const TROOP_COST = 2;           // drops to train one more blob (a new nest comes with one)
+const TROOPS_PER_NEST = 3;
+const TRAIN_S = 1.2;            // seconds to train a blob
+const TROOP_SPEED = 1.8;        // blob walking speed, tiles per second
+const TROOP_GUARD_R = 1.0;      // a blob grabs germs this close to its post (tiles)
+const TROOP_REST_S = 4;         // a tired blob rests in the nest this long
+const CHOMP_S = 0.4;            // seconds between bites
+const TROOP_RECOVER = 1;        // stamina a blob gets back per second while it waits at its post
+const GERMS = {                 // hp, walking speed (tiles per second), drops when popped, body radius (tiles), how fast it tires a blob, look
+  bloop:     { hp: 4,  speed: 0.85, drops: 1, size: 0.32, bite: 1,   shape: 'blob',   color: 0x8fd14f, bump: 0x5f9e33 },
+  big:       { hp: 12, speed: 0.6,  drops: 3, size: 0.48, bite: 2.5, shape: 'blob',   color: 0x7cc84d, bump: 0x4c8a2a },
+  wiggler:   { hp: 2,  speed: 1.5,  drops: 1, size: 0.3,  bite: 0.8, shape: 'rod',    color: 0xffcf3f, bump: 0xe39b17 },
+  corkscrew: { hp: 4,  speed: 1.1,  drops: 1, size: 0.34, bite: 1,   shape: 'spiral', color: 0x2bb3a3, bump: 0x1d8478, slippery: true },   // too wiggly for blobs to grab
+  chunky:    { hp: 14, speed: 0.5,  drops: 2, size: 0.5,  bite: 2,   shape: 'clump',  color: 0x9aa83e, bump: 0x6c7a24, splits: 3 },         // breaks into 3 bloops
+  spiky:     { hp: 6,  speed: 0.75, drops: 2, size: 0.34, bite: 1.5, shape: 'virus',  color: 0x9b5de5, bump: 0xffd23f, armour: true },     // nothing hurts it until an antibody sticks
+  king:      { hp: 130, speed: 0.4, drops: 12, size: 0.72, bite: 4, shape: 'king',   color: 0x4f9a3a, bump: 0x2f6e22, splits: 4, hurts: 3 },   // the boss: costs 3 hearts if it gets through
+};
+const GERM_HELLO = {            // said the first time each kind shows up in a wave
+  big: 'A big germ is coming! It takes lots of pops.',
+  wiggler: 'Watch out for the wigglers. They are fast!',
+  corkscrew: 'Corkscrew germs are too wiggly for the blobs to grab!',
+  chunky: 'A chunky germ! When it pops, it breaks into little ones.',
+  spiky: 'Spiky germs have armour! Stick an antibody on them first.',
+  king: 'Uh oh, it is the King Germ! It is huge. Use everything you have!',
+};
+for (const [kind, k] of Object.entries(GERMS)) k.kind = kind;
+const CAM_PITCH = 38;           // camera angle above the ground in degrees (true isometric is 35.3)
+
+/* ======== levels ======== */
+// Map key: ' ' nothing, '.' tissue, '#' blood vessel, '1'-'9' where germs get in, 'H' the heart, 'o' build pad.
+// The board is seen corner-on, so the map's top-left to bottom-right diagonal runs down the screen.
+// Waves are lists of groups: germ kind, how many, seconds apart, optional start delay, and which entry ('from', 0 = '1').
+const LEVELS = [
+  {
+    name: 'Scraped Knee', icon: '🦵', seed: 7, entry: 'scratch', startEnergy: 10, builds: ['zapper'],
+    map: [
+      ' ..1...         ',
+      ' ..#....        ',
+      ' ..#.o...       ',
+      ' ..#.....o      ',
+      ' ..######..     ',
+      '  ......#...    ',
+      '   ...o.#....   ',
+      '    ....#.o...  ',
+      '     ...#...... ',
+      '      ..######..',
+      '       o.....#..',
+      '        ...o.#..',
+      '         ....#..',
+      '          ...H..',
+      '           .....',
+      '            ....',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 6,  gap: 1.6 }],
+      [{ kind: 'bloop', n: 9,  gap: 1.2 }],
+      [{ kind: 'bloop', n: 12, gap: 1.0 }],
+      [{ kind: 'bloop', n: 10, gap: 1.0 }, { kind: 'big', n: 3, gap: 3, delay: 3 }],
+      [{ kind: 'bloop', n: 16, gap: 0.8 }, { kind: 'big', n: 4, gap: 2.5, delay: 4 }],
+    ],
+    intro: 'Oh no, a scratch on the knee! Germs are sneaking in. Tap a glowing spot to build a germ zapper.',
+    win: 'Hooray! You stopped all the germs. The knee is all better!', winTitle: 'The knee is all better!',
+  },
+  {
+    name: 'Runny Nose', icon: '👃', seed: 11, entry: 'nostril', startEnergy: 14, builds: ['zapper', 'nest'], sneeze: true, hint: [8, 8, 'nest'],
+    map: [
+      '    ...          ',
+      '   .2##.         ',
+      '  ....#.o        ',
+      ' .....#...       ',
+      '.1....####.      ',
+      '.#...o...#..     ',
+      '.####....#..     ',
+      ' ...#....#..     ',
+      '  o.#...o#....   ',
+      '   .######....   ',
+      '    .....#.o...  ',
+      '     ..o.#.....  ',
+      '      ...####..  ',
+      '       .....#..  ',
+      '        ....H..  ',
+      '          .....  ',
+      '          .....  ',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 4, gap: 1.8, from: 0 }, { kind: 'bloop', n: 4, gap: 1.8, delay: 0.9, from: 1 }],
+      [{ kind: 'bloop', n: 7, gap: 1.3, from: 0 }, { kind: 'bloop', n: 5, gap: 1.6, delay: 3, from: 1 }],
+      [{ kind: 'bloop', n: 5, gap: 1.4, from: 0 }, { kind: 'bloop', n: 9, gap: 1.0, delay: 1, from: 1 }, { kind: 'big', n: 2, gap: 4, delay: 6, from: 0 }],
+      [{ kind: 'bloop', n: 12, gap: 0.8, from: 0 }, { kind: 'bloop', n: 12, gap: 0.8, delay: 0.4, from: 1 }, { kind: 'big', n: 1, gap: 1, delay: 8, from: 1 }],
+      [{ kind: 'bloop', n: 14, gap: 0.7, from: 0 }, { kind: 'bloop', n: 14, gap: 0.7, delay: 0.35, from: 1 },
+       { kind: 'big', n: 3, gap: 3, delay: 5, from: 0 }, { kind: 'big', n: 3, gap: 3, delay: 6.5, from: 1 }],
+    ],
+    intro: 'Achoo! A runny nose! Germs are coming from both sides. Try the new blob nest: its blobs grab the germs and gobble them up!',
+    win: 'Hooray! No more sniffles!', winTitle: 'No more sniffles!',
+  },
+  {
+    name: 'Tummy Ache', icon: '🍔', seed: 5, entry: 'mouth', palette: 'tummy', startEnergy: 16, builds: ['zapper', 'nest', 'antibody'], sneeze: true, hint: [9, 7, 'antibody'],
+    map: [
+      '  1....         ',
+      ' .#.....        ',
+      '..#.o....       ',
+      '..#####...      ',
+      '......#.o..     ',
+      '......#.....    ',
+      '    ..#####..   ',
+      '    .....o#.o.  ',
+      '   ....o..#.... ',
+      '   .......#####.',
+      '    .2#####...#.',
+      '     ......o..#.',
+      '      .o......H.',
+      '       .........',
+      '        ..  ....',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 6, gap: 1.5, from: 0 }, { kind: 'wiggler', n: 3, gap: 1.5, delay: 4, from: 1 }],
+      [{ kind: 'bloop', n: 8, gap: 1.1, from: 0 }, { kind: 'wiggler', n: 5, gap: 1.0, delay: 3, from: 1 }],
+      [{ kind: 'chunky', n: 2, gap: 5, from: 0 }, { kind: 'bloop', n: 6, gap: 1.2, delay: 2, from: 1 }, { kind: 'wiggler', n: 6, gap: 0.7, delay: 8, from: 0 }],
+      [{ kind: 'bloop', n: 12, gap: 0.8, from: 0 }, { kind: 'wiggler', n: 8, gap: 0.6, delay: 4, from: 1 }, { kind: 'chunky', n: 2, gap: 4, delay: 6, from: 1 }],
+      [{ kind: 'chunky', n: 3, gap: 4, from: 0 }, { kind: 'bloop', n: 14, gap: 0.7, delay: 1, from: 1 }, { kind: 'wiggler', n: 10, gap: 0.5, delay: 6, from: 0 },
+       { kind: 'big', n: 2, gap: 4, delay: 10, from: 1 }],
+    ],
+    intro: 'Uh oh, a tummy ache! Germs came in with the food. New: the antibody maker. Its antibodies stick on germs, so they slow down and pop faster!',
+    win: 'Hooray! The tummy feels great!', winTitle: 'Happy tummy!',
+  },
+  {
+    name: 'Lungs', icon: '🫁', seed: 3, entry: 'airway', palette: 'lungs', startEnergy: 18, builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, hint: [7, 7, 'mucus'],
+    map: [
+      '  ....          ',
+      ' 2##....        ',
+      '...#.......     ',
+      '...#.o......    ',
+      ' ..#......3..   ',
+      '...#####.o#..   ',
+      '.....o.#..#..   ',
+      '..1#####.o#...  ',
+      ' ......#..#...  ',
+      '  ..o..#####....',
+      '   ........#....',
+      '    .....o.#.o..',
+      '       ....#....',
+      '       ....##H..',
+      '         .......',
+      '         .......',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 6, gap: 1.4, from: 1 }, { kind: 'corkscrew', n: 3, gap: 2, delay: 3, from: 0 }],
+      [{ kind: 'bloop', n: 6, gap: 1.2, from: 0 }, { kind: 'spiky', n: 2, gap: 4, delay: 2, from: 1 }, { kind: 'wiggler', n: 5, gap: 0.9, delay: 5, from: 2 }],
+      [{ kind: 'corkscrew', n: 6, gap: 1.0, from: 1 }, { kind: 'bloop', n: 8, gap: 1.0, delay: 2, from: 2 }, { kind: 'spiky', n: 3, gap: 3, delay: 4, from: 0 }],
+      [{ kind: 'bloop', n: 12, gap: 0.8, from: 1 }, { kind: 'chunky', n: 2, gap: 5, delay: 2, from: 0 }, { kind: 'corkscrew', n: 6, gap: 0.9, delay: 4, from: 2 },
+       { kind: 'spiky', n: 3, gap: 3, delay: 8, from: 1 }],
+      [{ kind: 'spiky', n: 5, gap: 2.5, from: 1 }, { kind: 'corkscrew', n: 8, gap: 0.8, delay: 2, from: 0 }, { kind: 'wiggler', n: 10, gap: 0.5, delay: 4, from: 2 },
+       { kind: 'chunky', n: 3, gap: 4, delay: 8, from: 1 }, { kind: 'big', n: 2, gap: 4, delay: 12, from: 0 }],
+    ],
+    intro: 'Cough cough! Germs are in the lungs, coming three ways. New: tap the vessel to drop sticky snot there. Germs get stuck in it!',
+    win: 'Hooray! Big deep breaths!', winTitle: 'Breathing easy!',
+  },
+  {
+    name: 'Big Fever', icon: '🤒', seed: 9, entry: ['nostril', 'mouth', 'scratch'], palette: 'fever', fever: true, startEnergy: 20,
+    builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true,
+    map: [
+      '  .....          ',
+      ' 2###.....       ',
+      '....#......      ',
+      '....#.o...3.     ',
+      ' ...#.....#..    ',
+      ' ...#####.#...   ',
+      '...o....#o#.o..  ',
+      '......o.#.#....  ',
+      '.1#######.#....  ',
+      ' .......#####....',
+      '  ..........#....',
+      '      ....o.#.o..',
+      '        ....#....',
+      '        ....##H..',
+      '          .......',
+      '          .......',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 8, gap: 1.2, from: 1 }, { kind: 'wiggler', n: 5, gap: 0.9, delay: 3, from: 0 }, { kind: 'spiky', n: 2, gap: 3, delay: 5, from: 2 }],
+      [{ kind: 'chunky', n: 2, gap: 5, from: 1 }, { kind: 'corkscrew', n: 6, gap: 0.9, delay: 2, from: 2 }, { kind: 'bloop', n: 8, gap: 0.9, delay: 4, from: 0 }],
+      [{ kind: 'big', n: 3, gap: 3, from: 1 }, { kind: 'spiky', n: 4, gap: 2.5, delay: 2, from: 0 }, { kind: 'wiggler', n: 8, gap: 0.6, delay: 5, from: 2 }],
+      [{ kind: 'bloop', n: 14, gap: 0.7, from: 1 }, { kind: 'chunky', n: 3, gap: 4, delay: 3, from: 2 }, { kind: 'corkscrew', n: 8, gap: 0.8, delay: 5, from: 0 },
+       { kind: 'spiky', n: 3, gap: 3, delay: 9, from: 1 }],
+      [{ kind: 'king', n: 1, gap: 1, from: 1 }, { kind: 'bloop', n: 10, gap: 0.9, delay: 4, from: 0 }, { kind: 'wiggler', n: 10, gap: 0.6, delay: 8, from: 2 },
+       { kind: 'spiky', n: 3, gap: 3, delay: 12, from: 1 }],
+    ],
+    intro: 'Oh no, a big fever! Germs are coming from the nose, the mouth and a scratch, all at once. Use everything you have!',
+    win: 'You did it! The fever is gone. You beat all the germs!', winTitle: 'Fever gone! You beat them all!',
+  },
+];
+
+/* ======== helpers ======== */
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('germguard.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('germguard.' + k, JSON.stringify(v)); } catch {} },
+};
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const pick = (arr, r = Math.random) => arr[Math.floor(r() * arr.length)];
+const lerpAngle = (a, b, t) => a + ((((b - a + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) - Math.PI) * t;
+const elasticOut = t => t <= 0 ? 0 : t >= 1 ? 1 : 2 ** (-10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI / 3)) + 1;
+const damp = (rate, dt) => 1 - Math.exp(-rate * dt);
+const stats = s => BUILDS[s.kind].levels[s.level - 1];
+const germIcon = (kind, cls = '') => (SVG[kind] || SVG.bloop)(kind === 'big' ? (cls + ' big').trim() : cls);
+
+const SVG = {
+  drop: '<svg viewBox="0 0 24 24"><path d="M12 2C12 2 4 11 4 15.5a8 8 0 0 0 16 0C20 11 12 2 12 2z" fill="#39c2ff" stroke="#0d7fc4" stroke-width="1.6"/><ellipse cx="9" cy="14.5" rx="2" ry="3" fill="#fff" opacity=".75"/></svg>',
+  heart: '<svg viewBox="0 0 24 24"><path d="M12 21s-8.5-5.3-8.5-11.3A4.7 4.7 0 0 1 12 6.6a4.7 4.7 0 0 1 8.5 3.1C20.5 15.7 12 21 12 21z" fill="#ff3b5c" stroke="#c81e43" stroke-width="1.6"/><ellipse cx="8" cy="9.5" rx="1.6" ry="2.2" fill="#fff" opacity=".6"/></svg>',
+  bloop: (cls = '') => `<svg class="${cls}" viewBox="0 0 40 40"><g fill="#5f9e33"><circle cx="9" cy="12" r="5"/><circle cx="31" cy="11" r="4.5"/><circle cx="33" cy="27" r="4"/><circle cx="7.5" cy="28" r="4"/><circle cx="20" cy="6.5" r="4"/></g><circle cx="20" cy="21" r="14" fill="#8fd14f" stroke="#5c9a2e" stroke-width="2"/><circle cx="15" cy="19" r="4.4" fill="#fff"/><circle cx="25" cy="19" r="4.4" fill="#fff"/><circle cx="15.6" cy="20.2" r="2.3" fill="#222"/><circle cx="25.6" cy="20.2" r="2.3" fill="#222"/><path d="M15 27q5 4 10 0" stroke="#2c4a17" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`,
+  zapper: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="41" rx="16" ry="5.5" fill="#f2b3c3"/><circle cx="15.5" cy="13" r="5.5" fill="#8a5cd6"/><circle cx="24" cy="9.5" r="6" fill="#9b6be6"/><circle cx="32.5" cy="13" r="5.5" fill="#8a5cd6"/><ellipse cx="24" cy="25.5" rx="15" ry="14" fill="#fbfaff" stroke="#cbbfe8" stroke-width="2"/><circle cx="18.5" cy="23" r="4" fill="#fff" stroke="#d5d0e6"/><circle cx="29.5" cy="23" r="4" fill="#fff" stroke="#d5d0e6"/><circle cx="19" cy="24" r="2.2" fill="#2a2140"/><circle cx="30" cy="24" r="2.2" fill="#2a2140"/><ellipse cx="24" cy="31" rx="3" ry="2" fill="#5a3a7a"/></svg>`,
+  nest: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="41" rx="17" ry="5.5" fill="#f2b3c3"/><path d="M6 39a18 18 0 0 1 36 0z" fill="#ffb27a" stroke="#e48a4c" stroke-width="2"/><path d="M18 39v-6a6 6 0 0 1 12 0v6z" fill="#7a3415"/><circle cx="13" cy="30" r="2.4" fill="#f0955a"/><circle cx="34" cy="28" r="2.8" fill="#f0955a"/><circle cx="24" cy="19" r="2.2" fill="#f0955a"/><circle cx="30" cy="35" r="3.6" fill="#ffc98f" stroke="#e08a3c"/><circle cx="29" cy="34.4" r="1" fill="#222"/><circle cx="31.6" cy="34.4" r="1" fill="#222"/></svg>`,
+  troop: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><path d="M9 31c-4-10 4-21 15-21s20 10 16 20c3 3 1 9-4 8-4 4-21 4-26 0-5 1-6-5-1-7z" fill="#ffbf7a" stroke="#e08a3c" stroke-width="2"/><circle cx="18" cy="22" r="4.4" fill="#fff"/><circle cx="30" cy="22" r="4.4" fill="#fff"/><circle cx="18.6" cy="23" r="2.3" fill="#222"/><circle cx="30.6" cy="23" r="2.3" fill="#222"/><ellipse cx="24" cy="32" rx="6" ry="4" fill="#7a2a10"/></svg>`,
+  wiggler: (cls = '') => `<svg class="${cls}" viewBox="0 0 40 40"><rect x="3" y="12" width="34" height="17" rx="8.5" fill="#ffcf3f" stroke="#d99a12" stroke-width="2"/><path d="M11 13v15M17 13v15" stroke="#e39b17" stroke-width="2.4"/><circle cx="25" cy="18.5" r="4" fill="#fff"/><circle cx="32" cy="18.5" r="4" fill="#fff"/><circle cx="26" cy="19.5" r="2.1" fill="#222"/><circle cx="33" cy="19.5" r="2.1" fill="#222"/></svg>`,
+  corkscrew: (cls = '') => `<svg class="${cls}" viewBox="0 0 40 40"><path d="M3 21c3-9 6 9 9 0s6 9 9 0 5 6 7 3" stroke="#1d8478" stroke-width="5.5" fill="none" stroke-linecap="round"/><path d="M3 21c3-9 6 9 9 0s6 9 9 0" stroke="#2bb3a3" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="31" cy="20" r="8" fill="#3fd0bf" stroke="#1d8478" stroke-width="2"/><circle cx="28.5" cy="18" r="3" fill="#fff"/><circle cx="34" cy="18" r="3" fill="#fff"/><circle cx="29" cy="18.8" r="1.6" fill="#222"/><circle cx="34.5" cy="18.8" r="1.6" fill="#222"/></svg>`,
+  chunky: (cls = '') => `<svg class="${cls}" viewBox="0 0 40 40"><g fill="#9aa83e" stroke="#6c7a24" stroke-width="2"><circle cx="11" cy="14" r="8"/><circle cx="29" cy="13" r="7.5"/><circle cx="31" cy="28" r="7"/><circle cx="9" cy="28" r="7"/><circle cx="20" cy="22" r="11"/></g><circle cx="15.5" cy="20" r="4" fill="#fff"/><circle cx="24.5" cy="20" r="4" fill="#fff"/><circle cx="16" cy="21" r="2.1" fill="#222"/><circle cx="25" cy="21" r="2.1" fill="#222"/><path d="M16 28q4 2.5 8 0" stroke="#3e4712" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  spiky: (cls = '') => `<svg class="${cls}" viewBox="0 0 40 40"><g stroke="#7a3fc4" stroke-width="2.6">${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<line x1="20" y1="21" x2="${20 + 17 * Math.cos(a * Math.PI / 180)}" y2="${21 + 17 * Math.sin(a * Math.PI / 180)}"/>`).join('')}</g><g fill="#ffd23f">${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<circle cx="${20 + 17 * Math.cos(a * Math.PI / 180)}" cy="${21 + 17 * Math.sin(a * Math.PI / 180)}" r="3"/>`).join('')}</g><circle cx="20" cy="21" r="11" fill="#9b5de5" stroke="#7a3fc4" stroke-width="2"/><circle cx="16" cy="19" r="3.6" fill="#fff"/><circle cx="24" cy="19" r="3.6" fill="#fff"/><circle cx="16.4" cy="20" r="1.9" fill="#222"/><circle cx="24.4" cy="20" r="1.9" fill="#222"/></svg>`,
+  antibody: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><ellipse cx="24" cy="41" rx="16" ry="5.5" fill="#f2b3c3"/><g stroke="#ff9f1c" stroke-width="3" stroke-linecap="round" fill="none"><path d="M16 15V8M16 8l-4-4M16 8l4-4"/><path d="M32 15V8M32 8l-4-4M32 8l4-4"/></g><circle cx="24" cy="26" r="14" fill="#ffe066" stroke="#e8b923" stroke-width="2"/><circle cx="18.5" cy="24" r="4" fill="#fff" stroke="#e0d3a0"/><circle cx="29.5" cy="24" r="4" fill="#fff" stroke="#e0d3a0"/><circle cx="19" cy="25" r="2.2" fill="#2a2140"/><circle cx="30" cy="25" r="2.2" fill="#2a2140"/><path d="M20 32q4 3 8 0" stroke="#7a5a10" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  mucus: (cls = '') => `<svg class="${cls}" viewBox="0 0 48 48"><path d="M6 32c0-6 6-8 11-8 2-5 12-6 15-1 6-1 11 2 10 8 4 2 2 8-4 8H10c-5 0-7-4-4-7z" fill="#b8de4a" stroke="#86a92a" stroke-width="2"/><circle cx="18" cy="31" r="3" fill="#fff" opacity=".7"/><circle cx="31" cy="29" r="2" fill="#fff" opacity=".7"/><circle cx="26" cy="35" r="1.6" fill="#fff" opacity=".7"/></svg>`,
+  play: '<svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="#fff"/></svg>',
+  home: (fill = '#fff') => `<svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="${fill}"/></svg>`,
+  again: (fill = '#fff') => `<svg viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8h-3a5 5 0 1 1-5-5v3l5-4.5L12 1z" fill="${fill}"/></svg>`,
+};
+
+/* ======== renderer / scene ======== */
+const canvas = $('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 120);
+
+scene.add(new THREE.HemisphereLight(0xfff4f7, 0xd77a96, 1.7));
+const sun = new THREE.DirectionalLight(0xffffff, 2.3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -13, right: 13, top: 13, bottom: -13, near: 1, far: 50 });
+sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.02;
+scene.add(sun, sun.target);
+
+const toonGrad = new THREE.DataTexture(new Uint8Array([95, 170, 255]), 3, 1, THREE.RedFormat);
+toonGrad.minFilter = toonGrad.magFilter = THREE.NearestFilter; toonGrad.needsUpdate = true;
+const toon = (color, extra = {}) => new THREE.MeshToonMaterial({ color, gradientMap: toonGrad, ...extra });
+const basic = (color, extra = {}) => new THREE.MeshBasicMaterial({ color, ...extra });
+const shared = o => { o.userData.shared = true; return o; };   // kept when a level is unloaded
+const SPHERE = shared(new THREE.SphereGeometry(1, 20, 14));
+const MAT = {
+  eye: toon(0xffffff), pupil: basic(0x1d1626), mouth: basic(0x3a1020),
+  cell: toon(0xfbfaff), lobe: toon(0x9467dd), mound: toon(0xf2b3c3), shot: basic(0xd9c2ff), gold: toon(0xffd23f),
+  nest: toon(0xffb27a), nestSpot: toon(0xf0955a), door: basic(0x6a2a10), troop: toon(0xffbf7a), troopFoot: toon(0xf3a25c),
+  bumpTissue: toon(0xe98aa2), fat: toon(0xffe08a), plinth: toon(0xff9cb4),
+  drop: toon(0x39c2ff, { emissive: 0x0b5c99, emissiveIntensity: 0.6 }),
+  bcell: toon(0xffe066), spike: toon(0xc9a2f5), steam: toon(0xffffff, { transparent: true, opacity: 0.45 }), ab: toon(0xff9f1c), spark: basic(0xfff2a0), puff: toon(0xffffff, { transparent: true, opacity: 0.85 }),
+  mucus: toon(0xb8de4a, { transparent: true, opacity: 0.88 }), bubble: toon(0xf4ffd8, { transparent: true, opacity: 0.8 }),
+  lips: toon(0xe8506a), tooth: toon(0xfffdf4), airway: toon(0xf8cfdc),
+};
+MAT.gold.side = THREE.DoubleSide;   // the king's crown is an open band
+Object.values(MAT).forEach(shared);
+function ball(mat, r, x = 0, y = 0, z = 0, shadow = true) {
+  const m = new THREE.Mesh(SPHERE, mat); m.scale.setScalar(r); m.position.set(x, y, z); m.castShadow = shadow; return m;
+}
+function addEyes(parent, s, y, z, spread) {   // googly eyes, s = eye radius
+  for (const side of [-1, 1]) {
+    parent.add(ball(MAT.eye, s, side * spread, y, z, false));
+    parent.add(ball(MAT.pupil, s * 0.55, side * spread * 1.05, y - s * 0.12, z + s * 0.62, false));
+  }
+}
+
+/* ======== level loading ======== */
+const TILE_H = 0.7, ROAD_Y = -0.14;
+const PALETTES = {   // tissue colours and the colour of the little bumps on it, per body part
+  pink:  { tissue: [0xf7a3b4, 0xf49aad, 0xf9b0bf, 0xf3a0b3, 0xf6a9b8], bump: 0xe98aa2 },
+  tummy: { tissue: [0xffb99a, 0xffc2a6, 0xf9ae8e, 0xffbfa0, 0xfcb593], bump: 0xf09a78 },
+  lungs: { tissue: [0xf4b6cf, 0xefadc9, 0xf7c0d6, 0xf1b2cc, 0xf5bad2], bump: 0xe597b8 },
+  fever: { tissue: [0xffa98f, 0xff9f86, 0xffb39a, 0xfaa08a, 0xffab92], bump: 0xf08a74 },
+};
+const entryStyle = i => Array.isArray(LEVEL.entry) ? LEVEL.entry[i] : LEVEL.entry;
+const ROAD = new THREE.Color(0xc42a48), SKIN = new THREE.Color(0xf4b49a);
+const PAD_GEO = shared(new THREE.CylinderGeometry(0.42, 0.46, 0.08, 28));
+const RING_GEO = shared(new THREE.RingGeometry(0.47, 0.58, 36).rotateX(-Math.PI / 2));
+const PLUS_GEO = shared(new THREE.BoxGeometry(0.34, 0.04, 0.09));
+const isRoad = ch => ch === '#' || ch === 'H' || (ch >= '1' && ch <= '9');
+const isEntry = ch => ch >= '1' && ch <= '9';
+
+let LEVEL = LEVELS[0], levelIndex = 0, board = null, world = null, entryFx = [], rbcs = [], rbcMesh = null, bestPad = null;
+const heartPos = new THREE.Vector3(), boundsPts = [];
+const view = { ppu: 40, yaw: 0, center: new THREE.Vector3(), g: new THREE.Vector3(1, 0, 1), base: new THREE.Vector3(), shake: 0 };
+
+function parseBoard(map) {
+  const b = { cells: new Map(), land: [], pads: [], entries: [], heart: null };
+  map.forEach((row, r) => [...row].forEach((ch, c) => {
+    if (ch === ' ') return;
+    const cell = { c, r, ch, x: c, z: r, top: 0 };
+    b.cells.set(c + ',' + r, cell); b.land.push(cell);
+    if (ch === 'o') b.pads.push(cell);
+    if (isEntry(ch)) b.entries[+ch - 1] = cell;
+    if (ch === 'H') b.heart = cell;
+  }));
+  for (const e of b.entries) e.path = findPath(b, e, b.heart);
+  // how many germ paths run over each vessel tile (blobs prefer to guard where paths merge)
+  for (const e of b.entries) for (const p of e.path) { const cell = b.cells.get(p.x + ',' + p.z); cell.paths = (cell.paths || 0) + 1; }
+  return b;
+}
+function findPath(b, from, to) {   // breadth-first search along the vessel tiles
+  const key = c => c.c + ',' + c.r, prev = new Map([[key(from), null]]), queue = [from];
+  while (queue.length) {
+    const cur = queue.shift(); if (cur === to) break;
+    for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const n = b.cells.get((cur.c + dc) + ',' + (cur.r + dr));
+      if (n && isRoad(n.ch) && !prev.has(key(n))) { prev.set(key(n), cur); queue.push(n); }
+    }
+  }
+  const path = [];
+  for (let c = to; c; c = prev.get(key(c))) path.unshift(new THREE.Vector3(c.x, 0, c.z));
+  return path;
+}
+
+function loadLevel(i) {
+  levelIndex = i; LEVEL = LEVELS[i];
+  clearField(); clearStructures(); closeMenu();
+  if (world) {
+    scene.remove(world);
+    world.traverse(o => {
+      if (o.geometry && !o.geometry.userData.shared) o.geometry.dispose();
+      if (o.material && !o.material.userData.shared) o.material.dispose();
+    });
+  }
+  world = new THREE.Group(); scene.add(world);
+  const rnd = mulberry32(LEVEL.seed);
+  const pal = PALETTES[LEVEL.palette || 'pink'], TISSUE = pal.tissue.map(c => new THREE.Color(c)), bumpMat = toon(pal.bump);
+  board = parseBoard(LEVEL.map);
+  game.sneezeHinted = false; game.spikyHinted = false;
+  const nearEntry = cell => board.entries.some(e => Math.abs(e.c - cell.c) <= 1 && Math.abs(e.r - cell.r) <= 1);
+
+  // tiles: tissue, sunken vessels, and skin around a nose's nostrils
+  const tiles = new THREE.InstancedMesh(new THREE.BoxGeometry(0.97, TILE_H, 0.97).translate(0, -TILE_H / 2, 0), toon(0xffffff), board.land.length);
+  tiles.receiveShadow = true;
+  const m = new THREE.Matrix4();
+  board.land.forEach((cell, n) => {
+    const road = isRoad(cell.ch) && cell.ch !== 'H';
+    cell.top = road ? ROAD_Y : rnd() * 0.06;
+    m.makeTranslation(cell.x, cell.top, cell.z); tiles.setMatrixAt(n, m);
+    const skin = isEntry(cell.ch) || (!road && board.entries.some((e, i) => entryStyle(i) === 'nostril' && Math.abs(e.c - cell.c) <= 1 && Math.abs(e.r - cell.r) <= 1));
+    tiles.setColorAt(n, skin ? SKIN : road ? ROAD : pick(TISSUE, rnd));
+  });
+  world.add(tiles);
+
+  // decorations: tissue bumps and little clusters of fat cells on free tiles
+  for (const cell of board.land) {
+    if (cell.ch !== '.' || nearEntry(cell)) continue;
+    if (Math.abs(cell.c - board.heart.c) <= 1 && Math.abs(cell.r - board.heart.r) <= 1) continue;
+    const roll = rnd(), jx = (rnd() - 0.5) * 0.4, jz = (rnd() - 0.5) * 0.4;
+    if (roll < 0.22) {
+      const b = ball(bumpMat, 1, cell.x + jx, cell.top, cell.z + jz);
+      const s = 0.2 + rnd() * 0.12; b.scale.set(s, s * 0.6, s); b.receiveShadow = true; world.add(b);
+    } else if (roll < 0.3) {
+      for (let k = 0, n = 2 + Math.floor(rnd() * 2); k < n; k++) {
+        const s = 0.11 + rnd() * 0.06;
+        world.add(ball(MAT.fat, s, cell.x + jx + (rnd() - 0.5) * 0.35, cell.top + s * 0.6, cell.z + jz + (rnd() - 0.5) * 0.35));
+      }
+    }
+  }
+
+  // build pads
+  for (const pad of board.pads) {
+    pad.plate = new THREE.Mesh(PAD_GEO, toon(0xfff1c9)); pad.plate.position.set(pad.x, pad.top + 0.04, pad.z);
+    pad.plate.receiveShadow = true; pad.plate.castShadow = true;
+    pad.ring = new THREE.Mesh(RING_GEO, basic(0xffd23f, { transparent: true, opacity: 0.6, depthWrite: false }));
+    pad.ring.position.set(pad.x, pad.top + 0.05, pad.z);
+    pad.plus = new THREE.Group();
+    for (const rot of [0, Math.PI / 2]) { const b = new THREE.Mesh(PLUS_GEO, toon(0xffc23a)); b.rotation.y = rot + Math.PI / 4; pad.plus.add(b); }
+    pad.plus.position.set(pad.x, pad.top + 0.1, pad.z);
+    pad.cover = board.land.filter(c => isRoad(c.ch) && Math.hypot(c.x - pad.x, c.z - pad.z) <= BUILDS.zapper.levels[0].range).length;
+    world.add(pad.plate, pad.ring, pad.plus);
+  }
+  bestPad = board.pads.reduce((a, b) => (b.cover > a.cover ? b : a));
+
+  // where germs get in (a scratch or a nostril), with a bobbing warning arrow and a wave label over each
+  $('labels').innerHTML = '';
+  entryFx = board.entries.map((e, i) => {
+    const look = new THREE.Group(), style = entryStyle(i);
+    const holeR = style === 'scratch' ? 0.4 : 0.42, holeScale = { scratch: [1.2, 0.6], nostril: [1, 0.75], mouth: [1.3, 0.7], airway: [1, 1] }[style];
+    const hole = new THREE.Mesh(new THREE.CircleGeometry(holeR, 24).rotateX(-Math.PI / 2), basic(style === 'scratch' ? 0x4a0718 : 0x3a0a14));
+    const rimMat = { scratch: toon(0xb3243f), nostril: toon(0xe9a389), mouth: MAT.lips, airway: MAT.airway }[style];
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(holeR + 0.02, style === 'scratch' ? 0.07 : style === 'mouth' ? 0.13 : 0.1, 8, 28).rotateX(Math.PI / 2), rimMat);
+    look.add(hole, rim);
+    if (style === 'mouth') for (const x of [-0.1, 0.1]) { const t = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.1, 0.1), MAT.tooth); t.position.set(x, 0.02, -0.3); look.add(t); }
+    if (style === 'airway') { const ring = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.06, 8, 24).rotateX(Math.PI / 2), MAT.airway); ring.position.y = -0.12; look.add(ring); }
+    look.scale.set(holeScale[0], 1, holeScale[1]);
+    look.position.set(e.x, ROAD_Y + 0.01, e.z);
+    const d = e.path[1].clone().sub(e.path[0]); look.rotation.y = Math.atan2(d.x, d.z) + Math.PI;   // across the vessel, teeth at the far side
+    const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.5, 20).rotateX(Math.PI), toon(0xffc23a));
+    arrow.position.set(e.x, 1.3, e.z); arrow.castShadow = true;
+    world.add(look, arrow);
+    const label = document.createElement('div'); label.className = 'anchor'; label.hidden = true;
+    label.innerHTML = '<div class="preview"></div>'; $('labels').append(label);
+    return { cell: e, arrow, label };
+  });
+
+  // red blood cells drifting along each vessel to show which way it flows
+  const perTile = board.entries.length > 1 ? 1 : 1.6;
+  rbcs = board.entries.flatMap(e => Array.from({ length: Math.round((e.path.length - 1) * perTile) }, () => (
+    { path: e.path, len: e.path.length - 1, d: rnd() * (e.path.length - 1), off: (rnd() - 0.5) * 0.55, spin: rnd() * 6, sp: 0.9 + rnd() * 0.4 })));
+  rbcMesh = new THREE.InstancedMesh(new THREE.TorusGeometry(0.075, 0.04, 6, 14), toon(0xff5568), rbcs.length);
+  world.add(rbcMesh);
+
+  // the heart sits on a plinth at the end of the vessel
+  const H = board.heart;
+  heart.plinth.position.set(H.x, H.top + 0.1, H.z);
+  heart.group.position.set(H.x, H.top + 0.95, H.z);
+  heartPos.copy(heart.group.position);
+  heart.thermo.visible = !!LEVEL.fever;
+
+  // camera framing
+  const xs = board.land.map(c => c.x), zs = board.land.map(c => c.z);
+  view.center.set((Math.min(...xs) + Math.max(...xs)) / 2, 0, (Math.min(...zs) + Math.max(...zs)) / 2);
+  boundsPts.length = 0;
+  for (const c of board.land) for (const dx of [-0.5, 0.5]) for (const dz of [-0.5, 0.5]) {
+    boundsPts.push(new THREE.Vector3(c.x + dx, c.top + 0.1, c.z + dz), new THREE.Vector3(c.x + dx, c.top - TILE_H, c.z + dz));
+  }
+  boundsPts.push(heartPos.clone().setY(2.0), ...board.entries.map(e => new THREE.Vector3(e.x, 2.3, e.z)));
+  resetLevelState();
+  placeCamera();
+}
+
+/* ======== heart ======== */
+const heart = { sneeze: 0, group: new THREE.Group(), body: null, mat: toon(0xff3b5c, { emissive: 0xffffff, emissiveIntensity: 0 }), hit: 0, plaster: new THREE.Group(), plinth: null };
+{
+  const s = new THREE.Shape();   // the classic heart curve, tip pointing up before it's turned over
+  s.moveTo(25, 25); s.bezierCurveTo(25, 25, 20, 0, 0, 0); s.bezierCurveTo(-30, 0, -30, 35, -30, 35);
+  s.bezierCurveTo(-30, 55, -10, 77, 25, 95); s.bezierCurveTo(60, 77, 80, 55, 80, 35);
+  s.bezierCurveTo(80, 35, 80, 0, 50, 0); s.bezierCurveTo(35, 0, 25, 25, 25, 25);
+  const geo = new THREE.ExtrudeGeometry(s, { depth: 22, bevelEnabled: true, bevelSegments: 5, bevelSize: 9, bevelThickness: 9, curveSegments: 24 });
+  geo.center(); geo.rotateZ(Math.PI); geo.scale(0.0125, 0.0125, 0.0125);
+  heart.body = new THREE.Mesh(geo, heart.mat); heart.body.castShadow = true;
+  const face = new THREE.Group(); face.position.z = 0.26;
+  addEyes(face, 0.1, 0.12, 0.02, 0.24);
+  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.028, 8, 20, Math.PI), MAT.mouth);
+  smile.rotation.z = Math.PI; smile.position.set(0, -0.08, 0.05); face.add(smile);
+  for (const side of [-1, 1]) {   // rosy cheeks
+    const ch = ball(toon(0xff8fa6), 0.07, side * 0.4, -0.06, 0.02, false); ch.scale.z = 0.3; face.add(ch);
+  }
+  // a plaster that appears after the first germ gets through
+  for (const rot of [0.6, -0.6]) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.11, 0.03), toon(0xf6d2a2)); p.rotation.z = rot; heart.plaster.add(p);
+  }
+  heart.plaster.position.set(0.38, 0.32, 0.29); heart.plaster.visible = false;
+  heart.thermo = new THREE.Group();   // a thermometer in its mouth, for the fever level
+  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.42, 10), MAT.tooth); stick.position.y = 0.21; heart.thermo.add(stick);
+  heart.thermo.add(ball(MAT.lips, 0.055, 0, 0.42, 0, false));
+  heart.thermo.position.set(0.04, -0.12, 0.34); heart.thermo.rotation.set(0.5, 0, -2.1); heart.thermo.visible = false;
+  heart.body.add(heart.thermo);
+  heart.body.add(face, heart.plaster);
+  heart.group.add(heart.body);
+  heart.plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.68, 0.2, 32), MAT.plinth);
+  heart.plinth.castShadow = heart.plinth.receiveShadow = true;
+  scene.add(heart.plinth, heart.group);
+}
+
+/* ======== range ring ======== */
+const rangeRing = new THREE.Group();
+rangeRing.add(new THREE.Mesh(new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2), basic(0xffffff, { transparent: true, opacity: 0.16, depthWrite: false })));
+rangeRing.add(new THREE.Mesh(new THREE.RingGeometry(0.975, 1, 64).rotateX(-Math.PI / 2), basic(0xffffff, { transparent: true, opacity: 0.7, depthWrite: false })));
+rangeRing.visible = false; scene.add(rangeRing);
+function showRing(x, y, z, r) { rangeRing.position.set(x, y, z); rangeRing.scale.set(r, 1, r); rangeRing.visible = true; }
+
+/* ======== models ======== */
+const GERM_MAT = {};   // per kind: plain body colour (for splat bits) and bump colour, shared by every germ of that kind
+for (const [kind, k] of Object.entries(GERMS)) GERM_MAT[kind] = { body: shared(toon(k.color)), bump: shared(toon(k.bump)) };
+const CAPSULE_GEO = shared(new THREE.CapsuleGeometry(1, 1.6, 6, 14).rotateX(Math.PI / 2));
+const HELIX_GEO = (() => {   // a corkscrew spring standing up
+  class Helix extends THREE.Curve { getPoint(t, out = new THREE.Vector3()) { const a = t * Math.PI * 5; return out.set(Math.cos(a) * 0.5, t * 2.2, Math.sin(a) * 0.5); } }
+  return shared(new THREE.TubeGeometry(new Helix(), 64, 0.2, 8));
+})();
+const CROWN_GEO = shared(new THREE.CylinderGeometry(0.42, 0.46, 0.24, 24, 1, true));
+const BROW_GEO = shared(new THREE.BoxGeometry(0.3, 0.06, 0.06));
+const SPIKE_GEO = shared(new THREE.ConeGeometry(0.34, 1, 8).translate(0, 0.5, 0));
+const Y_GEO = shared(new THREE.CylinderGeometry(0.028, 0.028, 0.16, 6).translate(0, 0.08, 0));
+function makeY(mat, scale = 1) {   // an antibody: a little Y
+  const y = new THREE.Group();
+  y.add(new THREE.Mesh(Y_GEO, mat));
+  for (const side of [-1, 1]) { const arm = new THREE.Mesh(Y_GEO, mat); arm.position.y = 0.15; arm.rotation.z = side * 0.65; y.add(arm); }
+  y.scale.setScalar(scale);
+  return y;
+}
+function makeGerm(k) {   // the body material is the germ's own so it can flash when hit
+  const mesh = new THREE.Group(), inner = new THREE.Group(), mat = toon(k.color, { emissive: 0xffffff, emissiveIntensity: 0 });
+  const bumpMat = GERM_MAT[k.kind].bump, s = k.size;
+  let spin = null, shell = null, top = s * 2, face = [s * 1.2, s * 0.78, s * 0.36];
+  if (k.shape === 'rod') {   // wiggler: a sausage with stripes
+    const body = new THREE.Mesh(CAPSULE_GEO, mat); body.scale.setScalar(s * 0.6); body.rotation.y = Math.PI / 2; body.position.y = s * 0.62; body.castShadow = true; inner.add(body);   // lies across its path
+    for (const x of [-0.6, 0.6]) { const band = ball(bumpMat, 1, x * s, s * 0.62, 0, false); band.scale.set(s * 0.12, s * 0.63, s * 0.63); inner.add(band); }
+    top = s * 1.3; face = [s * 0.82, s * 0.5, s * 0.24];
+  } else if (k.shape === 'spiral') {   // corkscrew: a spinning spring with a round head on top
+    spin = new THREE.Group();
+    const tail = new THREE.Mesh(HELIX_GEO, mat); tail.scale.setScalar(s * 0.6); tail.position.y = s * 0.15; tail.castShadow = true; spin.add(tail); inner.add(spin);
+    inner.add(ball(mat, s * 0.55, 0, s * 1.75, 0));
+    top = s * 2.35; face = [s * 1.85, s * 0.45, s * 0.22];
+  } else if (k.shape === 'clump') {   // chunky: a lumpy cluster
+    for (const [x, y, z, r] of [[0, 0.85, 0.1, 0.8], [-0.62, 0.62, -0.2, 0.56], [0.62, 0.6, -0.2, 0.56], [0, 1.35, -0.35, 0.5], [0.3, 0.45, -0.7, 0.48], [-0.35, 0.4, -0.65, 0.45]]) {
+      inner.add(ball(mat, s * r, x * s, y * s, z * s));
+    }
+    for (const [x, y, z] of [[-0.5, 1.0, 0.2], [0.55, 0.95, 0.15], [0.1, 1.55, -0.2]]) inner.add(ball(bumpMat, s * 0.13, x * s, y * s, z * s, false));
+    top = s * 1.9; face = [s * 1.0, s * 0.82, s * 0.3];
+  } else if (k.shape === 'virus') {   // spiky: a ball with yellow-tipped spikes that shrink once an antibody sticks
+    inner.add(ball(mat, s, 0, s, 0));
+    shell = new THREE.Group(); shell.position.y = s; inner.add(shell);
+    const n = 14;
+    for (let i = 0; i < n; i++) {   // spread evenly over the ball
+      const yv = 1 - (i + 0.5) / n * 2, rr = Math.sqrt(1 - yv * yv), a = i * 2.4;
+      const dir = new THREE.Vector3(Math.cos(a) * rr, yv, Math.sin(a) * rr);
+      if (dir.z > 0.55 && dir.y > -0.2 && dir.y < 0.6) continue;   // keep the face clear
+      const spike = new THREE.Mesh(SPIKE_GEO, MAT.spike); spike.scale.set(s * 0.55, s * 0.75, s * 0.55);
+      spike.position.copy(dir).multiplyScalar(s * 0.8); spike.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+      const tip = ball(bumpMat, s * 0.17, 0, 0, 0, false); tip.position.copy(dir).multiplyScalar(s * 1.6);
+      shell.add(spike, tip);
+    }
+    top = s * 2.4;
+  } else if (k.shape === 'king') {   // the King Germ: a big grumpy blob with a crown
+    inner.add(ball(mat, s, 0, s, 0));
+    for (const [a, b] of [[0.3, 1.0], [2.0, 0.8], [3.3, 1.1], [4.5, 0.7], [5.6, 1.2], [1.2, 1.4], [2.7, 1.5]]) {
+      const dir = new THREE.Vector3(Math.cos(a) * Math.sin(b), Math.cos(b), Math.sin(a) * Math.sin(b));
+      inner.add(ball(bumpMat, s * 0.22, dir.x * s, s + dir.y * s, dir.z * s));
+    }
+    const crown = new THREE.Group(); crown.position.y = s * 1.85;
+    const band = new THREE.Mesh(CROWN_GEO, MAT.gold); band.scale.setScalar(s); band.castShadow = true; crown.add(band);
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2, pt = new THREE.Mesh(SPIKE_GEO, MAT.gold);
+      pt.scale.set(s * 0.32, s * 0.38, s * 0.32); pt.position.set(Math.cos(a) * s * 0.4, s * 0.12, Math.sin(a) * s * 0.4); crown.add(pt);
+      crown.add(ball(MAT.lips, s * 0.06, Math.cos(a) * s * 0.4, s * 0.52, Math.sin(a) * s * 0.4, false));
+    }
+    inner.add(crown);
+    for (const side of [-1, 1]) {   // grumpy eyebrows
+      const brow = new THREE.Mesh(BROW_GEO, MAT.mouth); brow.scale.setScalar(s); brow.position.set(side * s * 0.36, s * 1.52, s * 0.86); brow.rotation.z = side * 0.35; inner.add(brow);
+    }
+    top = s * 2.6;
+  } else {   // blob: bloops and big bloops
+    inner.add(ball(mat, s, 0, s, 0));
+    for (const [a, b] of [[0.3, 0.9], [2.0, 0.7], [3.3, 1.0], [4.5, 0.6], [5.6, 1.2], [1.2, 1.5]]) {   // bumps around the top half
+      const dir = new THREE.Vector3(Math.cos(a) * Math.sin(b), Math.cos(b), Math.sin(a) * Math.sin(b));
+      inner.add(ball(bumpMat, s * 0.3, dir.x * s, s + dir.y * s, dir.z * s));
+    }
+  }
+  addEyes(inner, s * 0.32, face[0], face[1], face[2]);
+  if (k.shape !== 'rod') { const mouth = ball(MAT.mouth, 1, 0, face[0] - s * 0.48, face[1] + s * 0.15, false); mouth.scale.set(s * 0.22, s * 0.1, s * 0.08); inner.add(mouth); }
+  mesh.add(inner);
+  return { mesh, inner, mat, bumpMat, spin, shell, top };
+}
+const MOUND_GEO = shared(new THREE.CylinderGeometry(0.34, 0.42, 0.24, 24));
+const RANK_GEO = shared(new THREE.TorusGeometry(0.41, 0.035, 8, 32).rotateX(Math.PI / 2));
+const DOME_GEO = shared(new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2));
+const DOOR_GEO = (() => {   // an arched door: a square bottom with a round top
+  const sh = new THREE.Shape();
+  sh.moveTo(-0.1, 0); sh.lineTo(0.1, 0); sh.lineTo(0.1, 0.13); sh.absarc(0, 0.13, 0.1, 0, Math.PI, false); sh.lineTo(-0.1, 0);
+  return shared(new THREE.ShapeGeometry(sh, 12));
+})();
+function makeMound(group) {
+  const mound = new THREE.Mesh(MOUND_GEO, MAT.mound);
+  mound.position.y = 0.12; mound.castShadow = mound.receiveShadow = true; group.add(mound);
+}
+function makeZapper() {
+  const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
+  makeMound(group);
+  aim.position.y = 0.24; group.add(aim); aim.add(body);
+  const cell = ball(MAT.cell, 1, 0, 0.32, 0); cell.scale.set(0.36, 0.33, 0.36); body.add(cell);
+  for (const [x, y, z, r] of [[-0.15, 0.58, -0.1, 0.13], [0, 0.64, -0.17, 0.14], [0.15, 0.58, -0.1, 0.13]]) body.add(ball(MAT.lobe, r, x, y, z));
+  for (const side of [-1, 1]) body.add(ball(MAT.cell, 0.12, side * 0.34, 0.2, 0.06));   // little arms
+  addEyes(body, 0.085, 0.42, 0.27, 0.13);
+  const mouth = ball(MAT.mouth, 1, 0, 0.27, 0.34, false); mouth.scale.set(0.06, 0.04, 0.03); body.add(mouth);
+  return { group, aim, body };
+}
+function makeNest() {   // a little dome house the blobs live in, door towards the viewer
+  const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
+  makeMound(group);
+  aim.position.y = 0.24; group.add(aim); aim.add(body);
+  const dome = new THREE.Mesh(DOME_GEO, MAT.nest); dome.scale.set(0.42, 0.4, 0.42); dome.castShadow = true; body.add(dome);
+  const door = new THREE.Mesh(DOOR_GEO, MAT.door); door.position.set(0, 0.005, 0.44); door.rotation.x = -0.3; body.add(door);
+  for (const [a, h] of [[2.9, 0.5], [3.7, 0.9], [4.5, 0.4], [5.4, 0.8], [6.1, 0.35], [0.1, 0.9]]) {   // spots round the sides and back
+    const y = Math.sin(h) * 0.4, r = Math.cos(h) * 0.42;
+    body.add(ball(MAT.nestSpot, 0.05, Math.cos(a) * r, y, Math.sin(a) * r, false));
+  }
+  return { group, aim, body };
+}
+function makeFactory() {   // the antibody maker: a yellow B-cell with antibody antennae
+  const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
+  makeMound(group);
+  aim.position.y = 0.24; group.add(aim); aim.add(body);
+  const cell = ball(MAT.bcell, 1, 0, 0.32, 0); cell.scale.set(0.35, 0.33, 0.35); body.add(cell);
+  for (const side of [-1, 1]) { const y = makeY(MAT.ab, 1.4); y.position.set(side * 0.16, 0.58, -0.04); y.rotation.z = -side * 0.25; body.add(y); }
+  addEyes(body, 0.085, 0.4, 0.27, 0.13);
+  const mouth = ball(MAT.mouth, 1, 0, 0.25, 0.33, false); mouth.scale.set(0.07, 0.035, 0.03); body.add(mouth);
+  return { group, aim, body };
+}
+function makeTrap() {   // a snot puddle with a couple of bubbles
+  const g = new THREE.Group();
+  for (const [x, z, r] of [[0, 0, 0.42], [0.22, 0.18, 0.28], [-0.24, 0.12, 0.26], [0.05, -0.26, 0.3], [-0.2, -0.2, 0.22]]) {
+    const b = ball(MAT.mucus, 1, x, 0.02, z, false); b.scale.set(r, 0.09, r); b.receiveShadow = true; g.add(b);
+  }
+  for (const [x, z, r] of [[0.12, 0.05, 0.06], [-0.15, -0.08, 0.045], [0.02, -0.22, 0.035]]) g.add(ball(MAT.bubble, r, x, 0.07, z, false));
+  return g;
+}
+function makeTroop() {   // a macrophage blob: big, soft, hungry
+  const mesh = new THREE.Group(), inner = new THREE.Group();
+  const body = ball(MAT.troop, 1, 0, 0.2, 0); body.scale.set(0.25, 0.21, 0.25); inner.add(body);
+  for (const [x, z] of [[-0.19, 0.08], [0.19, 0.08], [0, -0.2]]) inner.add(ball(MAT.troopFoot, 0.08, x, 0.05, z));
+  addEyes(inner, 0.065, 0.3, 0.18, 0.09);
+  const mouth = ball(MAT.mouth, 1, 0, 0.16, 0.235, false); mouth.scale.set(0.09, 0.03, 0.04); inner.add(mouth);
+  mesh.add(inner);
+  return { mesh, inner, mouth };
+}
+const DROP_GEO = [shared(new THREE.SphereGeometry(0.165, 16, 12)), shared(new THREE.ConeGeometry(0.15, 0.26, 16).translate(0, 0.2, 0))];
+function makeDrop() {   // a raindrop: sphere with a cone on top
+  const g = new THREE.Group();
+  for (const geo of DROP_GEO) { const m = new THREE.Mesh(geo, MAT.drop); m.castShadow = true; g.add(m); }
+  return g;
+}
+
+/* ======== camera ======== */
+function placeCamera() {
+  // landscape screens try both layouts and keep the one that shows the board bigger
+  // (a phone on its side wants the side column; a 4:3 tablet on its side often fits the tall board better)
+  renderer.setSize(innerWidth, innerHeight, false);
+  const wide = innerWidth > innerHeight && aimCamera(true) > aimCamera(false);
+  aimCamera(wide);
+}
+function aimCamera(wide) {   // turns the camera for the layout, fits the board into the free space, returns pixels per tile
+  const W = innerWidth, H = innerHeight;
+  document.body.classList.toggle('wide', wide);
+  const pitch = CAM_PITCH * Math.PI / 180, c = view.center, g = view.g;
+  const entryMid = board.entries.reduce((v, e) => v.add(e.path[0]), new THREE.Vector3()).divideScalar(board.entries.length);
+  // portrait: the map diagonal runs down the screen; wide: turn 90 degrees so it runs left to right
+  for (const [gx, gz] of wide ? [[1, -1], [-1, 1]] : [[1, 1]]) {
+    g.set(gx, 0, gz).normalize();
+    camera.position.copy(c).addScaledVector(g, 40 * Math.cos(pitch)).setY(40 * Math.sin(pitch));
+    camera.lookAt(c); camera.updateMatrixWorld();
+    view.yaw = Math.atan2(gx, gz);
+    if (!wide) break;
+    const inv = camera.matrixWorldInverse, a = entryMid.clone().applyMatrix4(inv), b = heartPos.clone().applyMatrix4(inv);
+    if (b.x > a.x) break;
+  }
+  // fit the board into the space the HUD leaves free
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  const v = new THREE.Vector3();
+  for (const p of boundsPts) { v.copy(p).applyMatrix4(camera.matrixWorldInverse); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+  const safe = $('safe').getBoundingClientRect(), bar = $('bar').getBoundingClientRect(), dock = $('dock').getBoundingClientRect();
+  const r = wide
+    ? { x: safe.left + 8, y: safe.top + 8, w: Math.min(bar.left, dock.left) - safe.left - 16, h: safe.height - 16 }
+    : { x: safe.left + 6, y: bar.bottom + 6, w: safe.width - 12, h: dock.top - bar.bottom - 12 };
+  const s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0)), bx = (x0 + x1) / 2, by = (y0 + y1) / 2;
+  camera.left = bx - (r.x + r.w / 2) / s; camera.right = camera.left + W / s;
+  camera.top = by + (r.y + r.h / 2) / s; camera.bottom = camera.top - H / s;
+  camera.updateProjectionMatrix();
+  view.ppu = s; view.base.copy(camera.position);
+  // light from the upper left of the screen, behind the board, so shadows fall towards the viewer
+  const right = new THREE.Vector3(g.z, 0, -g.x);
+  sun.position.copy(c).addScaledVector(right, -7).addScaledVector(g, -5).setY(16);
+  sun.target.position.copy(c);
+  heart.group.rotation.set(-0.3, view.yaw, 0, 'YXZ');
+  for (const t of game.towers) if (t.kind === 'nest') setDoor(t);
+  return s;
+}
+const _v = new THREE.Vector3();
+function toScreen(x, y, z) {
+  _v.set(x, y, z).project(camera);
+  return { x: (_v.x + 1) / 2 * innerWidth, y: (1 - _v.y) / 2 * innerHeight };
+}
+function groundY(x, z) {   // height of the surface under a point (vessel floor, tissue, or a pad)
+  const cell = board.cells.get(Math.round(x) + ',' + Math.round(z));
+  return !cell ? 0 : cell.top + (cell.ch === 'o' ? 0.08 : 0);
+}
+
+/* ======== vibration ======== */
+// Same approach as math5/haptics.js. Android: navigator.vibrate patterns. iPhone/iPad (iOS 18+): no vibrate API,
+// but clicking a hidden native <input type="checkbox" switch> gives a system tap; iOS only plays those in response
+// to a touch, so buzzes that happen on their own (a germ reaching the heart) may stay silent there.
+const Haptics = (() => {
+  const PATTERNS = {   // [buzz ms, pause ms, buzz ms, ...]
+    tap: [8], build: [20], nope: [30, 40, 30], go: [25, 40, 40], pop: [15],
+    ouch: [70, 60, 70], sneeze: [30, 40, 30, 40, 250], boss: [200, 80, 200, 80, 300],
+    win: [50, 70, 50, 70, 180], lose: [120, 80, 120],
+  };
+  const touch = navigator.maxTouchPoints > 0;   // desktop Chrome has navigator.vibrate too, but it does nothing
+  const canVibrate = touch && typeof navigator.vibrate === 'function';
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const useSwitch = !canVibrate && isIOS;
+  let enabled = store.get('vibrate', true);
+  function iosTap() {
+    try {
+      const label = document.createElement('label'), input = document.createElement('input');
+      label.setAttribute('aria-hidden', 'true'); label.style.display = 'none';
+      input.type = 'checkbox'; input.setAttribute('switch', '');
+      label.appendChild(input); document.head.appendChild(label); label.click(); document.head.removeChild(label);
+    } catch {}
+  }
+  return {
+    supported: canVibrate || useSwitch,
+    isOn: () => enabled,
+    setOn(on) { enabled = !!on; store.set('vibrate', enabled); if (!enabled && canVibrate) try { navigator.vibrate(0); } catch {} },
+    buzz(name) {
+      const p = PATTERNS[name]; if (!enabled || !p) return;
+      if (canVibrate) { try { navigator.vibrate(p); } catch {} }
+      else if (useSwitch) { const taps = Math.min(4, Math.ceil(p.length / 2)); iosTap(); for (let i = 1; i < taps; i++) setTimeout(iosTap, i * 110); }
+    },
+  };
+})();
+
+/* ======== sound ======== */
+// All synthesized: Web Audio for effects, speechSynthesis for the spoken lines.
+const Sound = {
+  ctx: null, muted: store.get('muted', false), lastShot: 0, lastNom: 0, combo: 0, lastCollect: 0,
+  init() {
+    if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; this.ctx = new AC(); }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  tone(f, d, type = 'sine', v = 0.12, delay = 0, f2) {
+    if (this.muted || !this.ctx) return;
+    const t = this.ctx.currentTime + delay, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + d + 0.03);
+  },
+  noise(d, v, freq, delay = 0) {   // a short filtered noise burst (cough, splat)
+    if (this.muted || !this.ctx) return;
+    const ctx = this.ctx, n = Math.floor(ctx.sampleRate * d), buf = ctx.createBuffer(1, n, ctx.sampleRate), data = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / n) ** 2;
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 1.3; g.gain.value = v;
+    s.connect(f).connect(g).connect(ctx.destination); s.start(ctx.currentTime + delay);
+  },
+  tap() { Haptics.buzz('tap'); this.tone(720, 0.06, 'triangle', 0.06); },
+  shoot() {
+    if (!this.ctx || this.ctx.currentTime - this.lastShot < 0.07) return; this.lastShot = this.ctx.currentTime;
+    this.tone(880 + Math.random() * 200, 0.07, 'triangle', 0.028, 0, 1500);
+  },
+  hit() { this.tone(300, 0.05, 'sine', 0.04, 0, 200); },
+  nom() {
+    if (!this.ctx || this.ctx.currentTime - this.lastNom < 0.12) return; this.lastNom = this.ctx.currentTime;
+    this.tone(210 + Math.random() * 40, 0.09, 'square', 0.035, 0, 120); this.tone(160, 0.08, 'sine', 0.08, 0.06, 90);
+  },
+  pop(big) { if (big) Haptics.buzz('pop'); this.tone(big ? 380 : 620, 0.16, 'sine', 0.16, 0, big ? 90 : 160); this.tone(1400, 0.04, 'triangle', 0.05); this.noise(0.08, 0.12, 900); },
+  collect() {
+    const now = this.ctx ? this.ctx.currentTime : 0;
+    this.combo = now - this.lastCollect < 0.5 ? Math.min(this.combo + 1, 8) : 0; this.lastCollect = now;
+    const f = 1050 * 2 ** (this.combo / 12 * 2);
+    this.tone(f, 0.09, 'sine', 0.08); this.tone(f * 1.5, 0.12, 'sine', 0.05, 0.05);
+  },
+  build() { Haptics.buzz('build'); [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.16, 'triangle', 0.09, i * 0.07)); },
+  upgrade() { Haptics.buzz('build'); [659, 831, 988, 1319, 1661].forEach((f, i) => this.tone(f, 0.2, 'triangle', 0.08, i * 0.06)); },
+  train() { Haptics.buzz('build'); this.tone(260, 0.18, 'sine', 0.14, 0, 620); this.tone(620, 0.12, 'triangle', 0.05, 0.12, 900); },
+  tired() { this.tone(500, 0.35, 'sine', 0.06, 0, 220); },
+  boss() { Haptics.buzz('boss'); [98, 92, 82].forEach((f, i) => this.tone(f, 0.5, 'sawtooth', 0.09, i * 0.35, f * 0.9)); this.noise(1.2, 0.25, 200, 0.1); },
+  clink() { this.tone(2200, 0.08, 'triangle', 0.05); this.tone(3100, 0.06, 'sine', 0.03, 0.03); },
+  stick() { this.tone(900, 0.06, 'sine', 0.06, 0, 500); this.tone(500, 0.08, 'triangle', 0.04, 0.05); },
+  puff() { this.noise(0.1, 0.12, 1600); },
+  splat() { this.noise(0.25, 0.35, 500); this.tone(180, 0.2, 'sine', 0.12, 0, 90); },
+  vowel(f, d, delay) {   // a buzzy "ah"
+    if (this.muted || !this.ctx) return;
+    const ctx = this.ctx, t = ctx.currentTime + delay, o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * 1.25, t + d);
+    lp.type = 'lowpass'; lp.frequency.value = 1100;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(lp).connect(g).connect(ctx.destination); o.start(t); o.stop(t + d + 0.05);
+  },
+  sneeze() { Haptics.buzz('sneeze'); this.vowel(300, 0.3, 0); this.vowel(340, 0.34, 0.36); this.noise(0.55, 0.9, 2600, 0.75); this.noise(0.4, 0.5, 900, 0.78); },
+  nope() { Haptics.buzz('nope'); this.tone(240, 0.12, 'square', 0.04); this.tone(200, 0.16, 'square', 0.04, 0.12); },
+  go() { Haptics.buzz('go'); [392, 523, 659, 784].forEach((f, i) => this.tone(f, 0.18, 'square', 0.045, i * 0.09)); this.tone(1047, 0.4, 'triangle', 0.08, 0.36); },
+  ouch() { Haptics.buzz('ouch'); this.tone(110, 0.32, 'sine', 0.3, 0, 55); this.noise(0.14, 0.35, 700, 0.05); this.noise(0.12, 0.25, 600, 0.22); },
+  cleared() { [659, 784, 988, 1319].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.08, i * 0.1)); },
+  win() { Haptics.buzz('win'); [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.26, 'triangle', 0.09, i * 0.12)); },
+  lose() { Haptics.buzz('lose'); [523, 440, 349, 262].forEach((f, i) => this.tone(f, 0.3, 'triangle', 0.08, i * 0.18)); this.noise(0.3, 0.4, 1200, 0.8); },
+};
+const Speech = {
+  voice: null, lastNope: -99,
+  pickVoice() {
+    const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+    this.voice = vs.find(v => /^en[-_]US/i.test(v.lang) && /Samantha|Google US English|Aria|Jenny|Zira/i.test(v.name))
+      || vs.find(v => /^en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+  },
+  say(text, queue = false) {   // queue: wait for whatever is being said instead of cutting it off
+    if (Sound.muted || !window.speechSynthesis) return;
+    if (!queue) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.95; u.pitch = 1.15; if (this.voice) u.voice = this.voice;
+    u.onstart = () => Music.duck(true);
+    u.onend = u.onerror = () => { if (!speechSynthesis.speaking) Music.duck(false); };
+    speechSynthesis.speak(u);
+  },
+};
+if (window.speechSynthesis) { Speech.pickVoice(); speechSynthesis.onvoiceschanged = () => Speech.pickVoice(); }
+
+/* ======== music ======== */
+// Synthesized, after Robot Spy's Music: a lookahead scheduler queues each 16th note ~0.15 s ahead of the audio clock.
+// Three moods: gentle while building, bouncy with drums during a wave, minor and heavier while the King Germ is out.
+// Only clean tones, no noise loops. It dips while the voice is talking.
+const MUSIC_VOL = 0.15;         // overall music level
+const MUSIC_DUCK = 0.35;        // music level (fraction) while the voice talks
+const MAJOR = [{ bass: 48, arp: [60, 64, 67, 72] }, { bass: 45, arp: [57, 60, 64, 69] }, { bass: 41, arp: [57, 60, 65, 69] }, { bass: 43, arp: [55, 59, 62, 67] }];   // C Am F G
+const MINOR = [{ bass: 45, arp: [57, 60, 64, 69] }, { bass: 41, arp: [57, 60, 65, 69] }, { bass: 38, arp: [57, 62, 65, 69] }, { bass: 40, arp: [56, 59, 64, 68] }];   // Am F Dm E
+const MUSIC_MOODS = {           // tempo, chords, melody notes (MIDI), drums, how busy the melody is (0-1)
+  build: { bpm: 92,  bars: MAJOR, tune: [72, 74, 76, 79, 81], drums: false, busy: 0.22, bass: [0, 8] },
+  wave:  { bpm: 124, bars: MAJOR, tune: [72, 74, 76, 79, 81, 84], drums: true, busy: 0.4, bass: [0, 3, 6, 8, 11, 14] },
+  boss:  { bpm: 110, bars: MINOR, tune: [69, 71, 72, 76, 77], drums: true, busy: 0.35, bass: [0, 2, 4, 8, 10, 12] },
+};
+const midiHz = m => 440 * 2 ** ((m - 69) / 12);
+const Music = {
+  out: null, timer: 0, step: 0, next: 0, on: false, tune: [], mood: null, ducked: false,
+  set(mood) {   // switch mood (null = silence)
+    if (mood === this.mood) return;
+    this.mood = mood;
+    if (!mood) this.stop(); else this.start();
+  },
+  start() {
+    const ctx = Sound.ctx; if (this.on || Sound.muted || !ctx || ctx.state !== 'running') { if (!this.on) this.mood = null; return; }
+    if (!this.out) { this.out = ctx.createGain(); this.out.gain.value = 0.0001; this.out.connect(ctx.destination); }
+    this.ramp(this.level(), 1.2);
+    this.on = true; this.step = 0; this.next = ctx.currentTime + 0.1;
+    this.timer = setInterval(() => this.schedule(), 25);
+  },
+  stop(fade = 0.6) {
+    if (!this.on) return; this.on = false; clearInterval(this.timer); this.mood = null;
+    this.ramp(0.0001, fade);
+  },
+  level() { return MUSIC_VOL * (this.ducked ? MUSIC_DUCK : 1); },
+  ramp(v, secs) {
+    const g = this.out.gain, t = Sound.ctx.currentTime;
+    g.cancelScheduledValues(t); g.setValueAtTime(Math.max(0.0001, g.value), t); g.exponentialRampToValueAtTime(Math.max(0.0001, v), t + secs);
+  },
+  duck(on) { this.ducked = on; if (this.on) this.ramp(this.level(), on ? 0.15 : 0.8); },
+  schedule() {
+    const ctx = Sound.ctx, m = MUSIC_MOODS[this.mood]; if (!m) return;
+    if (this.next < ctx.currentTime - 0.05) this.next = ctx.currentTime + 0.05;   // timer was held up: skip missed notes
+    while (this.next < ctx.currentTime + 0.15) { this.play(m, this.step, this.next); this.next += 60 / m.bpm / 4; this.step++; }
+  },
+  play(m, i, t) {
+    const s = i % 16, bar = m.bars[Math.floor(i / 16) % m.bars.length];
+    if (s === 0) this.tune = Array.from({ length: 8 }, () => Math.random() < m.busy ? pick(m.tune) : 0);   // a new little melody each bar
+    if (m.drums && (s === 0 || s === 8)) this.note(130, t, 0.15, 'sine', 0.5, 0, 45);          // soft kick
+    if (m.drums && (s === 4 || s === 12)) this.note(2400, t, 0.03, 'triangle', 0.03);          // tick
+    if (m.bass.includes(s)) this.note(midiHz(bar.bass), t, m.drums ? 0.14 : 0.4, 'triangle', 0.2, 900);
+    if (s % (m.drums ? 2 : 4) === 0) this.note(midiHz(bar.arp[(s / (m.drums ? 2 : 4)) % 4] + (s >= 8 ? 12 : 0)), t, 0.12, 'triangle', 0.05);
+    if (s % 2 === 0 && this.tune[s / 2]) { const f = midiHz(this.tune[s / 2]); this.note(f, t, 0.3, 'sine', 0.07); this.note(f * 2, t, 0.12, 'sine', 0.015); }   // a little bell
+  },
+  note(f, t, d, type, v, cutoff = 0, f2 = 0) {
+    const ctx = Sound.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    let node = o;
+    if (cutoff) { const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = cutoff; o.connect(lp); node = lp; }
+    node.connect(g).connect(this.out); o.start(t); o.stop(t + d + 0.03);
+  },
+};
+function wantedMood() {
+  if (game.state === 'won' || game.state === 'lost') return null;
+  if (game.state === 'wave') return game.germs.some(g => g.k.kind === 'king') ? 'boss' : 'wave';
+  return 'build';
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && Music.on) Music.stop(0.2); });   // background tabs throttle timers
+
+/* ======== game state ======== */
+const game = {
+  state: 'title', run: 0, energy: 0, sparkles: HEART_SPARKLES, wave: 0,
+  queue: [], waveT: 0, germs: [], towers: [], troops: [], shots: [], drops: [], fx: [],
+  menuSpot: null, tutorial: true, time: 0, timeScale: 1, instant: false, traps: [], sneezeCd: 0, sneezeAt: 0, sneezeHint: 0, sneezeHinted: false,
+  seen: new Set(),
+  unlocked: Math.min(store.get('unlocked', 0), LEVELS.length - 1),
+  stars: store.get('stars', []),   // best stars per level
+};
+
+function clearField() {   // everything that moves: germs, shots, drops, bits
+  for (const g of game.germs) g.mat.dispose();
+  for (const list of [game.germs, game.shots, game.drops, game.fx]) { for (const o of list) scene.remove(o.mesh); list.length = 0; }
+  game.queue = [];
+}
+function clearStructures() {
+  for (const tr of game.traps) { scene.remove(tr.mesh); tr.cell.trap = null; }
+  game.traps = [];
+  for (const t of game.towers) scene.remove(t.group);
+  for (const b of game.troops) scene.remove(b.mesh);
+  game.towers = []; game.troops = [];
+}
+function resetLevelState() {
+  Object.assign(game, { run: game.run + 1, energy: LEVEL.startEnergy, sparkles: HEART_SPARKLES, wave: 0, state: 'build', sneezeCd: 0, sneezeAt: 0, sneezeHint: 0 });
+  for (const p of board.pads) { p.tower = null; p.plus.visible = p.ring.visible = true; }
+  heart.plaster.visible = false;
+  updateHud(); showPreview();
+}
+function startLevel() {   // play the loaded level from the beginning
+  clearField(); clearStructures(); closeMenu();
+  resetLevelState();
+}
+function startWave() {
+  if (game.state !== 'build') return;
+  const groups = LEVEL.waves[game.wave];
+  game.queue = groups.flatMap(gr => Array.from({ length: gr.n }, (_, i) => ({ t: (gr.delay || 0) + i * gr.gap, kind: gr.kind, from: gr.from || 0 })))
+    .sort((a, b) => a.t - b.t);
+  game.waveT = 0; game.state = 'wave'; game.tutorial = false;
+  closeMenu(); updateHud(); showPreview();
+  Sound.go();
+  Speech.say(game.wave === LEVEL.waves.length - 1 ? 'Last wave! Here they come!' : 'Here they come!');
+}
+function waveCleared() {
+  game.wave++;
+  for (let i = 0; i < WAVE_BONUS; i++) spawnDrop(heartPos, 1.4 + i * 0.15);
+  if (game.wave >= LEVEL.waves.length) {
+    game.state = 'won'; Sound.win(); Speech.say(LEVEL.win);
+    if (levelIndex + 1 < LEVELS.length && game.unlocked <= levelIndex) { game.unlocked = levelIndex + 1; store.set('unlocked', game.unlocked); }
+    if (starsFor(game.sparkles) > (game.stars[levelIndex] || 0)) { game.stars[levelIndex] = starsFor(game.sparkles); store.set('stars', game.stars); }
+    const run = game.run; setTimeout(() => run === game.run && showEnd('won'), 2600);
+  } else {
+    game.state = 'build'; Sound.cleared(); Speech.say('Great job! Build more, then tap Go.');
+    showPreview();
+  }
+  updateHud();
+}
+function heartHit(amount = 1) {
+  if (game.state !== 'wave') return;
+  game.sparkles = Math.max(0, game.sparkles - amount); heart.hit = 1; view.shake = Math.max(view.shake, amount > 1 ? 1 : 0.6); heart.plaster.visible = true; Sound.ouch();
+  updateHud();
+  if (game.sparkles <= 0) {
+    game.state = 'lost'; Sound.lose(); Speech.say('Achoo! The germs got through. Let\'s try that wave again!');
+    const run = game.run; setTimeout(() => run === game.run && showEnd('lost'), 1600);
+  }
+}
+function retryWave() {   // keep every defender and the drops, refill the heart, and go back to building
+  for (const d of [...game.drops]) collectDrop(d);
+  clearField();
+  for (const b of game.troops) { b.foe = null; b.stamina = stats(b.nest).stamina; b.state = 'walk'; b.mesh.visible = true; }
+  game.sparkles = HEART_SPARKLES; game.state = 'build';
+  updateHud(); showPreview();
+}
+
+/* ======== germs ======== */
+function spawnGerm(kind, path, dist = 0, at = null) {   // at: start above ground at this point (germs that split off), else rise out of the entry
+  const k = GERMS[kind], m = makeGerm(k);
+  if (k.hurts > 1 && !at) { Sound.boss(); view.shake = 0.7; }
+  const g = { k, ...m, hp: k.hp, path, end: path.length - 1.6, dist, off: (Math.random() - 0.5) * 0.26, heldBy: null, tagged: false, abIncoming: false, blow: null,
+    rise: at ? 1 : 0, phase: Math.random() * 6, flash: 0, clink: 0, leaving: -1, from: new THREE.Vector3(), target: new THREE.Vector3() };
+  if (at) g.mesh.position.copy(at).setY(ROAD_Y); else g.mesh.position.set(path[0].x, ROAD_Y - 0.6, path[0].z);
+  g.mesh.rotation.y = view.yaw;
+  scene.add(g.mesh); game.germs.push(g);
+  return g;
+}
+function inMucus(g) {
+  const p = g.mesh.position;
+  return game.traps.some(tr => Math.hypot(tr.cell.x - p.x, tr.cell.z - p.z) < MUCUS_R);
+}
+function pathPoint(g, out) {   // position along the path, nudged sideways by the germ's lane offset; returns the heading
+  const p = g.path, i = Math.min(Math.floor(g.dist), p.length - 2), f = g.dist - i, a = p[i], b = p[i + 1];
+  const dx = b.x - a.x, dz = b.z - a.z;
+  out.set(a.x + dx * f - dz * g.off, 0, a.z + dz * f + dx * g.off);
+  return Math.atan2(dx, dz);
+}
+function updateGerms(dt) {
+  const moving = game.state === 'wave';
+  for (const g of [...game.germs]) {
+    if (g.heldBy && g.heldBy.foe !== g) g.heldBy = null;
+    g.phase += dt * 10 * g.k.speed;
+    g.flash = Math.max(0, g.flash - dt * 6); g.mat.emissiveIntensity = g.flash * 0.7;
+    const shrink = 0.7 + 0.3 * Math.max(0, g.hp) / g.k.hp;
+    if (g.leaving >= 0) {   // jumping into the heart
+      g.leaving = Math.min(1, g.leaving + dt * 2.4);
+      const t = g.leaving;
+      g.mesh.position.lerpVectors(g.from, heartPos, t); g.mesh.position.y += Math.sin(t * Math.PI) * 0.8;
+      g.mesh.scale.setScalar(shrink * (1 - t * 0.7));
+      if (t >= 1) { removeGerm(g); heartHit(g.k.hurts || 1); }
+      continue;
+    }
+    if (g.blow) {   // blown back by a sneeze, tumbling
+      g.blow.t = Math.min(1, g.blow.t + dt / 0.7);
+      const e = 1 - (1 - g.blow.t) ** 3;
+      g.dist = g.blow.from + (g.blow.to - g.blow.from) * e;
+      g.inner.rotation.x = -g.blow.t * Math.PI * 4;
+      if (g.blow.t >= 1) { g.blow = null; g.inner.rotation.x = 0; }
+    } else if (moving && !g.heldBy) {
+      g.dist += g.k.speed * (g.tagged ? TAG_SLOW : 1) * (inMucus(g) ? MUCUS_SLOW : 1) * dt;
+      if (g.dist >= g.end) { g.leaving = 0; g.from.copy(g.mesh.position); continue; }
+    }
+    g.rise = Math.min(1, g.rise + dt * 1.8);
+    const heading = pathPoint(g, g.target);
+    const pos = g.mesh.position, k = damp(12, dt);
+    pos.x += (g.target.x - pos.x) * k; pos.z += (g.target.z - pos.z) * k;
+    pos.y = ROAD_Y - (1 - g.rise) * 0.6;
+    g.mesh.rotation.y = lerpAngle(g.mesh.rotation.y, moving ? heading : view.yaw, damp(8, dt));
+    const hop = g.heldBy ? 0.3 : Math.abs(Math.sin(g.phase)), sq = 1 - 0.14 * Math.cos(g.phase * 2);
+    g.inner.position.y = hop * 0.1;
+    g.inner.rotation.z = g.heldBy ? Math.sin(game.time * 28) * 0.18 : 0;   // struggling in a blob's grip
+    g.inner.rotation.y = g.k.shape === 'rod' ? Math.sin(g.phase * 1.6) * 0.35 : 0;   // wigglers wiggle
+    if (g.spin) g.spin.rotation.y += dt * 9;
+    if (g.shell) { const sh = g.tagged ? 0.5 : 1; g.shell.scale.setScalar(g.shell.scale.x + (sh - g.shell.scale.x) * damp(6, dt)); g.shell.rotation.y += dt; }
+    g.clink = Math.max(0, g.clink - dt * 4);
+    g.inner.scale.set(shrink * (2 - sq), shrink * sq, shrink * (2 - sq));
+  }
+}
+function damageGerm(g, dmg) {
+  if (g.hp <= 0 || g.leaving >= 0) return;
+  if (g.k.armour && !g.tagged) {   // bounces off the spikes
+    if (g.clink <= 0) { g.clink = 1; Sound.clink(); burst(g.mesh.position.clone().setY(g.mesh.position.y + g.k.size * 1.6), 3, 0.25, [MAT.spark], 1.5); }
+    if (!game.spikyHinted) {   // the first bounce on a level: say what to do about it
+      game.spikyHinted = true;
+      Speech.say(game.towers.some(t => t.kind === 'antibody') ? 'Bonk! Wait for an antibody to stick on the spiky germ.' : 'Bonk! Spiky germs need an antibody maker!');
+    }
+    return;
+  }
+  g.hp -= dmg * (g.tagged ? TAG_DAMAGE : 1); g.flash = 1;
+  if (g.hp <= 0) popGerm(g);
+}
+function tagGerm(g) {   // an antibody sticks: the germ slows down, takes more damage, and loses its armour
+  if (g.tagged || g.hp <= 0) return;
+  g.tagged = true; g.flash = 0.6;
+  const y = makeY(MAT.ab, 1.6); y.position.set((Math.random() - 0.5) * g.k.size * 0.6, g.top, (Math.random() - 0.5) * g.k.size * 0.4);
+  y.rotation.set((Math.random() - 0.5) * 0.6, 0, (Math.random() - 0.5) * 0.8); g.inner.add(y);
+  Sound.stick();
+  if (g.k.armour) burst(g.mesh.position.clone().setY(g.mesh.position.y + g.k.size * 1.4), 8, 0.35, [g.bumpMat], 2.5);
+}
+function removeGerm(g) { scene.remove(g.mesh); g.mat.dispose(); game.germs.splice(game.germs.indexOf(g), 1); }
+function popGerm(g) {
+  const p = g.mesh.position.clone(); p.y += g.k.size;
+  removeGerm(g);
+  Sound.pop(g.k.size > 0.4);
+  burst(p, 10, g.k.size, [GERM_MAT[g.k.kind].body, GERM_MAT[g.k.kind].body, g.bumpMat]);
+  for (let i = 0; i < g.k.drops; i++) spawnDrop(p, DROP_AUTOCOLLECT_S);
+  for (let i = 0; i < (g.k.splits || 0); i++) {   // chunky breaks into little bloops
+    const off = (i - (g.k.splits - 1) / 2) * 0.45, kid = spawnGerm('bloop', g.path, Math.max(0, g.dist + off), g.mesh.position);
+    kid.mesh.position.x += (Math.random() - 0.5) * 0.4; kid.mesh.position.z += (Math.random() - 0.5) * 0.4;
+  }
+}
+function burst(p, n, size, mats, up = 2) {   // a splash of little balls
+  for (let i = 0; i < n; i++) {
+    const s = size * (0.18 + Math.random() * 0.2), m = ball(mats[i % mats.length], s, p.x, p.y, p.z, false);
+    const a = Math.random() * Math.PI * 2, sp = 1.5 + Math.random() * 2;
+    game.fx.push({ mesh: m, vel: new THREE.Vector3(Math.cos(a) * sp, up + Math.random() * 2.5, Math.sin(a) * sp), life: 0.55, t: 0, s });
+    scene.add(m);
+  }
+}
+function updateFx(dt) {
+  for (const f of [...game.fx]) {
+    f.t += dt; f.vel.y -= (f.grav ?? 12) * dt; f.mesh.position.addScaledVector(f.vel, dt);
+    f.mesh.scale.setScalar(f.s * Math.max(0, 1 - f.t / f.life));
+    if (f.t >= f.life) { scene.remove(f.mesh); game.fx.splice(game.fx.indexOf(f), 1); }
+  }
+}
+
+/* ======== defenders: zappers and nests ======== */
+function buildStruct(pad, kind) {
+  const m = kind === 'nest' ? makeNest() : kind === 'antibody' ? makeFactory() : makeZapper();
+  const t = { kind, level: 1, pad, ...m, ranks: [], cool: 0.4, born: 0, kick: 0, trainQ: 0, trainT: 0 };
+  t.group.position.set(pad.x, pad.top + 0.08, pad.z);
+  t.aim.rotation.y = view.yaw; t.group.scale.setScalar(0.01);
+  pad.tower = t; pad.plus.visible = pad.ring.visible = false;
+  scene.add(t.group); game.towers.push(t);
+  if (kind === 'nest') { choosePost(t); t.trainQ = 1; }
+  burst(new THREE.Vector3(pad.x, pad.top + 0.3, pad.z), 8, 0.3, [MAT.shot], 2.5);
+}
+function upgradeStruct(t) {
+  t.level++; t.born = 0.45; t.kick = 1;
+  const rank = new THREE.Mesh(RANK_GEO, MAT.gold); rank.position.y = 0.07 + 0.09 * (t.level - 2); t.group.add(rank); t.ranks.push(rank);
+  if (t.kind === 'nest') for (const b of game.troops) if (b.nest === t) { b.stamina = stats(t).stamina; b.mesh.scale.setScalar(troopScale(t)); }
+  burst(t.group.position.clone().setY(t.pad.top + 0.6), 12, 0.3, [MAT.gold], 3);
+}
+function choosePost(t) {   // the vessel tile the nest's blobs guard: close by, preferring tiles where paths merge
+  let best = null, bestScore = Infinity;
+  for (const c of board.land) {
+    if (!c.paths || c.ch === 'H' || isEntry(c.ch)) continue;
+    const d = Math.hypot(c.x - t.pad.x, c.z - t.pad.z);
+    if (d > stats(t).reach) continue;
+    const score = d - 0.6 * (c.paths - 1);
+    if (score < bestScore) { bestScore = score; best = c; }
+  }
+  if (!best) best = board.land.filter(c => c.paths).reduce((a, c) => (Math.hypot(c.x - t.pad.x, c.z - t.pad.z) < Math.hypot(a.x - t.pad.x, a.z - t.pad.z) ? c : a));
+  t.post = new THREE.Vector3(best.x, 0, best.z);
+  setDoor(t);
+}
+function setDoor(t) {   // the nest's door faces the viewer; blobs come out and go home through it
+  t.aim.rotation.y = view.yaw;
+  t.door = new THREE.Vector3(t.pad.x + Math.sin(view.yaw) * 0.45, 0, t.pad.z + Math.cos(view.yaw) * 0.45);
+}
+function buildTrap(cell) {
+  const mesh = makeTrap(); mesh.position.set(cell.x, ROAD_Y, cell.z); mesh.scale.setScalar(0.01);
+  const tr = { cell, mesh, born: 0 }; cell.trap = tr;
+  scene.add(mesh); game.traps.push(tr);
+  burst(new THREE.Vector3(cell.x, ROAD_Y + 0.3, cell.z), 8, 0.3, [MAT.mucus], 2);
+}
+const TROOP_SLOTS = [[0, 0], [0.34, 0.2], [-0.28, 0.3]];
+const troopScale = nest => 1.3 * (1 + 0.12 * (nest.level - 1));
+function spawnTroop(nest) {
+  const m = makeTroop(), slot = game.troops.filter(b => b.nest === nest).length;
+  const b = { nest, ...m, slot, state: 'walk', stamina: stats(nest).stamina, foe: null, chompT: 0, chomp: 0, restT: 0, phase: Math.random() * 6 };
+  b.mesh.position.copy(nest.door).setY(groundY(nest.door.x, nest.door.z));
+  b.mesh.scale.setScalar(troopScale(nest));
+  scene.add(b.mesh); game.troops.push(b);
+  burst(b.mesh.position.clone().setY(b.mesh.position.y + 0.3), 6, 0.25, [MAT.troop], 2);
+}
+function postOf(b) { const [dx, dz] = TROOP_SLOTS[b.slot % 3]; return new THREE.Vector3(b.nest.post.x + dx, 0, b.nest.post.z + dz); }
+function moveTo(b, target, speed, dt) {   // walk towards a point; true once there
+  const p = b.mesh.position, dx = target.x - p.x, dz = target.z - p.z, d = Math.hypot(dx, dz), step = speed * dt;
+  if (d > 0.02) b.mesh.rotation.y = lerpAngle(b.mesh.rotation.y, Math.atan2(dx, dz), damp(10, dt));
+  if (d <= step) { p.x = target.x; p.z = target.z; return true; }
+  p.x += dx / d * step; p.z += dz / d * step;
+  return false;
+}
+function updateTroops(dt) {
+  const fighting = game.state === 'wave';
+  for (const b of game.troops) {
+    const st = stats(b.nest);
+    b.phase += dt * 6; b.chomp = Math.max(0, b.chomp - dt * 5);
+    if (b.state === 'guard') {
+      b.stamina = Math.min(st.stamina, b.stamina + dt * TROOP_RECOVER);
+      b.mesh.rotation.y = lerpAngle(b.mesh.rotation.y, view.yaw, damp(4, dt));
+      if (fighting) {   // grab the nearest free germ near the post
+        const post = postOf(b); let foe = null, fd = TROOP_GUARD_R;
+        for (const g of game.germs) {
+          if (g.heldBy || g.leaving >= 0 || g.rise < 0.6 || g.blow || g.k.slippery) continue;
+          const d = Math.hypot(g.mesh.position.x - post.x, g.mesh.position.z - post.z);
+          if (d < fd) { fd = d; foe = g; }
+        }
+        if (foe) { b.foe = foe; foe.heldBy = b; b.state = 'fight'; b.chompT = 0; }
+      }
+    } else if (b.state === 'fight') {
+      const g = b.foe;
+      if (!g || !game.germs.includes(g) || g.leaving >= 0 || !fighting) { if (g && g.heldBy === b) g.heldBy = null; b.foe = null; b.state = 'walk'; }
+      else {
+        const gp = g.mesh.position, post = postOf(b), away = new THREE.Vector3(post.x - gp.x, 0, post.z - gp.z);
+        if (away.lengthSq() < 0.01) away.set(Math.sin(view.yaw), 0, Math.cos(view.yaw));
+        away.normalize().multiplyScalar(g.k.size + 0.3);
+        moveTo(b, new THREE.Vector3(gp.x + away.x, 0, gp.z + away.z), TROOP_SPEED * 1.5, dt);
+        b.mesh.rotation.y = lerpAngle(b.mesh.rotation.y, Math.atan2(gp.x - b.mesh.position.x, gp.z - b.mesh.position.z), damp(12, dt));
+        b.chompT += dt;
+        if (b.chompT >= CHOMP_S) { b.chompT = 0; b.chomp = 1; Sound.nom(); damageGerm(g, st.dps * CHOMP_S); }
+        b.stamina -= g.k.bite * dt;
+        if (b.stamina <= 0 && b.foe) { g.heldBy = null; b.foe = null; b.state = 'home'; Sound.tired(); }   // too tired: let go and go home for a rest
+      }
+    } else if (b.state === 'home') {
+      if (moveTo(b, b.nest.door, TROOP_SPEED * 0.6, dt)) { b.state = 'rest'; b.restT = TROOP_REST_S; b.mesh.visible = false; }
+    } else if (b.state === 'rest') {
+      b.restT -= dt;
+      if (b.restT <= 0) { b.stamina = st.stamina; b.mesh.visible = true; b.state = 'walk'; }
+    } else if (b.state === 'walk') {
+      if (moveTo(b, postOf(b), TROOP_SPEED, dt)) b.state = 'guard';
+    }
+    // bounce, droop when tired, open wide to chomp
+    const tired = b.state === 'home', p = b.mesh.position;
+    p.y = groundY(p.x, p.z) + (b.state === 'walk' || tired ? Math.abs(Math.sin(b.phase * 1.4)) * 0.08 : 0);
+    const sq = b.state === 'fight' ? 1 + 0.15 * b.chomp : tired ? 0.8 : 1 + Math.sin(b.phase) * 0.04;
+    b.inner.scale.set(2 - sq, sq, 2 - sq);
+    b.mouth.scale.y = 0.03 + 0.07 * b.chomp + (tired ? 0.02 : 0);
+  }
+}
+function updateTowers(dt) {
+  for (const t of game.towers) {
+    t.born = Math.min(1, t.born + dt * 1.8); t.group.scale.setScalar(Math.max(0.01, elasticOut(t.born)));
+    t.kick = Math.max(0, t.kick - dt * 5);
+    const lv = 1 + 0.12 * (t.level - 1), bob = Math.sin(game.time * 3 + t.pad.c) * 0.02;
+    t.body.scale.set(lv * (1 + 0.14 * t.kick), lv * (1 - 0.16 * t.kick + bob), lv * (1 + 0.14 * t.kick));
+    if (t.kind === 'nest') {
+      if (t.trainQ > 0 && (t.trainT += dt) >= TRAIN_S) { t.trainT = 0; t.trainQ--; t.kick = 1; spawnTroop(t); Sound.train(); }
+      continue;
+    }
+    const st = stats(t), R2 = st.range * st.range;
+    t.cool -= dt;
+    if (t.kind === 'antibody') {   // pick germs without an antibody yet: armoured ones first, then the one furthest along
+      const near = game.germs.filter(g => !g.tagged && !g.abIncoming && g.leaving < 0 && g.rise >= 0.6 && g.hp > 0
+        && (g.mesh.position.x - t.group.position.x) ** 2 + (g.mesh.position.z - t.group.position.z) ** 2 <= R2)
+        .sort((a, b) => (b.k.armour ? 1 : 0) - (a.k.armour ? 1 : 0) || b.dist - a.dist);
+      const first = near[0];
+      t.aim.rotation.y = lerpAngle(t.aim.rotation.y, first ? Math.atan2(first.mesh.position.x - t.group.position.x, first.mesh.position.z - t.group.position.z) : view.yaw, damp(8, dt));
+      if (first && t.cool <= 0 && game.state === 'wave') { near.slice(0, st.multi).forEach(g => fireAb(t, g)); t.cool = st.reload; t.kick = 1; }
+      continue;
+    }
+    let best = null, bx = 0, bz = 0;
+    for (const g of game.germs) {   // aim at the germ that is furthest along
+      if (g.leaving >= 0 || g.rise < 0.6) continue;
+      const dx = g.mesh.position.x - t.group.position.x, dz = g.mesh.position.z - t.group.position.z;
+      if (dx * dx + dz * dz <= R2 && (!best || g.dist > best.dist)) { best = g; bx = dx; bz = dz; }
+    }
+    t.aim.rotation.y = lerpAngle(t.aim.rotation.y, best ? Math.atan2(bx, bz) : view.yaw, damp(10, dt));
+    if (best && t.cool <= 0 && game.state === 'wave') { fire(t, best, st.damage); t.cool = st.reload; t.kick = 1; }
+  }
+}
+function fire(t, target, damage) {
+  const from = t.body.localToWorld(new THREE.Vector3(0, 0.3, 0.36));
+  const mesh = ball(MAT.shot, damage > 1 ? 0.11 : 0.085, from.x, from.y, from.z, false);
+  scene.add(mesh); game.shots.push({ mesh, target, damage });
+  Sound.shoot();
+}
+function fireAb(t, target) {
+  const from = t.body.localToWorld(new THREE.Vector3(0, 0.62, 0));
+  const mesh = makeY(MAT.ab, 2); mesh.position.copy(from);
+  target.abIncoming = true;
+  scene.add(mesh); game.shots.push({ mesh, target, ab: true });
+  Sound.puff();
+}
+function updateShots(dt) {
+  const aim = new THREE.Vector3();
+  for (const s of [...game.shots]) {
+    const g = s.target, alive = game.germs.includes(g) && g.leaving < 0;
+    if (!alive) { if (s.ab) g.abIncoming = false; scene.remove(s.mesh); game.shots.splice(game.shots.indexOf(s), 1); continue; }
+    aim.copy(g.mesh.position); aim.y += g.k.size;
+    const d = aim.sub(s.mesh.position), len = d.length(), step = (s.ab ? AB_SPEED : SHOT_SPEED) * dt;
+    if (s.ab) { s.mesh.rotation.x += dt * 10; s.mesh.rotation.y += dt * 7; }
+    if (len <= Math.max(0.15, step)) {
+      if (s.ab) { g.abIncoming = false; tagGerm(g); } else { Sound.hit(); damageGerm(g, s.damage); }
+      scene.remove(s.mesh); game.shots.splice(game.shots.indexOf(s), 1); continue;
+    }
+    s.mesh.position.addScaledVector(d, step / len);
+  }
+}
+
+/* ======== sneeze ======== */
+function sneeze() {
+  if (!LEVEL.sneeze || game.state !== 'wave' || game.sneezeCd > 0) return;
+  game.sneezeCd = SNEEZE_COOLDOWN; game.sneezeAt = game.time + 0.75; game.sneezeHint = 0; heart.sneeze = 0.001;
+  Sound.sneeze(); updateHud();
+}
+function blowBack() {   // every germ on the vessels tumbles back towards where it came in
+  view.shake = 0.8;
+  for (const g of game.germs) {
+    if (g.leaving >= 0) continue;
+    if (g.heldBy) { g.heldBy.foe = null; g.heldBy.state = 'walk'; g.heldBy = null; }
+    g.blow = { from: g.dist, to: Math.max(0, g.dist - SNEEZE_PUSH), t: 0 };
+  }
+  for (const e of board.entries) for (let i = e.path.length - 1; i > 0; i -= 2) {   // gusts of air blowing back up the vessels
+    const p = e.path[i], q = e.path[i - 1], v = new THREE.Vector3(q.x - p.x, 0.3, q.z - p.z).multiplyScalar(5 + Math.random() * 2);
+    const m = ball(MAT.puff, 0.16 + Math.random() * 0.1, p.x, ROAD_Y + 0.35, p.z, false);
+    game.fx.push({ mesh: m, vel: v, life: 0.7, t: 0, s: m.scale.x, grav: 0 }); scene.add(m);
+  }
+  burst(heartPos.clone(), 14, 0.9, [MAT.puff], 1);
+}
+
+/* ======== drops ======== */
+function spawnDrop(at, life) {
+  const mesh = makeDrop(); mesh.position.copy(at);
+  const a = Math.random() * Math.PI * 2, sp = 0.5 + Math.random() * 0.9;
+  game.drops.push({ mesh, vel: new THREE.Vector3(Math.cos(a) * sp, 3.2, Math.sin(a) * sp), t: 0, life, restY: 0.55 + Math.random() * 0.15 });
+  scene.add(mesh);
+}
+function updateDrops(dt) {
+  for (const d of [...game.drops]) {
+    d.t += dt; d.mesh.rotation.y += dt * 2.5;
+    if (d.vel) {
+      d.mesh.position.addScaledVector(d.vel, dt); d.vel.y -= 12 * dt;
+      if (d.vel.y < 0 && d.mesh.position.y <= d.restY) { d.mesh.position.y = d.restY; d.vel = null; d.bobT = 0; }
+    } else {
+      d.bobT += dt; d.mesh.position.y = d.restY + Math.sin(d.bobT * 4) * 0.06;
+    }
+    const pulse = d.t > d.life - 1 ? 1 + Math.sin(d.t * 20) * 0.08 : 1;
+    d.mesh.scale.setScalar(Math.min(1, d.t * 6) * pulse);
+    if (d.t >= d.life) collectDrop(d);
+  }
+}
+function collectDrop(d) {
+  const i = game.drops.indexOf(d); if (i < 0) return;
+  game.drops.splice(i, 1); scene.remove(d.mesh);
+  if (game.instant) { game.energy++; updateHud(); return; }   // debug runs bank drops straight away
+  const p = toScreen(d.mesh.position.x, d.mesh.position.y, d.mesh.position.z), run = game.run;
+  const el = document.createElement('div'); el.className = 'fly'; el.innerHTML = SVG.drop;
+  el.style.transform = `translate(${p.x}px,${p.y}px) scale(1.2)`;
+  document.body.append(el);
+  const to = $('energyIcon').getBoundingClientRect();
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = `translate(${to.left + to.width / 2}px,${to.top + to.height / 2}px) scale(.8)`; }));
+  setTimeout(() => {
+    el.remove(); if (run !== game.run) return;
+    game.energy++; Sound.collect(); updateHud();
+    const pill = $('energyPill'); pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump');
+  }, 560);
+}
+
+/* ======== HUD and menus ======== */
+$('energyIcon').innerHTML = SVG.drop;
+$('play').innerHTML = SVG.play + 'Play';
+$('againBtn').innerHTML = SVG.again('#c2456c');
+$('mapBtn').innerHTML = $('home').innerHTML = SVG.home('#c2456c');
+$('mute').textContent = Sound.muted ? '🔇' : '🔊';
+
+function updateHud() {
+  $('energy').textContent = game.energy;
+  $('hearts').innerHTML = Array.from({ length: HEART_SPARKLES }, (_, i) => SVG.heart.replace('<svg', `<svg class="${i < game.sparkles ? '' : 'lost'}"`)).join('');
+  $('waves').innerHTML = LEVEL.waves.map((_, i) => `<i class="${i < game.wave ? 'done' : i === game.wave && game.state !== 'won' ? 'now' : ''}"></i>`).join('');
+  $('go').classList.toggle('off', game.state !== 'build');
+  $('sneeze').classList.toggle('off', !(game.state === 'wave' && LEVEL.sneeze));
+  for (const o of $('opts').children) o.classList.toggle('poor', game.energy < +o.dataset.cost);
+}
+function showPreview() {   // which germs come next out of each entry, shown while building
+  const on = game.state === 'build';
+  entryFx.forEach((fx, i) => {
+    const counts = {};
+    if (on) for (const gr of LEVEL.waves[game.wave]) if ((gr.from || 0) === i) counts[gr.kind] = (counts[gr.kind] || 0) + gr.n;
+    const any = Object.keys(counts).length > 0;
+    fx.arrow.visible = any; fx.label.hidden = !any;
+    if (on) for (const k of Object.keys(counts)) if (!game.seen.has(k)) { game.seen.add(k); if (GERM_HELLO[k]) Speech.say(GERM_HELLO[k], true); }
+    fx.label.firstElementChild.innerHTML = Object.entries(counts).map(([k, n]) => `${germIcon(k)}<span>×${n}</span>`).join('&nbsp;');
+  });
+}
+function menuOptions(pad) {   // the choices for a pad: build something, or improve what's there; on a vessel tile, snot
+  if (pad.ch !== 'o') {
+    const left = MUCUS_MAX - game.traps.length;
+    return LEVEL.mucus && !pad.trap && left > 0 ? [{ act: 'build', kind: 'mucus', cost: MUCUS_COST, pic: SVG.mucus('pic'), pips: '🟢'.repeat(left) }] : [];
+  }
+  const t = pad.tower;
+  if (!t) return LEVEL.builds.map(kind => ({ act: 'build', kind, cost: BUILDS[kind].cost, pic: SVG[kind]('pic') }));
+  const opts = [];
+  if (t.kind === 'nest' && game.troops.filter(b => b.nest === t).length + t.trainQ < TROOPS_PER_NEST) {
+    opts.push({ act: 'train', kind: '', cost: TROOP_COST, pic: SVG.troop('pic'), badge: '+' });
+  }
+  if (t.level < 3) opts.push({ act: 'upgrade', kind: '', cost: UPGRADE_COSTS[t.level - 1], pic: SVG[t.kind]('pic'), badge: '▲', pips: '⭐'.repeat(t.level) });
+  return opts;
+}
+function openMenu(pad, refresh = false) {
+  const opts = menuOptions(pad);
+  if (!opts.length) { closeMenu(); return false; }
+  game.menuSpot = pad; $('menu').hidden = false;
+  $('opts').innerHTML = opts.map(o => `<button class="opt" data-act="${o.act}" data-kind="${o.kind}" data-cost="${o.cost}" aria-label="${o.act} ${o.kind}">`
+    + (o.pips ? `<span class="pips">${o.pips}</span>` : '') + o.pic + (o.badge ? `<span class="badge">${o.badge}</span>` : '')
+    + `<span class="cost">${SVG.drop.repeat(o.cost)}</span></button>`).join('');
+  $('opts').classList.toggle('many', opts.length > 2);
+  const t = pad.tower;
+  if (pad.ch !== 'o') showRing(pad.x, ROAD_Y + 0.03, pad.z, MUCUS_R);
+  else if (t && t.kind === 'nest') showRing(t.post.x, groundY(t.post.x, t.post.z) + 0.04, t.post.z, TROOP_GUARD_R);
+  else showRing(pad.x, pad.top + 0.06, pad.z, (t ? stats(t) : BUILDS.zapper.levels[0]).range);
+  updateHud(); if (!refresh) Sound.tap();
+  return true;
+}
+function closeMenu() { game.menuSpot = null; $('menu').hidden = true; rangeRing.visible = false; }
+function act(button) {
+  const pad = game.menuSpot; if (!pad) return;
+  const { act: action, kind } = button.dataset, cost = +button.dataset.cost;
+  if (game.energy < cost) {
+    button.classList.remove('shake'); void button.offsetWidth; button.classList.add('shake');
+    Sound.nope();
+    if (game.time - Speech.lastNope > 5) { Speech.lastNope = game.time; Speech.say('Pop germs to get more drops!'); }
+    return;
+  }
+  game.energy -= cost;
+  if (action === 'build' && kind === 'mucus') {
+    buildTrap(pad); closeMenu(); Sound.splat();
+  } else if (action === 'build') {
+    buildStruct(pad, kind); closeMenu(); Sound.build();
+    if (game.tutorial && game.towers.length === 1) Speech.say(kind === 'nest' ? 'A blob nest! Its blobs will wait by the vessel. Tap Go when you\'re ready.' : 'Great! Tap Go when you\'re ready.');
+  } else if (action === 'upgrade') {
+    upgradeStruct(pad.tower); Sound.upgrade(); openMenu(pad, true);
+  } else if (action === 'train') {
+    pad.tower.trainQ++; pad.tower.kick = 1; Sound.tap(); openMenu(pad, true);
+  }
+  updateHud();
+}
+$('opts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b) act(b); });
+
+const starsFor = hearts => hearts >= HEART_SPARKLES ? 3 : hearts >= 3 ? 2 : 1;
+function showEnd(kind) {
+  const won = kind === 'won', stars = starsFor(game.sparkles);
+  const next = won && levelIndex + 1 < LEVELS.length;
+  $('endArt').innerHTML = won ? SVG.heart.replace('<svg', '<svg class="mid"') : SVG.bloop('mid');
+  $('endTitle').textContent = won ? LEVEL.winTitle : 'Achoo! Germs got through.';
+  $('stars').hidden = !won;
+  $('stars').innerHTML = [0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}">⭐</span>`).join('');
+  $('endBtn').innerHTML = next ? SVG.play + 'Next' : won ? SVG.again() + 'Again' : SVG.again() + 'Try again';
+  $('endBtn').dataset.do = next ? 'next' : won ? 'again' : 'retry';
+  $('againBtn').hidden = !next;
+  $('mapBtn').hidden = false;
+  $('end').hidden = false;
+}
+// The level map: a child's outline with a spot where each level happens (knee, nose, tummy, lungs, and a thermometer for the fever)
+const MAP_SPOTS = [[78, 222], [100, 54], [100, 154], [100, 112], [160, 26]];
+const BODY_SVG = `<svg class="body" viewBox="0 0 200 260" aria-hidden="true">
+  <g stroke="#e9a48c" stroke-width="20" stroke-linecap="round"><path d="M67 96 38 150M133 96l29 54M86 168l-6 72M114 168l6 72"/></g>
+  <g stroke="#ffd9c7" stroke-width="14" stroke-linecap="round"><path d="M67 96 38 150M133 96l29 54M86 168l-6 72M114 168l6 72"/></g>
+  <rect x="62" y="80" width="76" height="96" rx="30" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
+  <circle cx="100" cy="44" r="34" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
+  <path d="M112 104s-9-6-9-12a5 5 0 0 1 9-2 5 5 0 0 1 9 2c0 6-9 12-9 12z" fill="#ff8fa6" opacity=".55"/>
+  <path d="M128 36q14-10 22-12" stroke="#e9a48c" stroke-width="3" stroke-dasharray="4 5" fill="none" stroke-linecap="round"/>
+</svg>`;
+function renderMap() {
+  const next = Math.min(game.unlocked, LEVELS.length - 1);
+  $('bodymap').innerHTML = BODY_SVG + LEVELS.map((L, i) => {
+    const [x, y] = MAP_SPOTS[i], locked = i > game.unlocked, got = game.stars[i] || 0;
+    const stars = locked ? '' : `<span class="st">${[0, 1, 2].map(k => k < got ? '⭐' : '<i>⭐</i>').join('')}</span>`;
+    return `<button class="spot ${locked ? 'locked' : ''} ${i === next && !got ? 'next' : ''}" style="left:${x / 2}%;top:${y / 2.6}%" data-i="${i}" aria-label="Level ${i + 1}: ${L.name}">`
+      + `${locked ? '🔒' : L.icon}<b>${i + 1}</b>${stars}</button>`;
+  }).join('');
+}
+function playLevel(i) {   // from the map: load a level and start it
+  Sound.init(); $('title').hidden = true; $('end').hidden = true;
+  Speech.say(LEVELS[i].intro);
+  if (i !== levelIndex) loadLevel(i); else startLevel();
+}
+$('bodymap').addEventListener('click', e => {
+  const b = e.target.closest('.spot'); if (!b) return;
+  const i = +b.dataset.i;
+  if (i > game.unlocked) { Sound.init(); Sound.nope(); return; }
+  playLevel(i);
+});
+function goHome() {   // back to the map; the level in progress is dropped
+  game.run++; clearField(); clearStructures(); closeMenu();
+  game.state = 'title'; showPreview(); updateHud();
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  $('end').hidden = true; renderMap(); $('title').hidden = false;
+}
+function hintTarget() {   // the pointing hand: the sneeze button when germs get close, the first build of a level, then (level 1) Go
+  if (!$('end').hidden || !$('title').hidden) return null;
+  if (game.sneezeHint > 0 && game.state === 'wave') { const r = $('sneeze').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top - 6, up: false }; }
+  if (game.state !== 'build' || game.wave !== 0) return null;
+  if (game.towers.length + game.traps.length === 0) {
+    const [hc, hr, kind] = LEVEL.hint || [bestPad.c, bestPad.r, 'zapper'];
+    const pad = board.cells.get(hc + ',' + hr) || bestPad;
+    if (game.menuSpot === pad) {
+      const o = [...$('opts').children].find(b => b.dataset.kind === kind) || $('opts').firstElementChild;
+      const r = o.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.bottom + 6, up: true };
+    }
+    const p = toScreen(pad.x, pad.top, pad.z); return { x: p.x + 6, y: p.y + 12, up: true };
+  }
+  if (levelIndex === 0 && game.tutorial) { const r = $('go').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top - 6, up: false }; }
+  return null;
+}
+function updateAnchors() {
+  for (const fx of entryFx) {
+    if (fx.label.hidden) continue;
+    const p = toScreen(fx.cell.x, 1.75, fx.cell.z), box = fx.label.firstElementChild, half = box.offsetWidth / 2 + 6;
+    const minY = (document.body.classList.contains('wide') ? 0 : $('bar').getBoundingClientRect().bottom) + box.offsetHeight + 6;
+    const x = Math.max(half, Math.min(innerWidth - half, p.x)), y = Math.max(minY, p.y);   // keep it on screen, clear of the HUD
+    fx.label.style.transform = `translate(${x}px,${y}px)`;
+  }
+  const sz = $('sneeze');
+  if (!sz.classList.contains('off')) { sz.style.setProperty('--cd', Math.max(0, game.sneezeCd) / SNEEZE_COOLDOWN); sz.classList.toggle('ready', game.sneezeCd <= 0); }
+  if (game.menuSpot) {
+    const pad = game.menuSpot, p = toScreen(pad.x, pad.top + 0.1, pad.z), half = $('opts').offsetWidth / 2 + 8;
+    const x = Math.max(half, Math.min(innerWidth - half, p.x)), y = Math.max(150, p.y);
+    $('menu').style.transform = `translate(${x}px,${y}px)`;
+  }
+  const hint = hintTarget();
+  $('hand').hidden = !hint;
+  if (hint) {
+    $('hand').classList.toggle('down', !hint.up); $('hand').firstElementChild.textContent = hint.up ? '👆' : '👇';
+    $('hand').style.transform = `translate(${hint.x}px,${hint.y}px)`;
+  }
+}
+
+/* ======== input ======== */
+let press = null, ringTimer = 0;
+const raycaster = new THREE.Raycaster(), roadPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -ROAD_Y);
+function groundAt(x, y) {   // the point on the vessel floor under a screen position
+  raycaster.setFromCamera(new THREE.Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1), camera);
+  return raycaster.ray.intersectPlane(roadPlane, new THREE.Vector3());
+}
+canvas.addEventListener('pointerdown', e => { press = { x: e.clientX, y: e.clientY, id: e.pointerId }; });
+canvas.addEventListener('pointercancel', () => { press = null; });
+canvas.addEventListener('pointerup', e => {
+  if (!press || press.id !== e.pointerId) return;
+  const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y); press = null;
+  if (moved < 16) onTap(e.clientX, e.clientY);
+});
+function onTap(x, y) {
+  if (game.state === 'title') return;
+  Sound.init();
+  // drops first: grab every drop near the finger
+  const dropR = Math.max(46, view.ppu * 0.7);
+  const hits = game.drops.filter(d => { const p = toScreen(d.mesh.position.x, d.mesh.position.y, d.mesh.position.z); return Math.hypot(p.x - x, p.y - y) < dropR; });
+  if (hits.length) { hits.forEach(collectDrop); return; }
+  if (game.state === 'won' || game.state === 'lost') return;
+  // then the nearest build pad
+  const padR = Math.max(42, view.ppu * 0.8);
+  let best = null, bestD = padR;
+  for (const pad of board.pads) {
+    const p = toScreen(pad.x, pad.top + 0.2, pad.z), d = Math.hypot(p.x - x, p.y - y);
+    if (d < bestD) { best = pad; bestD = d; }
+  }
+  if (!best && LEVEL.mucus) {   // no pad: maybe a vessel tile, for a snot puddle
+    const g = groundAt(x, y), cell = g && board.cells.get(Math.round(g.x) + ',' + Math.round(g.z));
+    if (cell && cell.paths && cell.ch === '#') {
+      if (game.menuSpot === cell) { closeMenu(); return; }
+      if (!openMenu(cell)) { closeMenu(); Sound.nope(); }
+      return;
+    }
+  }
+  if (!best || game.menuSpot === best) { closeMenu(); return; }
+  if (best.tower) best.tower.kick = 1;
+  if (!openMenu(best)) {   // a fully upgraded zapper: just show its reach and give a happy wiggle
+    Sound.tap(); showRing(best.x, best.top + 0.06, best.z, stats(best.tower).range);
+    clearTimeout(ringTimer); ringTimer = setTimeout(() => { if (!game.menuSpot) rangeRing.visible = false; }, 1200);
+  }
+}
+$('go').addEventListener('click', () => { Sound.init(); startWave(); });
+$('sneeze').addEventListener('click', () => { Sound.init(); if (game.sneezeCd > 0) Sound.nope(); else sneeze(); });
+$('play').addEventListener('click', () => playLevel(Math.min(game.unlocked, LEVELS.length - 1)));
+$('home').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
+$('mapBtn').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
+$('endBtn').addEventListener('click', () => {
+  Sound.init(); $('end').hidden = true;
+  const what = $('endBtn').dataset.do;
+  if (what === 'next') playLevel(levelIndex + 1);
+  else if (what === 'again') { startLevel(); Speech.say('Here we go again!'); }
+  else { retryWave(); Speech.say('Build more, then tap Go.'); }
+});
+$('againBtn').addEventListener('click', () => { Sound.init(); $('end').hidden = true; startLevel(); Speech.say('Here we go again!'); });
+if (Haptics.supported) {
+  const vibe = $('vibe'), show = () => vibe.classList.toggle('off', !Haptics.isOn());
+  vibe.hidden = false; show();
+  vibe.addEventListener('click', () => { Haptics.setOn(!Haptics.isOn()); show(); Haptics.buzz('build'); Sound.init(); Sound.tap(); });
+}
+$('mute').addEventListener('click', () => {
+  Sound.muted = !Sound.muted; store.set('muted', Sound.muted);
+  $('mute').textContent = Sound.muted ? '🔇' : '🔊';
+  if (Sound.muted && window.speechSynthesis) speechSynthesis.cancel();
+  if (Sound.muted) Music.stop(0.2);
+  Sound.init(); Sound.tap();
+});
+
+/* ======== loop ======== */
+const dummy = new THREE.Object3D();
+function updateWorld(dt) {
+  game.time += dt;
+  if (game.state === 'wave') {
+    game.waveT += dt;
+    while (game.queue.length && game.queue[0].t <= game.waveT) { const q = game.queue.shift(); spawnGerm(q.kind, board.entries[q.from].path); }
+    // the first time germs get most of the way on a sneeze level, point at the sneeze button
+    if (LEVEL.sneeze && !game.sneezeHinted && game.sneezeCd <= 0 && game.germs.some(g => g.dist > g.path.length * 0.6)) {
+      game.sneezeHinted = true; game.sneezeHint = 5; Speech.say('Quick! Press the sneeze button!');
+    }
+  }
+  if (game.state !== 'title') game.sneezeCd = Math.max(0, game.sneezeCd - dt);
+  game.sneezeHint = Math.max(0, game.sneezeHint - dt);
+  if (game.sneezeAt && game.time >= game.sneezeAt) { game.sneezeAt = 0; blowBack(); }
+  if (LEVEL.fever && game.state !== 'title' && Math.random() < dt * 4) {   // heat shimmer: little wisps rising off the hot tissue
+    const c = board.land[Math.floor(Math.random() * board.land.length)], m = ball(MAT.steam, 0.1 + Math.random() * 0.08, c.x, c.top + 0.1, c.z, false);
+    game.fx.push({ mesh: m, vel: new THREE.Vector3((Math.random() - 0.5) * 0.2, 0.7, (Math.random() - 0.5) * 0.2), life: 1.6, t: 0, s: m.scale.x, grav: 0 }); scene.add(m);
+  }
+  for (const tr of game.traps) { tr.born = Math.min(1, tr.born + dt * 2); tr.mesh.scale.set(elasticOut(tr.born), 1 + 0.08 * Math.sin(game.time * 3 + tr.cell.c), elasticOut(tr.born)); }
+  updateGerms(dt); updateTowers(dt); updateTroops(dt); updateShots(dt); updateDrops(dt); updateFx(dt);
+  if (game.state === 'wave' && !game.queue.length && !game.germs.length) waveCleared();
+
+  // heart: lub-dub, flinch when hit, jump for joy at the end
+  const ph = game.time % 0.9, beat = Math.exp(-(ph ** 2) / 0.003) + 0.6 * Math.exp(-((ph - 0.22) ** 2) / 0.003);
+  heart.hit = Math.max(0, heart.hit - dt * 2.5);
+  heart.mat.emissiveIntensity = heart.hit * 0.5;
+  heart.body.scale.setScalar(1 + 0.07 * beat - 0.12 * heart.hit);
+  if (heart.sneeze) {   // breathe in (stretch, lean back)... then ACHOO (squash forward)
+    heart.sneeze += dt;
+    const t = heart.sneeze, k = t < 0.75 ? t / 0.75 : Math.max(0, 1 - (t - 0.75) / 0.5);
+    const stretch = t < 0.75 ? 1 + 0.15 * k : 1 - 0.2 * k;
+    heart.body.scale.set(heart.body.scale.x * (2 - stretch), heart.body.scale.y * stretch, heart.body.scale.z);
+    heart.body.rotation.x = t < 0.75 ? -0.35 * k : 0.4 * k;
+    if (t > 1.25) { heart.sneeze = 0; heart.body.rotation.x = 0; }
+  }
+  heart.body.position.x = Math.sin(game.time * 60) * 0.06 * heart.hit;
+  heart.body.position.y = game.state === 'won' ? Math.abs(Math.sin(game.time * 6)) * 0.35 : 0;
+
+  // pads glow when something can be afforded
+  const cheapest = Math.min(...LEVEL.builds.map(k => BUILDS[k].cost));
+  const afford = game.energy >= cheapest, glow = 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(game.time * 4));
+  for (const p of board.pads) if (!p.tower) p.ring.material.opacity = afford ? glow : 0.18;
+  for (const fx of entryFx) fx.arrow.position.y = 1.35 + Math.sin(game.time * 4) * 0.12;
+
+  // red blood cells
+  rbcs.forEach((b, i) => {
+    b.d = (b.d + dt * b.sp) % b.len; b.spin += dt * 1.5;
+    const ix = Math.floor(b.d), f = b.d - ix, a = b.path[ix], c = b.path[ix + 1], dx = c.x - a.x, dz = c.z - a.z;
+    const fade = Math.min(1, b.d * 2, (b.len - b.d) * 2);
+    dummy.position.set(a.x + dx * f - dz * b.off, ROAD_Y + 0.05, a.z + dz * f + dx * b.off);
+    dummy.rotation.set(Math.PI / 2 + Math.sin(b.spin) * 0.5, b.spin, 0);
+    dummy.scale.setScalar(Math.max(0.001, fade));
+    dummy.updateMatrix(); rbcMesh.setMatrixAt(i, dummy.matrix);
+  });
+  rbcMesh.instanceMatrix.needsUpdate = true;
+}
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000) * game.timeScale; last = now;
+  updateWorld(dt);
+  if (view.shake > 0) {   // a little screen shake when the heart gets hit, on a sneeze, and when the King Germ arrives
+    view.shake = Math.max(0, view.shake - dt * 2.5);
+    const a = view.shake * view.shake * 0.12;
+    camera.position.copy(view.base).add(new THREE.Vector3((Math.random() - 0.5) * a, (Math.random() - 0.5) * a, (Math.random() - 0.5) * a));
+  } else if (!camera.position.equals(view.base)) camera.position.copy(view.base);
+  if (Sound.ctx && !Sound.muted && !document.hidden) Music.set(wantedMood());
+  renderer.render(scene, camera);
+  updateAnchors();
+  requestAnimationFrame(frame);
+}
+
+/* ======== boot ======== */
+addEventListener('resize', placeCamera);
+loadLevel(game.unlocked); game.state = 'title'; showPreview(); updateHud(); renderMap();
+requestAnimationFrame(frame);
+// #debug exposes a console handle for testing: gg.build(padIndex, kind), gg.step(seconds) runs the game without waiting for frames
+if (location.hash === '#debug') window.gg = {
+  game, get board() { return board; }, startWave, loadLevel, startLevel,
+  build: (i, kind = 'zapper') => { const p = board.pads[i]; if (!p.tower) buildStruct(p, kind); },
+  upgrade: i => { const t = board.pads[i].tower; if (t && t.level < 3) upgradeStruct(t); },
+  train: i => { const t = board.pads[i].tower; if (t && t.kind === 'nest') t.trainQ++; },
+  trap: (c, r) => { const cell = board.cells.get(c + ',' + r); if (cell && cell.ch === '#' && !cell.trap) buildTrap(cell); },
+  sneeze, goHome, Music, Haptics,
+  unlockAll: () => { game.unlocked = LEVELS.length - 1; store.set('unlocked', game.unlocked); renderMap(); },
+  spawn: (kind, entry = 0, dist = 0) => spawnGerm(kind, board.entries[entry].path, dist, dist ? board.entries[entry].path[Math.floor(dist)] : null),
+  step: secs => { for (let t = 0; t < secs; t += 1 / 30) updateWorld(1 / 30); renderer.render(scene, camera); updateAnchors(); },
+};
+</script>
+<script>
+// Offline support: sw.js caches this page. Once the page has loaded, send it every file the page used (fonts,
+// three.js) so those work offline too. Fails quietly where unsupported, e.g. on file://.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then((reg) => {
+    const send = () => reg.active && reg.active.postMessage({ cache: [location.href, ...performance.getEntriesByType('resource').map((r) => r.name)] });
+    send(); setTimeout(send, 5000); setTimeout(send, 20000);
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
