@@ -110,6 +110,13 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 }
 .preview svg{width:30px;height:30px}
 .preview svg.big{width:40px;height:40px}
+.hearttag{gap:1px;padding:3px 7px}
+.hearttag svg{width:17px;height:17px;transition:transform .2s,opacity .3s,filter .3s}
+.hearttag .lost{opacity:.3;filter:grayscale(1);transform:scale(.8)}
+.hearttag.low,.hearts.low{animation:low .55s ease-in-out infinite alternate}
+@keyframes low{to{box-shadow:0 0 0 5px rgba(255,59,92,.55)}}
+.dmg{position:fixed;left:0;top:0;z-index:8;pointer-events:none;white-space:nowrap;font:700 30px/1 var(--title);color:var(--heart);text-shadow:0 2px 0 #fff,0 0 8px #fff;transition:transform 1s ease-out,opacity 1s ease-in}
+.nametag{font:700 20px/1 var(--title);padding:8px 14px;color:var(--ink);animation:popin .3s ease-out}
 .menu{z-index:6}
 .opts{position:absolute;left:0;top:0;transform:translate(-50%,calc(-100% - 34px));display:flex;gap:10px}
 .opts::after{content:"";position:absolute;left:50%;bottom:-11px;margin-left:-11px;border:11px solid transparent;border-bottom:0;border-top-color:#fff;filter:drop-shadow(0 4px 0 #e7a9bc)}
@@ -119,6 +126,7 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;animation:popin .18s ease-out;
 }
 .opt .pic{width:66px;height:66px}
+.opt .name{font:bold 11px/1 var(--plain);color:#8a4a62;margin-top:-2px}
 .opt .cost{display:flex;flex-wrap:wrap;justify-content:center;gap:1px;max-width:82px}
 .opt .cost svg{width:14px;height:14px}
 .opt .badge{
@@ -129,7 +137,12 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 .opt.poor .pic,.opt.poor .cost,.opt.poor .badge{filter:grayscale(.85);opacity:.6}
 .opt.shake{animation:shake .4s}
 .opts.many .opt{width:84px;min-height:100px}
+.opt.sell .badge{background:#ff5a6e;box-shadow:0 2px 0 #c8324a}
+.opt.sell .cost::before{content:"+";font:bold 14px/14px var(--plain);color:var(--go-dark);margin-right:1px}
+.opt.sell.sure{background:#ffe1e7;box-shadow:0 5px 0 #ff8aa0,0 0 0 4px #ff5a6e;animation:sure .5s ease-in-out infinite alternate}
+@keyframes sure{to{transform:scale(1.06)}}
 .opts.many .opt .pic{width:56px;height:56px}
+.opts.tight{gap:6px} .opts.tight .opt{width:74px} .opts.tight .opt .pic{width:48px;height:48px}
 .hand{z-index:7}
 .hand span{display:block;font-size:46px;line-height:1;transform:translate(-50%,0);animation:bob .7s ease-in-out infinite alternate;filter:drop-shadow(0 3px 2px rgba(0,0,0,.2))}
 .hand.down span{transform:translate(-50%,-100%);animation-name:bobdown}
@@ -157,8 +170,31 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 .card .go{margin:0 auto}
 /* the level map: a body with a glowing spot per level */
 .title-card{padding-top:20px;position:relative}
-.row .round.vibe{font-size:24px;box-shadow:0 4px 0 var(--shade)}
-.vibe.off{filter:grayscale(1);opacity:.45}
+.fact{font:15px/1.4 var(--plain);color:#6a3048;background:#fff3c9;border-radius:14px;padding:10px 12px;margin:-4px 0 16px;text-align:left}
+.fact b{color:var(--heart)}
+/* tip cards: what a new defender does, and how each defender copes with a new germ */
+.tipcard{padding:20px 18px 24px}
+.tip-head{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px}
+.tip-head svg{width:72px;height:72px;flex:none}
+.tip-head h2{margin:0;text-align:left}
+.tip-head small{display:block;font:14px/1.3 var(--plain);color:#8a4a62;margin-top:4px}
+.tip-strip{display:flex;align-items:center;justify-content:center;gap:4px;margin:6px 0 10px}
+.tip-strip i,.tip-row i{font-style:normal}
+.tip-strip svg{width:56px;height:56px}
+.tip-strip .arrow{font-size:22px;color:#d58aa4}
+.tip-strip .fx{font-size:28px;line-height:1}
+.tip-strip .y{font:900 30px/1 var(--title);color:#ff9f1c}
+.tip-cap{font:16px/1.35 var(--plain);margin:0 0 16px;color:var(--ink)}
+.tip-rows{display:flex;flex-direction:column;gap:7px;margin:8px 0 16px;text-align:left}
+.tip-row{display:flex;align-items:center;gap:9px;background:#fff4f7;border-radius:14px;padding:5px 10px}
+.tip-row svg{width:40px;height:40px;flex:none}
+.tip-row span{font:15px/1.25 var(--plain)}
+.mark{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:bold 17px/1 var(--plain);color:#fff;flex:none}
+.mark.yes{background:var(--go)} .mark.no{background:#ff5a6e} .mark.star{background:var(--gold);color:#5a3a00}
+.credit{font:12px/1.3 var(--plain);color:#b07a8e;margin:12px 0 0}
+.credit a{color:inherit}
+.row .round.toggle{font-size:24px;box-shadow:0 4px 0 var(--shade)}
+.toggle.off{filter:grayscale(1);opacity:.45}
 .title-card h1{font-size:46px}
 .title-card p{margin-bottom:6px}
 .bodymap{position:relative;width:min(270px,70vw);aspect-ratio:200/260;margin:0 auto 12px}
@@ -184,6 +220,8 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 .row .round svg{width:30px;height:30px}
 .dock .round.home{left:auto;right:calc(env(safe-area-inset-right,0px) + 14px)}
 .dock .round.home svg{width:24px;height:24px}
+.dock .round.speed{left:auto;right:calc(env(safe-area-inset-right,0px) + 74px);font:bold 18px/1 var(--plain);color:#8a4a62}
+.dock .round.speed.on{background:var(--gold);color:#5a3a00;box-shadow:0 4px 0 #e0a800,0 0 0 3px #fff6c9}
 
 @keyframes pulse{50%{transform:scale(1.3)}}
 @keyframes bump{50%{transform:scale(1.18)}}
@@ -207,11 +245,14 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
   <button class="go sneeze off" id="sneeze" aria-label="Sneeze the germs away">🤧</button>
   <button class="round" id="mute" aria-label="Sound on or off">🔊</button>
   <button class="round home" id="home" aria-label="Back to the map"></button>
+  <button class="round speed" id="speed" aria-label="Play faster" aria-pressed="false" hidden>2×</button>
 </div>
 
 <div id="labels"></div>
 <div class="anchor menu" id="menu" hidden><div class="opts" id="opts"></div></div>
 <div class="anchor hand" id="hand" hidden><span>👆</span></div>
+<div class="anchor" id="heartTag" hidden><div class="preview hearttag" id="heartTagBody"></div></div>
+<div class="anchor" id="nametag" hidden><div class="preview nametag"></div></div>
 
 <div class="overlay" id="title">
   <div class="card title-card">
@@ -220,8 +261,16 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
     <div class="bodymap" id="bodymap"></div>
     <div class="row">
       <button class="go" id="play" aria-label="Play"></button>
-      <button class="round vibe" id="vibe" aria-label="Vibration on or off" hidden>📳</button>
+      <button class="round toggle" id="music" aria-label="Music on or off">🎵</button>
+      <button class="round toggle" id="vibe" aria-label="Vibration on or off" hidden>📳</button>
     </div>
+    <p class="credit">Voices and sounds: <a href="https://elevenlabs.io" target="_blank" rel="noopener">elevenlabs.io</a></p>
+  </div>
+</div>
+<div class="overlay" id="tip" hidden>
+  <div class="card tipcard">
+    <div id="tipBody"></div>
+    <button class="go" id="tipOk" aria-label="Got it">OK 👍</button>
   </div>
 </div>
 <div class="overlay" id="end" hidden>
@@ -229,11 +278,13 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
     <div class="art" id="endArt"></div>
     <h2 id="endTitle"></h2>
     <div class="stars" id="stars"></div>
+    <p class="fact" id="endFact" hidden></p>
     <div class="row">
       <button class="round" id="mapBtn" aria-label="Back to the map"></button>
       <button class="round" id="againBtn" aria-label="Play this level again"></button>
       <button class="go" id="endBtn"></button>
     </div>
+    <p class="credit">Voices and sounds: <a href="https://elevenlabs.io" target="_blank" rel="noopener">elevenlabs.io</a></p>
   </div>
 </div>
 
@@ -245,23 +296,22 @@ const HEART_SPARKLES = 5;       // germs that may reach the heart before the wav
 const WAVE_BONUS = 3;           // drops that pop out of the heart after each cleared wave
 const DROP_AUTOCOLLECT_S = 4;   // a drop nobody taps flies to the counter on its own after this long
 const SHOT_SPEED = 9;           // zapper shots, tiles per second
-const BUILDS = {                // what can go on a pad: cost in drops, then the stats for levels 1, 2 and 3
-  zapper: { cost: 5, levels: [   // shoots: reach in tiles, seconds between shots, damage per shot
-    { range: 2.7, reload: 0.85, damage: 1 },
-    { range: 2.9, reload: 0.6,  damage: 1 },
-    { range: 3.1, reload: 0.8,  damage: 2 },
-  ] },
-  nest: { cost: 6, levels: [     // trains blobs: how far from the nest they stand guard, damage per second, how long they can hold germs
-    { reach: 2.3, dps: 1.8, stamina: 8 },
-    { reach: 2.5, dps: 2.4, stamina: 11 },
-    { reach: 2.7, dps: 3.0, stamina: 14 },
-  ] },
+const BUILDS = {                // what can go on a pad: its cost in drops, and two upgrade paths (each step can be bought twice)
+  zapper: { cost: 5, grow: 'power', tracks: {   // shoots bubbles at germs
+    reach: { label: 'Reach', badge: '◎', pip: '🔵', costs: [5, 8], steps: [{ range: 2.7 }, { range: 3.0 }, { range: 3.3 }] },   // how far it shoots, in tiles
+    power: { label: 'Power', badge: '⚡', pip: '⚡', costs: [6, 9], steps: [   // seconds between shots, damage per shot
+      { reload: 0.85, damage: 1 }, { reload: 0.6, damage: 1 }, { reload: 0.8, damage: 2 }] },
+  } },
+  nest: { cost: 6, grow: 'bite', base: { reach: 2.3 }, tracks: {   // trains blobs that guard the vessel within `reach` tiles
+    bite:   { label: 'Bite',   badge: '🦷', pip: '🦷', costs: [6, 9], steps: [{ dps: 1.8 }, { dps: 2.4 }, { dps: 3.0 }] },        // blob damage per second
+    energy: { label: 'Energy', badge: '🔋', pip: '🔋', costs: [5, 8], steps: [{ stamina: 8 }, { stamina: 11 }, { stamina: 14 }] },  // how long a blob can hold germs
+  } },
+  antibody: { cost: 6, grow: 'speed', tracks: {   // throws antibodies that stick on germs
+    reach: { label: 'Reach', badge: '◎', pip: '🔵', costs: [5, 8], steps: [{ range: 2.8 }, { range: 3.1 }, { range: 3.4 }] },
+    speed: { label: 'Speed', badge: '⚡', pip: '⚡', costs: [6, 9], steps: [   // seconds between throws, germs per throw
+      { reload: 1.4, multi: 1 }, { reload: 1.0, multi: 1 }, { reload: 0.9, multi: 2 }] },
+  } },
 };
-BUILDS.antibody = { cost: 6, levels: [   // sticks antibodies on germs: reach in tiles, seconds between shots, germs per shot
-  { range: 2.8, reload: 1.4, multi: 1 },
-  { range: 3.0, reload: 1.0, multi: 1 },
-  { range: 3.2, reload: 0.9, multi: 2 },
-] };
 const TAG_SLOW = 0.7;           // a germ with an antibody stuck on walks at this fraction of its speed...
 const TAG_DAMAGE = 1.5;         // ...and takes this much more damage
 const AB_SPEED = 6;             // antibody flying speed, tiles per second
@@ -271,12 +321,14 @@ const MUCUS_R = 0.6;            // how far a puddle reaches, in tiles
 const MUCUS_SLOW = 0.4;         // germs in snot walk at this fraction of their speed
 const SNEEZE_COOLDOWN = 40;     // seconds before the sneeze button works again
 const SNEEZE_PUSH = 5;          // tiles every germ gets blown back
-const UPGRADE_COSTS = [6, 9];   // drops to go to level 2, then level 3
+const FAST_SPEED = 2;           // how much faster waves run with the speed button on
+const SELL_REFUND = 0.75;       // selling gives back this share of everything spent on it (rounded down)
 const TROOP_COST = 2;           // drops to train one more blob (a new nest comes with one)
 const TROOPS_PER_NEST = 3;
 const TRAIN_S = 1.2;            // seconds to train a blob
 const TROOP_SPEED = 1.8;        // blob walking speed, tiles per second
 const TROOP_GUARD_R = 1.0;      // a blob grabs germs this close to its post (tiles)
+const TROOP_SPREAD = 1.9;       // a nest's blobs guard spots at least this far apart (tiles), so they cover different stretches
 const TROOP_REST_S = 4;         // a tired blob rests in the nest this long
 const CHOMP_S = 0.4;            // seconds between bites
 const TROOP_RECOVER = 1;        // stamina a blob gets back per second while it waits at its post
@@ -287,7 +339,7 @@ const GERMS = {                 // hp, walking speed (tiles per second), drops w
   corkscrew: { hp: 4,  speed: 1.1,  drops: 1, size: 0.34, bite: 1,   shape: 'spiral', color: 0x2bb3a3, bump: 0x1d8478, slippery: true },   // too wiggly for blobs to grab
   chunky:    { hp: 14, speed: 0.5,  drops: 2, size: 0.5,  bite: 2,   shape: 'clump',  color: 0x9aa83e, bump: 0x6c7a24, splits: 3 },         // breaks into 3 bloops
   spiky:     { hp: 6,  speed: 0.75, drops: 2, size: 0.34, bite: 1.5, shape: 'virus',  color: 0x9b5de5, bump: 0xffd23f, armour: true },     // nothing hurts it until an antibody sticks
-  king:      { hp: 130, speed: 0.4, drops: 12, size: 0.72, bite: 4, shape: 'king',   color: 0x4f9a3a, bump: 0x2f6e22, splits: 4, hurts: 3 },   // the boss: costs 3 hearts if it gets through
+  king:      { hp: 340, speed: 0.4, drops: 12, size: 0.72, bite: 4, shape: 'king',   color: 0x4f9a3a, bump: 0x2f6e22, splits: 4, hurts: 3 },   // the boss: costs 3 hearts if it gets through
 };
 const GERM_HELLO = {            // said the first time each kind shows up in a wave
   big: 'A big germ is coming! It takes lots of pops.',
@@ -295,7 +347,7 @@ const GERM_HELLO = {            // said the first time each kind shows up in a w
   corkscrew: 'Corkscrew germs are too wiggly for the blobs to grab!',
   chunky: 'A chunky germ! When it pops, it breaks into little ones.',
   spiky: 'Spiky germs have armour! Stick an antibody on them first.',
-  king: 'Uh oh, it is the King Germ! It is huge. Use everything you have!',
+  king: "Uh oh, it's the King Germ! It's huge. Use everything you have!",
 };
 for (const [kind, k] of Object.entries(GERMS)) k.kind = kind;
 const CAM_PITCH = 38;           // camera angle above the ground in degrees (true isometric is 35.3)
@@ -306,7 +358,7 @@ const CAM_PITCH = 38;           // camera angle above the ground in degrees (tru
 // Waves are lists of groups: germ kind, how many, seconds apart, optional start delay, and which entry ('from', 0 = '1').
 const LEVELS = [
   {
-    name: 'Scraped Knee', icon: '🦵', seed: 7, entry: 'scratch', startEnergy: 10, builds: ['zapper'],
+    id: 'knee', spot: [78, 222], name: 'Scraped Knee', icon: '🦵', seed: 7, entry: 'scratch', startEnergy: 10, toughness: 1.35, builds: ['zapper'],
     map: [
       ' ..1...         ',
       ' ..#....        ',
@@ -316,10 +368,10 @@ const LEVELS = [
       '  ......#...    ',
       '   ...o.#....   ',
       '    ....#.o...  ',
-      '     ...#...... ',
+      '     ...#...c.. ',
       '      ..######..',
       '       o.....#..',
-      '        ...o.#..',
+      '        ...o.#e.',
       '         ....#..',
       '          ...H..',
       '           .....',
@@ -329,14 +381,15 @@ const LEVELS = [
       [{ kind: 'bloop', n: 6,  gap: 1.6 }],
       [{ kind: 'bloop', n: 9,  gap: 1.2 }],
       [{ kind: 'bloop', n: 12, gap: 1.0 }],
-      [{ kind: 'bloop', n: 10, gap: 1.0 }, { kind: 'big', n: 3, gap: 3, delay: 3 }],
-      [{ kind: 'bloop', n: 16, gap: 0.8 }, { kind: 'big', n: 4, gap: 2.5, delay: 4 }],
+      [{ kind: 'bloop', n: 12, gap: 0.9 }, { kind: 'big', n: 4, gap: 2.6, delay: 3 }],
+      [{ kind: 'bloop', n: 20, gap: 0.7 }, { kind: 'big', n: 5, gap: 2.2, delay: 4 }],
     ],
     intro: 'Oh no, a scratch on the knee! Germs are sneaking in. Tap a glowing spot to build a germ zapper.',
     win: 'Hooray! You stopped all the germs. The knee is all better!', winTitle: 'The knee is all better!',
+    fact: "Did you know? When you scrape your knee, white blood cells rush there to fight the germs. That's why a cut gets a bit red and warm.",
   },
   {
-    name: 'Runny Nose', icon: '👃', seed: 11, entry: 'nostril', startEnergy: 14, builds: ['zapper', 'nest'], sneeze: true, hint: [8, 8, 'nest'],
+    id: 'nose', spot: [100, 54], name: 'Runny Nose', icon: '👃', seed: 11, entry: 'nostril', startEnergy: 14, toughness: 1.25, builds: ['zapper', 'nest'], sneeze: true, hint: [8, 8, 'nest'],
     map: [
       '    ...          ',
       '   .2##.         ',
@@ -344,9 +397,9 @@ const LEVELS = [
       ' .....#...       ',
       '.1....####.      ',
       '.#...o...#..     ',
-      '.####....#..     ',
+      '.####...e#..     ',
       ' ...#....#..     ',
-      '  o.#...o#....   ',
+      '  o.#c..o#....   ',
       '   .######....   ',
       '    .....#.o...  ',
       '     ..o.#.....  ',
@@ -360,26 +413,27 @@ const LEVELS = [
       [{ kind: 'bloop', n: 4, gap: 1.8, from: 0 }, { kind: 'bloop', n: 4, gap: 1.8, delay: 0.9, from: 1 }],
       [{ kind: 'bloop', n: 7, gap: 1.3, from: 0 }, { kind: 'bloop', n: 5, gap: 1.6, delay: 3, from: 1 }],
       [{ kind: 'bloop', n: 5, gap: 1.4, from: 0 }, { kind: 'bloop', n: 9, gap: 1.0, delay: 1, from: 1 }, { kind: 'big', n: 2, gap: 4, delay: 6, from: 0 }],
-      [{ kind: 'bloop', n: 12, gap: 0.8, from: 0 }, { kind: 'bloop', n: 12, gap: 0.8, delay: 0.4, from: 1 }, { kind: 'big', n: 1, gap: 1, delay: 8, from: 1 }],
-      [{ kind: 'bloop', n: 14, gap: 0.7, from: 0 }, { kind: 'bloop', n: 14, gap: 0.7, delay: 0.35, from: 1 },
-       { kind: 'big', n: 3, gap: 3, delay: 5, from: 0 }, { kind: 'big', n: 3, gap: 3, delay: 6.5, from: 1 }],
+      [{ kind: 'bloop', n: 15, gap: 0.7, from: 0 }, { kind: 'bloop', n: 15, gap: 0.7, delay: 0.35, from: 1 }, { kind: 'big', n: 2, gap: 3, delay: 6, from: 1 }],
+      [{ kind: 'bloop', n: 18, gap: 0.6, from: 0 }, { kind: 'bloop', n: 18, gap: 0.6, delay: 0.3, from: 1 },
+       { kind: 'big', n: 4, gap: 2.5, delay: 5, from: 0 }, { kind: 'big', n: 4, gap: 2.5, delay: 6.2, from: 1 }],
     ],
     intro: 'Achoo! A runny nose! Germs are coming from both sides. Try the new blob nest: its blobs grab the germs and gobble them up!',
     win: 'Hooray! No more sniffles!', winTitle: 'No more sniffles!',
+    fact: "Did you know? Snot traps germs before they can get inside you. A runny nose is your body cleaning itself!",
   },
   {
-    name: 'Tummy Ache', icon: '🍔', seed: 5, entry: 'mouth', palette: 'tummy', startEnergy: 16, builds: ['zapper', 'nest', 'antibody'], sneeze: true, hint: [9, 7, 'antibody'],
+    id: 'tummy', spot: [100, 154], name: 'Tummy Ache', icon: '🍔', seed: 5, entry: 'mouth', palette: 'tummy', startEnergy: 16, toughness: 1.1, builds: ['zapper', 'nest', 'antibody'], sneeze: true, hint: [9, 7, 'antibody'],
     map: [
       '  1....         ',
       ' .#.....        ',
       '..#.o....       ',
       '..#####...      ',
       '......#.o..     ',
-      '......#.....    ',
+      '.....c#.....    ',
       '    ..#####..   ',
       '    .....o#.o.  ',
       '   ....o..#.... ',
-      '   .......#####.',
+      '   ......e#####.',
       '    .2#####...#.',
       '     ......o..#.',
       '      .o......H.',
@@ -390,15 +444,16 @@ const LEVELS = [
       [{ kind: 'bloop', n: 6, gap: 1.5, from: 0 }, { kind: 'wiggler', n: 3, gap: 1.5, delay: 4, from: 1 }],
       [{ kind: 'bloop', n: 8, gap: 1.1, from: 0 }, { kind: 'wiggler', n: 5, gap: 1.0, delay: 3, from: 1 }],
       [{ kind: 'chunky', n: 2, gap: 5, from: 0 }, { kind: 'bloop', n: 6, gap: 1.2, delay: 2, from: 1 }, { kind: 'wiggler', n: 6, gap: 0.7, delay: 8, from: 0 }],
-      [{ kind: 'bloop', n: 12, gap: 0.8, from: 0 }, { kind: 'wiggler', n: 8, gap: 0.6, delay: 4, from: 1 }, { kind: 'chunky', n: 2, gap: 4, delay: 6, from: 1 }],
-      [{ kind: 'chunky', n: 3, gap: 4, from: 0 }, { kind: 'bloop', n: 14, gap: 0.7, delay: 1, from: 1 }, { kind: 'wiggler', n: 10, gap: 0.5, delay: 6, from: 0 },
-       { kind: 'big', n: 2, gap: 4, delay: 10, from: 1 }],
+      [{ kind: 'bloop', n: 15, gap: 0.7, from: 0 }, { kind: 'wiggler', n: 10, gap: 0.5, delay: 4, from: 1 }, { kind: 'chunky', n: 3, gap: 3.5, delay: 6, from: 1 }],
+      [{ kind: 'chunky', n: 4, gap: 3.5, from: 0 }, { kind: 'bloop', n: 18, gap: 0.6, delay: 1, from: 1 }, { kind: 'wiggler', n: 13, gap: 0.45, delay: 6, from: 0 },
+       { kind: 'big', n: 3, gap: 3.5, delay: 10, from: 1 }],
     ],
     intro: 'Uh oh, a tummy ache! Germs came in with the food. New: the antibody maker. Its antibodies stick on germs, so they slow down and pop faster!',
     win: 'Hooray! The tummy feels great!', winTitle: 'Happy tummy!',
+    fact: "Did you know? Your tummy has acid that kills lots of germs in your food. Washing your hands before you eat helps too!",
   },
   {
-    name: 'Lungs', icon: '🫁', seed: 3, entry: 'airway', palette: 'lungs', startEnergy: 18, builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, hint: [7, 7, 'mucus'],
+    id: 'lungs', spot: [100, 112], name: 'Lungs', icon: '🫁', seed: 3, entry: 'airway', palette: 'lungs', startEnergy: 18, builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, hint: [7, 7, 'mucus'],
     map: [
       '  ....          ',
       ' 2##....        ',
@@ -408,7 +463,7 @@ const LEVELS = [
       '...#####.o#..   ',
       '.....o.#..#..   ',
       '..1#####.o#...  ',
-      ' ......#..#...  ',
+      ' .....e#..#c..  ',
       '  ..o..#####....',
       '   ........#....',
       '    .....o.#.o..',
@@ -428,20 +483,82 @@ const LEVELS = [
     ],
     intro: 'Cough cough! Germs are in the lungs, coming three ways. New: tap the vessel to drop sticky snot there. Germs get stuck in it!',
     win: 'Hooray! Big deep breaths!', winTitle: 'Breathing easy!',
+    fact: "Did you know? Tiny hairs in your airways sweep sticky mucus up and out, and the germs go with it.",
   },
   {
-    name: 'Big Fever', icon: '🤒', seed: 9, entry: ['nostril', 'mouth', 'scratch'], palette: 'fever', fever: true, startEnergy: 20,
+    id: 'eye', name: 'Itchy Eye', icon: '👁️', seed: 21, entry: 'tear', palette: 'eye', iris: [5.5, 5.5], startEnergy: 18,
+    builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, spot: [34, 30], link: [88, 38],
+    map: [
+      ' .....o..      ',
+      '..........     ',
+      '...1######.    ',
+      '..2......#..   ',
+      '..#.o...c#.o.  ',
+      '..#......#.... ',
+      'o.#......#.... ',
+      '..#....o.#.... ',
+      '..#......#.... ',
+      ' .########.o.. ',
+      '  ......e#.... ',
+      '   .o....###.. ',
+      '    ....o..#.. ',
+      '     ......H.. ',
+      '      ........ ',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 6, gap: 1.3, from: 0 }, { kind: 'bloop', n: 6, gap: 1.3, delay: 0.6, from: 1 }],
+      [{ kind: 'wiggler', n: 8, gap: 0.7, from: 0 }, { kind: 'bloop', n: 6, gap: 1.0, delay: 2, from: 1 }, { kind: 'spiky', n: 2, gap: 3, delay: 3, from: 1 }],
+      [{ kind: 'corkscrew', n: 6, gap: 1.0, from: 1 }, { kind: 'chunky', n: 2, gap: 5, delay: 2, from: 0 }, { kind: 'wiggler', n: 6, gap: 0.6, delay: 6, from: 1 }],
+      [{ kind: 'spiky', n: 4, gap: 2.5, from: 0 }, { kind: 'spiky', n: 4, gap: 2.5, delay: 1.2, from: 1 }, { kind: 'bloop', n: 10, gap: 0.8, delay: 5, from: 0 }],
+      [{ kind: 'big', n: 3, gap: 3, from: 1 }, { kind: 'corkscrew', n: 8, gap: 0.8, delay: 2, from: 0 }, { kind: 'chunky', n: 2, gap: 5, delay: 6, from: 1 },
+       { kind: 'wiggler', n: 10, gap: 0.5, delay: 9, from: 0 }],
+    ],
+    intro: 'Blink blink, an itchy eye! Germs are sneaking along both eyelids. Guard the top and the bottom!',
+    win: 'Hooray! The eye is bright and clear!', winTitle: 'Bright eyes!',
+    fact: "Did you know? Tears wash germs out of your eyes, and they even have germ fighters in them!",
+  },
+  {
+    id: 'ear', name: 'Earache', icon: '👂', seed: 17, entry: 'ear', palette: 'ear', startEnergy: 16, toughness: 1.6,
+    builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, spot: [172, 84], link: [136, 50],
+    map: [
+      '.........   ',
+      '.1########  ',
+      '....o....#. ',
+      '.#######c#..',
+      '.#....o#.#..',
+      '.#.##H.#o#..',
+      '.#o#o..#.#..',
+      '.#.#####e#o.',
+      '.#...o...#..',
+      ' #########..',
+      '  ..........',
+      '   .........',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 10, gap: 0.9 }],
+      [{ kind: 'wiggler', n: 20, gap: 0.4 }, { kind: 'bloop', n: 10, gap: 0.7, delay: 3 }],
+      [{ kind: 'chunky', n: 6, gap: 2.5 }, { kind: 'corkscrew', n: 14, gap: 0.5, delay: 2 }],
+      [{ kind: 'spiky', n: 8, gap: 1.5 }, { kind: 'bloop', n: 20, gap: 0.45, delay: 2 }, { kind: 'big', n: 4, gap: 3, delay: 6 }],
+      [{ kind: 'chunky', n: 6, gap: 2 }, { kind: 'wiggler', n: 24, gap: 0.35, delay: 2 }, { kind: 'spiky', n: 8, gap: 1.5, delay: 5 },
+       { kind: 'corkscrew', n: 16, gap: 0.45, delay: 8 }, { kind: 'big', n: 3, gap: 3, delay: 12 }],
+    ],
+    intro: 'Ouch, an earache! The germs go round and round the ear to reach the heart. Build in between the rings to zap two at once!',
+    win: 'Hooray! The earache is gone!', winTitle: 'Happy ears!',
+    fact: "Did you know? Earwax is sticky, so it catches dust and germs before they get deep into your ear.",
+  },
+  {
+    id: 'fever', spot: [164, 24], link: [128, 36], name: 'Big Fever', icon: '🤒', seed: 9, entry: ['nostril', 'mouth', 'scratch'], palette: 'fever', fever: true, startEnergy: 23,
     builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true,
     map: [
       '  .....          ',
       ' 2###.....       ',
       '....#......      ',
       '....#.o...3.     ',
-      ' ...#.....#..    ',
+      ' ...#...c.#..    ',
       ' ...#####.#...   ',
       '...o....#o#.o..  ',
       '......o.#.#....  ',
-      '.1#######.#....  ',
+      '.1#######e#....  ',
       ' .......#####....',
       '  ..........#....',
       '      ....o.#.o..',
@@ -451,7 +568,7 @@ const LEVELS = [
       '          .......',
     ],
     waves: [
-      [{ kind: 'bloop', n: 8, gap: 1.2, from: 1 }, { kind: 'wiggler', n: 5, gap: 0.9, delay: 3, from: 0 }, { kind: 'spiky', n: 2, gap: 3, delay: 5, from: 2 }],
+      [{ kind: 'bloop', n: 6, gap: 1.4, from: 1 }, { kind: 'wiggler', n: 4, gap: 1.1, delay: 4, from: 0 }, { kind: 'spiky', n: 1, gap: 3, delay: 8, from: 2 }],
       [{ kind: 'chunky', n: 2, gap: 5, from: 1 }, { kind: 'corkscrew', n: 6, gap: 0.9, delay: 2, from: 2 }, { kind: 'bloop', n: 8, gap: 0.9, delay: 4, from: 0 }],
       [{ kind: 'big', n: 3, gap: 3, from: 1 }, { kind: 'spiky', n: 4, gap: 2.5, delay: 2, from: 0 }, { kind: 'wiggler', n: 8, gap: 0.6, delay: 5, from: 2 }],
       [{ kind: 'bloop', n: 14, gap: 0.7, from: 1 }, { kind: 'chunky', n: 3, gap: 4, delay: 3, from: 2 }, { kind: 'corkscrew', n: 8, gap: 0.8, delay: 5, from: 0 },
@@ -461,6 +578,7 @@ const LEVELS = [
     ],
     intro: 'Oh no, a big fever! Germs are coming from the nose, the mouth and a scratch, all at once. Use everything you have!',
     win: 'You did it! The fever is gone. You beat all the germs!', winTitle: 'Fever gone! You beat them all!',
+    fact: "Did you know? A fever is your body turning up the heat to make it hard for germs to grow. Rest and drink water to help!",
   },
 ];
 
@@ -475,7 +593,11 @@ const pick = (arr, r = Math.random) => arr[Math.floor(r() * arr.length)];
 const lerpAngle = (a, b, t) => a + ((((b - a + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) - Math.PI) * t;
 const elasticOut = t => t <= 0 ? 0 : t >= 1 ? 1 : 2 ** (-10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI / 3)) + 1;
 const damp = (rate, dt) => 1 - Math.exp(-rate * dt);
-const stats = s => BUILDS[s.kind].levels[s.level - 1];
+const stats = s => Object.assign({}, BUILDS[s.kind].base,   // a defender's numbers: its base plus the step it has reached on each path
+  ...Object.entries(BUILDS[s.kind].tracks).map(([k, tr]) => tr.steps[(s.ups && s.ups[k]) || 0]));
+const upgradesOf = t => Object.values(t.ups).reduce((a, b) => a + b, 0);
+const growOf = t => t.ups[BUILDS[t.kind].grow];   // steps on the path that makes it physically bigger
+const NAMES = { zapper: 'Neutrophil', nest: 'Macrophage', antibody: 'B cell', mucus: 'Mucus' };   // the real names, shown on the build cards
 const germIcon = (kind, cls = '') => (SVG[kind] || SVG.bloop)(kind === 'big' ? (cls + ' big').trim() : cls);
 
 const SVG = {
@@ -526,6 +648,9 @@ const MAT = {
   nest: toon(0xffb27a), nestSpot: toon(0xf0955a), door: basic(0x6a2a10), troop: toon(0xffbf7a), troopFoot: toon(0xf3a25c),
   bumpTissue: toon(0xe98aa2), fat: toon(0xffe08a), plinth: toon(0xff9cb4),
   drop: toon(0x39c2ff, { emissive: 0x0b5c99, emissiveIntensity: 0.6 }),
+  moundSilver: toon(0xdbe4f2), reach: toon(0x6cc8ff, { emissive: 0x2e8fd0, emissiveIntensity: 0.5 }), star: toon(0xffd23f, { emissive: 0xffb000, emissiveIntensity: 0.6 }),
+  aura: toon(0xd8c4ff, { transparent: true, opacity: 0.28, depthWrite: false }), auraGold: toon(0xfff0a0, { transparent: true, opacity: 0.3, depthWrite: false }),
+  flag: toon(0xff5a6e), pole: toon(0xfff6e8), chimney: toon(0xc97b4a),
   bcell: toon(0xffe066), spike: toon(0xc9a2f5), steam: toon(0xffffff, { transparent: true, opacity: 0.45 }), ab: toon(0xff9f1c), spark: basic(0xfff2a0), puff: toon(0xffffff, { transparent: true, opacity: 0.85 }),
   mucus: toon(0xb8de4a, { transparent: true, opacity: 0.88 }), bubble: toon(0xf4ffd8, { transparent: true, opacity: 0.8 }),
   lips: toon(0xe8506a), tooth: toon(0xfffdf4), airway: toon(0xf8cfdc),
@@ -549,6 +674,8 @@ const PALETTES = {   // tissue colours and the colour of the little bumps on it,
   tummy: { tissue: [0xffb99a, 0xffc2a6, 0xf9ae8e, 0xffbfa0, 0xfcb593], bump: 0xf09a78 },
   lungs: { tissue: [0xf4b6cf, 0xefadc9, 0xf7c0d6, 0xf1b2cc, 0xf5bad2], bump: 0xe597b8 },
   fever: { tissue: [0xffa98f, 0xff9f86, 0xffb39a, 0xfaa08a, 0xffab92], bump: 0xf08a74 },
+  eye:   { tissue: [0xfbe9ee, 0xf8e1e7, 0xfcedf1, 0xf6dce4, 0xfae5eb], bump: 0xf2b9c8 },
+  ear:   { tissue: [0xf3b8aa, 0xefae9f, 0xf6c1b4, 0xf1b3a5, 0xf4bcae], bump: 0xe39a8a },
 };
 const entryStyle = i => Array.isArray(LEVEL.entry) ? LEVEL.entry[i] : LEVEL.entry;
 const ROAD = new THREE.Color(0xc42a48), SKIN = new THREE.Color(0xf4b49a);
@@ -568,13 +695,18 @@ function parseBoard(map) {
     if (ch === ' ') return;
     const cell = { c, r, ch, x: c, z: r, top: 0 };
     b.cells.set(c + ',' + r, cell); b.land.push(cell);
-    if (ch === 'o') b.pads.push(cell);
+    if (ch === 'o' || (ch >= 'b' && ch <= 'e')) {   // a pad; 'b'-'e' are pads that open up before wave 2-5
+      cell.unlock = ch === 'o' ? 0 : ch.charCodeAt(0) - 97; cell.ch = 'o'; b.pads.push(cell);
+    }
     if (isEntry(ch)) b.entries[+ch - 1] = cell;
     if (ch === 'H') b.heart = cell;
   }));
-  for (const e of b.entries) e.path = findPath(b, e, b.heart);
+  for (const e of b.entries) {
+    e.path = findPath(b, e, b.heart);
+    if (e.path.length < 2 || !e.path[0].equals(new THREE.Vector3(e.x, 0, e.z))) throw new Error(`Germ Guard map: entry ${e.ch} can't reach the heart`);
+  }
   // how many germ paths run over each vessel tile (blobs prefer to guard where paths merge)
-  for (const e of b.entries) for (const p of e.path) { const cell = b.cells.get(p.x + ',' + p.z); cell.paths = (cell.paths || 0) + 1; }
+  b.entries.forEach((e, ei) => { for (const p of e.path) { const cell = b.cells.get(p.x + ',' + p.z); cell.paths = (cell.paths || 0) + 1; cell.lanes = (cell.lanes || 0) | (1 << ei); } });
   return b;
 }
 function findPath(b, from, to) {   // breadth-first search along the vessel tiles
@@ -624,6 +756,7 @@ function loadLevel(i) {
   // decorations: tissue bumps and little clusters of fat cells on free tiles
   for (const cell of board.land) {
     if (cell.ch !== '.' || nearEntry(cell)) continue;
+    if (LEVEL.iris && Math.hypot(cell.x - LEVEL.iris[0], cell.z - LEVEL.iris[1]) < 2.8) continue;
     if (Math.abs(cell.c - board.heart.c) <= 1 && Math.abs(cell.r - board.heart.r) <= 1) continue;
     const roll = rnd(), jx = (rnd() - 0.5) * 0.4, jz = (rnd() - 0.5) * 0.4;
     if (roll < 0.22) {
@@ -637,6 +770,14 @@ function loadLevel(i) {
     }
   }
 
+  if (LEVEL.iris) {   // the eye level: an iris and pupil lying on the tissue between the eyelids
+    const [ix, iz] = LEVEL.iris, eye = new THREE.Group();
+    const disc = (r, color, y) => { const m = new THREE.Mesh(new THREE.CircleGeometry(r, 40).rotateX(-Math.PI / 2), toon(color)); m.position.y = y; m.receiveShadow = true; eye.add(m); };
+    disc(2.4, 0x5aa9e6, 0.075); disc(2.1, 0x7cc4f5, 0.08); disc(1.05, 0x22223a, 0.085);
+    const glint = new THREE.Mesh(new THREE.CircleGeometry(0.35, 20).rotateX(-Math.PI / 2), basic(0xffffff)); glint.position.set(-0.45, 0.09, -0.45); eye.add(glint);
+    eye.position.set(ix, 0, iz); world.add(eye);
+  }
+
   // build pads
   for (const pad of board.pads) {
     pad.plate = new THREE.Mesh(PAD_GEO, toon(0xfff1c9)); pad.plate.position.set(pad.x, pad.top + 0.04, pad.z);
@@ -646,18 +787,18 @@ function loadLevel(i) {
     pad.plus = new THREE.Group();
     for (const rot of [0, Math.PI / 2]) { const b = new THREE.Mesh(PLUS_GEO, toon(0xffc23a)); b.rotation.y = rot + Math.PI / 4; pad.plus.add(b); }
     pad.plus.position.set(pad.x, pad.top + 0.1, pad.z);
-    pad.cover = board.land.filter(c => isRoad(c.ch) && Math.hypot(c.x - pad.x, c.z - pad.z) <= BUILDS.zapper.levels[0].range).length;
+    pad.cover = board.land.filter(c => isRoad(c.ch) && Math.hypot(c.x - pad.x, c.z - pad.z) <= stats({ kind: 'zapper' }).range).length;
     world.add(pad.plate, pad.ring, pad.plus);
   }
-  bestPad = board.pads.reduce((a, b) => (b.cover > a.cover ? b : a));
+  bestPad = board.pads.filter(p => !p.unlock).reduce((a, b) => (b.cover > a.cover ? b : a));
 
   // where germs get in (a scratch or a nostril), with a bobbing warning arrow and a wave label over each
   $('labels').innerHTML = '';
   entryFx = board.entries.map((e, i) => {
     const look = new THREE.Group(), style = entryStyle(i);
-    const holeR = style === 'scratch' ? 0.4 : 0.42, holeScale = { scratch: [1.2, 0.6], nostril: [1, 0.75], mouth: [1.3, 0.7], airway: [1, 1] }[style];
-    const hole = new THREE.Mesh(new THREE.CircleGeometry(holeR, 24).rotateX(-Math.PI / 2), basic(style === 'scratch' ? 0x4a0718 : 0x3a0a14));
-    const rimMat = { scratch: toon(0xb3243f), nostril: toon(0xe9a389), mouth: MAT.lips, airway: MAT.airway }[style];
+    const holeR = style === 'scratch' ? 0.4 : 0.42, holeScale = { scratch: [1.2, 0.6], nostril: [1, 0.75], mouth: [1.3, 0.7], airway: [1, 1], tear: [1.1, 0.8], ear: [1, 1] }[style];
+    const hole = new THREE.Mesh(new THREE.CircleGeometry(holeR, 24).rotateX(-Math.PI / 2), basic({ scratch: 0x4a0718, tear: 0x1f3c5c, ear: 0x4a2a14 }[style] || 0x3a0a14));
+    const rimMat = { scratch: toon(0xb3243f), nostril: toon(0xe9a389), mouth: MAT.lips, airway: MAT.airway, tear: toon(0x9fd8ff), ear: toon(0xe0aa45) }[style];
     const rim = new THREE.Mesh(new THREE.TorusGeometry(holeR + 0.02, style === 'scratch' ? 0.07 : style === 'mouth' ? 0.13 : 0.1, 8, 28).rotateX(Math.PI / 2), rimMat);
     look.add(hole, rim);
     if (style === 'mouth') for (const x of [-0.1, 0.1]) { const t = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.1, 0.1), MAT.tooth); t.position.set(x, 0.02, -0.3); look.add(t); }
@@ -685,7 +826,7 @@ function loadLevel(i) {
   heart.plinth.position.set(H.x, H.top + 0.1, H.z);
   heart.group.position.set(H.x, H.top + 0.95, H.z);
   heartPos.copy(heart.group.position);
-  heart.thermo.visible = !!LEVEL.fever;
+  heart.fever.visible = !!LEVEL.fever;
 
   // camera framing
   const xs = board.land.map(c => c.x), zs = board.land.map(c => c.z);
@@ -700,7 +841,7 @@ function loadLevel(i) {
 }
 
 /* ======== heart ======== */
-const heart = { sneeze: 0, group: new THREE.Group(), body: null, mat: toon(0xff3b5c, { emissive: 0xffffff, emissiveIntensity: 0 }), hit: 0, plaster: new THREE.Group(), plinth: null };
+const heart = { sneeze: 0, group: new THREE.Group(), body: null, mat: toon(0xff3b5c, { emissive: 0xffffff, emissiveIntensity: 0 }), hit: 0, plasters: [], mouths: {}, plinth: null };
 {
   const s = new THREE.Shape();   // the classic heart curve, tip pointing up before it's turned over
   s.moveTo(25, 25); s.bezierCurveTo(25, 25, 20, 0, 0, 0); s.bezierCurveTo(-30, 0, -30, 35, -30, 35);
@@ -711,22 +852,33 @@ const heart = { sneeze: 0, group: new THREE.Group(), body: null, mat: toon(0xff3
   heart.body = new THREE.Mesh(geo, heart.mat); heart.body.castShadow = true;
   const face = new THREE.Group(); face.position.z = 0.26;
   addEyes(face, 0.1, 0.12, 0.02, 0.24);
-  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.028, 8, 20, Math.PI), MAT.mouth);
-  smile.rotation.z = Math.PI; smile.position.set(0, -0.08, 0.05); face.add(smile);
+  // three mouths for how the heart feels: happy, a bit worried, very worried
+  const arc = new THREE.TorusGeometry(0.12, 0.028, 8, 20, Math.PI);
+  const smile = new THREE.Mesh(arc, MAT.mouth); smile.rotation.z = Math.PI; smile.position.set(0, -0.08, 0.05);
+  const frown = new THREE.Mesh(arc, MAT.mouth); frown.position.set(0, -0.16, 0.05);
+  const flat = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.04, 0.03), MAT.mouth); flat.position.set(0, -0.11, 0.05);
+  face.add(smile, frown, flat); heart.mouths = { smile, flat, frown };
   for (const side of [-1, 1]) {   // rosy cheeks
     const ch = ball(toon(0xff8fa6), 0.07, side * 0.4, -0.06, 0.02, false); ch.scale.z = 0.3; face.add(ch);
   }
-  // a plaster that appears after the first germ gets through
-  for (const rot of [0.6, -0.6]) {
-    const p = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.11, 0.03), toon(0xf6d2a2)); p.rotation.z = rot; heart.plaster.add(p);
+  // a plaster for every germ that gets through (up to four)
+  const PLASTER_GEO = new THREE.BoxGeometry(0.32, 0.1, 0.03), plasterMat = toon(0xf6d2a2);
+  for (const [px, py, tilt] of [[0.42, 0.34, 0], [-0.44, 0.32, 0.5], [0.34, -0.24, -0.4], [-0.3, -0.26, 0.2]]) {
+    const pl = new THREE.Group();
+    for (const rot of [0.6, -0.6]) { const m = new THREE.Mesh(PLASTER_GEO, plasterMat); m.rotation.z = rot; pl.add(m); }
+    pl.position.set(px, py, 0.29); pl.rotation.z = tilt; pl.visible = false; heart.plasters.push(pl);
   }
-  heart.plaster.position.set(0.38, 0.32, 0.29); heart.plaster.visible = false;
-  heart.thermo = new THREE.Group();   // a thermometer in its mouth, for the fever level
-  const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.42, 10), MAT.tooth); stick.position.y = 0.21; heart.thermo.add(stick);
-  heart.thermo.add(ball(MAT.lips, 0.055, 0, 0.42, 0, false));
-  heart.thermo.position.set(0.04, -0.12, 0.34); heart.thermo.rotation.set(0.5, 0, -2.1); heart.thermo.visible = false;
-  heart.body.add(heart.thermo);
-  heart.body.add(face, heart.plaster);
+  heart.fever = new THREE.Group();   // for the fever level: drops of sweat trickling down both sides
+  const sweatMat = toon(0x9fe0ff), DROP_TIP = new THREE.ConeGeometry(0.048, 0.1, 12);
+  for (const side of [1, -1]) {
+    const drop = new THREE.Group(), tip = new THREE.Mesh(DROP_TIP, sweatMat); tip.position.y = 0.06;
+    drop.add(ball(sweatMat, 0.05, 0, 0, 0, false), tip); drop.scale.setScalar(1.6);
+    drop.position.set(side * 0.5, 0.22, 0.3); drop.userData.y = 0.22; drop.userData.phase = side > 0 ? 0 : 0.5;
+    heart.fever.add(drop);
+  }
+  heart.fever.visible = false;
+  heart.body.add(heart.fever);
+  heart.body.add(face, ...heart.plasters);
   heart.group.add(heart.body);
   heart.plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.68, 0.2, 32), MAT.plinth);
   heart.plinth.castShadow = heart.plinth.receiveShadow = true;
@@ -823,7 +975,15 @@ function makeGerm(k) {   // the body material is the germ's own so it can flash 
   return { mesh, inner, mat, bumpMat, spin, shell, top };
 }
 const MOUND_GEO = shared(new THREE.CylinderGeometry(0.34, 0.42, 0.24, 24));
-const RANK_GEO = shared(new THREE.TorusGeometry(0.41, 0.035, 8, 32).rotateX(Math.PI / 2));
+const STAR_GEO = (() => {
+  const sh = new THREE.Shape();
+  for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 0.07 : 0.155; i ? sh.lineTo(Math.cos(a) * r, -Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, -Math.sin(a) * r); }
+  return shared(new THREE.ExtrudeGeometry(sh, { depth: 0.04, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 1 }).center());
+})();
+const REACH_GEO = shared(new THREE.TorusGeometry(0.46, 0.03, 8, 40).rotateX(Math.PI / 2));
+const POLE_GEO = shared(new THREE.CylinderGeometry(0.012, 0.012, 0.34, 6).translate(0, 0.17, 0));
+const FLAG_GEO = shared(new THREE.BoxGeometry(0.17, 0.1, 0.012).translate(0.085, 0, 0));
+const CHIMNEY_GEO = shared(new THREE.CylinderGeometry(0.05, 0.06, 0.18, 10));
 const DOME_GEO = shared(new THREE.SphereGeometry(1, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2));
 const DOOR_GEO = (() => {   // an arched door: a square bottom with a round top
   const sh = new THREE.Shape();
@@ -833,21 +993,22 @@ const DOOR_GEO = (() => {   // an arched door: a square bottom with a round top
 function makeMound(group) {
   const mound = new THREE.Mesh(MOUND_GEO, MAT.mound);
   mound.position.y = 0.12; mound.castShadow = mound.receiveShadow = true; group.add(mound);
+  return mound;
 }
 function makeZapper() {
   const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
-  makeMound(group);
+  const mound = makeMound(group);
   aim.position.y = 0.24; group.add(aim); aim.add(body);
   const cell = ball(MAT.cell, 1, 0, 0.32, 0); cell.scale.set(0.36, 0.33, 0.36); body.add(cell);
   for (const [x, y, z, r] of [[-0.15, 0.58, -0.1, 0.13], [0, 0.64, -0.17, 0.14], [0.15, 0.58, -0.1, 0.13]]) body.add(ball(MAT.lobe, r, x, y, z));
   for (const side of [-1, 1]) body.add(ball(MAT.cell, 0.12, side * 0.34, 0.2, 0.06));   // little arms
   addEyes(body, 0.085, 0.42, 0.27, 0.13);
   const mouth = ball(MAT.mouth, 1, 0, 0.27, 0.34, false); mouth.scale.set(0.06, 0.04, 0.03); body.add(mouth);
-  return { group, aim, body };
+  return { group, aim, body, mound };
 }
 function makeNest() {   // a little dome house the blobs live in, door towards the viewer
   const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
-  makeMound(group);
+  const mound = makeMound(group);
   aim.position.y = 0.24; group.add(aim); aim.add(body);
   const dome = new THREE.Mesh(DOME_GEO, MAT.nest); dome.scale.set(0.42, 0.4, 0.42); dome.castShadow = true; body.add(dome);
   const door = new THREE.Mesh(DOOR_GEO, MAT.door); door.position.set(0, 0.005, 0.44); door.rotation.x = -0.3; body.add(door);
@@ -855,17 +1016,17 @@ function makeNest() {   // a little dome house the blobs live in, door towards t
     const y = Math.sin(h) * 0.4, r = Math.cos(h) * 0.42;
     body.add(ball(MAT.nestSpot, 0.05, Math.cos(a) * r, y, Math.sin(a) * r, false));
   }
-  return { group, aim, body };
+  return { group, aim, body, mound };
 }
 function makeFactory() {   // the antibody maker: a yellow B-cell with antibody antennae
   const group = new THREE.Group(), aim = new THREE.Group(), body = new THREE.Group();
-  makeMound(group);
+  const mound = makeMound(group);
   aim.position.y = 0.24; group.add(aim); aim.add(body);
   const cell = ball(MAT.bcell, 1, 0, 0.32, 0); cell.scale.set(0.35, 0.33, 0.35); body.add(cell);
   for (const side of [-1, 1]) { const y = makeY(MAT.ab, 1.4); y.position.set(side * 0.16, 0.58, -0.04); y.rotation.z = -side * 0.25; body.add(y); }
   addEyes(body, 0.085, 0.4, 0.27, 0.13);
   const mouth = ball(MAT.mouth, 1, 0, 0.25, 0.33, false); mouth.scale.set(0.07, 0.035, 0.03); body.add(mouth);
-  return { group, aim, body };
+  return { group, aim, body, mound };
 }
 function makeTrap() {   // a snot puddle with a couple of bubbles
   const g = new THREE.Group();
@@ -981,12 +1142,51 @@ const Haptics = (() => {
 })();
 
 /* ======== sound ======== */
-// All synthesized: Web Audio for effects, speechSynthesis for the spoken lines.
+// Spoken lines and six sound effects are ElevenLabs clips in assets/ (see the README's audio credits); every other
+// sound is synthesized with Web Audio. Each line falls back to the browser's speech voice and each effect to its
+// synthesized version when a clip can't load (for example when the game is opened straight from disk).
+const ASSET_V = 1;              // bump after replacing any file in assets/
+const CLIP_VOL = 0.8;           // sound effect clips
+const VOICE_VOL = 1;            // spoken lines
+const CLIP_TRIM = { 'sfx-sneeze': 0.54, 'sfx-chomp': 0.58, 'sfx-king': 0.83, 'sfx-win': 0.52 };   // measured, to even out the clips' loudness
+const SNEEZE_PEAK = 1.0;        // seconds into the sneeze clip where the "CHOO" lands (the synthesized one: 0.75)
+const LINES = {                 // everything the voice says: key -> words; the clip for a key is assets/say-<key>.mp3
+  go: 'Here they come!', 'go-last': 'Last wave! Here they come!', cleared: 'Great job! Build more, then tap Go.',
+  lost: "Achoo! The germs got through. Let's try that wave again!", retry: 'Build more, then tap Go.', again: 'Here we go again!',
+  'first-build': "Great! Tap Go when you're ready.",
+  // the first time each defender is placed: its real name and what it does in the body
+  'meet-zapper': 'This is a neutrophil, a kind of white blood cell. Neutrophils rush to germs first and zap them!',
+  'meet-nest': 'This is a macrophage nest. Macrophages are big white blood cells. Their name means big eater, and they gobble up germs!',
+  'meet-antibody': 'This is a B cell. B cells make antibodies, little Y shapes that stick to germs, so they slow down and pop more easily!',
+  'meet-mucus': "That's mucus. Grown-ups call it snot! It's sticky, so germs get stuck in it. That's why your nose runs when you have a cold.",
+  'meet-sneeze': 'Achoo! A sneeze blows germs out of your nose. Remember to sneeze into your elbow!',
+  'upgrade-reach': 'Now it can reach further!', 'upgrade-power': 'Now it zaps harder!',
+  nope: 'Pop germs to get more drops!', 'sneeze-hint': 'Quick! Press the sneeze button!',
+  bonk: 'Bonk! Spiky germs need an antibody maker!', 'bonk-wait': 'Bonk! Wait for an antibody to stick on the spiky germ.',
+  sell: 'Tap again to sell it.',
+};
+for (const L of LEVELS) { LINES['intro-' + L.id] = L.intro; LINES['win-' + L.id] = L.win; LINES['fact-' + L.id] = L.fact; }
+for (const [kind, words] of Object.entries(GERM_HELLO)) LINES['hello-' + kind] = words;
+const SFX = ['sfx-sneeze', 'sfx-chomp', 'sfx-pop', 'sfx-ouch', 'sfx-king', 'sfx-win'];
+const CLIPS = [...SFX, ...Object.keys(LINES).map(k => 'say-' + k)];
 const Sound = {
   ctx: null, muted: store.get('muted', false), lastShot: 0, lastNom: 0, combo: 0, lastCollect: 0,
+  decoded: {}, clips: {},   // clips download and decode after the first tap, so just opening the map costs nothing
   init() {
-    if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; this.ctx = new AC(); }
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      this.ctx = new AC();
+      for (const n of CLIPS) this.decoded[n] = fetch(`assets/${n}.mp3?v=${ASSET_V}`).then(r => r.ok ? r.arrayBuffer() : null)
+        .then(b => b && new Promise((res, rej) => this.ctx.decodeAudioData(b, res, rej)))
+        .then(buf => { if (buf) this.clips[n] = buf; return buf; }).catch(() => null);
+    }
     if (this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  clip(name, vol = CLIP_VOL, rate = 1) {   // plays a loaded clip; returns null if it isn't loaded so the caller can synthesize
+    const buf = this.clips[name]; if (this.muted || !this.ctx || !buf) return null;
+    const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
+    s.buffer = buf; s.playbackRate.value = rate; g.gain.value = vol * (CLIP_TRIM[name] ?? 1);
+    s.connect(g).connect(this.ctx.destination); s.start(); return s;
   },
   tone(f, d, type = 'sine', v = 0.12, delay = 0, f2) {
     if (this.muted || !this.ctx) return;
@@ -1012,9 +1212,10 @@ const Sound = {
   hit() { this.tone(300, 0.05, 'sine', 0.04, 0, 200); },
   nom() {
     if (!this.ctx || this.ctx.currentTime - this.lastNom < 0.12) return; this.lastNom = this.ctx.currentTime;
+    if (this.clip('sfx-chomp', CLIP_VOL, 0.9 + Math.random() * 0.3)) return;
     this.tone(210 + Math.random() * 40, 0.09, 'square', 0.035, 0, 120); this.tone(160, 0.08, 'sine', 0.08, 0.06, 90);
   },
-  pop(big) { if (big) Haptics.buzz('pop'); this.tone(big ? 380 : 620, 0.16, 'sine', 0.16, 0, big ? 90 : 160); this.tone(1400, 0.04, 'triangle', 0.05); this.noise(0.08, 0.12, 900); },
+  pop(big) { if (big) Haptics.buzz('pop'); if (this.clip('sfx-pop', CLIP_VOL, big ? 0.7 : 0.95 + Math.random() * 0.2)) return; this.tone(big ? 380 : 620, 0.16, 'sine', 0.16, 0, big ? 90 : 160); this.tone(1400, 0.04, 'triangle', 0.05); this.noise(0.08, 0.12, 900); },
   collect() {
     const now = this.ctx ? this.ctx.currentTime : 0;
     this.combo = now - this.lastCollect < 0.5 ? Math.min(this.combo + 1, 8) : 0; this.lastCollect = now;
@@ -1025,7 +1226,9 @@ const Sound = {
   upgrade() { Haptics.buzz('build'); [659, 831, 988, 1319, 1661].forEach((f, i) => this.tone(f, 0.2, 'triangle', 0.08, i * 0.06)); },
   train() { Haptics.buzz('build'); this.tone(260, 0.18, 'sine', 0.14, 0, 620); this.tone(620, 0.12, 'triangle', 0.05, 0.12, 900); },
   tired() { this.tone(500, 0.35, 'sine', 0.06, 0, 220); },
-  boss() { Haptics.buzz('boss'); [98, 92, 82].forEach((f, i) => this.tone(f, 0.5, 'sawtooth', 0.09, i * 0.35, f * 0.9)); this.noise(1.2, 0.25, 200, 0.1); },
+  boss() { Haptics.buzz('boss'); if (this.clip('sfx-king')) return; [98, 92, 82].forEach((f, i) => this.tone(f, 0.5, 'sawtooth', 0.09, i * 0.35, f * 0.9)); this.noise(1.2, 0.25, 200, 0.1); },
+  sell() { Haptics.buzz('build'); [784, 659, 523].forEach((f, i) => this.tone(f, 0.14, 'triangle', 0.08, i * 0.07)); this.noise(0.2, 0.2, 1400, 0.1); },
+  newSpot() { [784, 988, 1175, 1568].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.08, 0.3 + i * 0.08)); },
   clink() { this.tone(2200, 0.08, 'triangle', 0.05); this.tone(3100, 0.06, 'sine', 0.03, 0.03); },
   stick() { this.tone(900, 0.06, 'sine', 0.06, 0, 500); this.tone(500, 0.08, 'triangle', 0.04, 0.05); },
   puff() { this.noise(0.1, 0.12, 1600); },
@@ -1038,23 +1241,51 @@ const Sound = {
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
     o.connect(lp).connect(g).connect(ctx.destination); o.start(t); o.stop(t + d + 0.05);
   },
-  sneeze() { Haptics.buzz('sneeze'); this.vowel(300, 0.3, 0); this.vowel(340, 0.34, 0.36); this.noise(0.55, 0.9, 2600, 0.75); this.noise(0.4, 0.5, 900, 0.78); },
+  sneeze() { Haptics.buzz('sneeze'); if (this.clip('sfx-sneeze')) return; this.vowel(300, 0.3, 0); this.vowel(340, 0.34, 0.36); this.noise(0.55, 0.9, 2600, 0.75); this.noise(0.4, 0.5, 900, 0.78); },
   nope() { Haptics.buzz('nope'); this.tone(240, 0.12, 'square', 0.04); this.tone(200, 0.16, 'square', 0.04, 0.12); },
   go() { Haptics.buzz('go'); [392, 523, 659, 784].forEach((f, i) => this.tone(f, 0.18, 'square', 0.045, i * 0.09)); this.tone(1047, 0.4, 'triangle', 0.08, 0.36); },
-  ouch() { Haptics.buzz('ouch'); this.tone(110, 0.32, 'sine', 0.3, 0, 55); this.noise(0.14, 0.35, 700, 0.05); this.noise(0.12, 0.25, 600, 0.22); },
+  ouch() { Haptics.buzz('ouch'); if (this.clip('sfx-ouch')) return; this.tone(110, 0.32, 'sine', 0.3, 0, 55); this.noise(0.14, 0.35, 700, 0.05); this.noise(0.12, 0.25, 600, 0.22); },
   cleared() { [659, 784, 988, 1319].forEach((f, i) => this.tone(f, 0.22, 'triangle', 0.08, i * 0.1)); },
-  win() { Haptics.buzz('win'); [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.26, 'triangle', 0.09, i * 0.12)); },
+  win() { Haptics.buzz('win'); if (this.clip('sfx-win')) return; [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.26, 'triangle', 0.09, i * 0.12)); },
   lose() { Haptics.buzz('lose'); [523, 440, 349, 262].forEach((f, i) => this.tone(f, 0.3, 'triangle', 0.08, i * 0.18)); this.noise(0.3, 0.4, 1200, 0.8); },
 };
-const Speech = {
-  voice: null, lastNope: -99,
+const Speech = {   // says a line from LINES: the recorded clip when it's loaded, otherwise the browser's voice
+  voice: null, lastNope: -99, srcs: [], endAt: 0, chain: Promise.resolve(), gen: 0,
   pickVoice() {
     const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
     this.voice = vs.find(v => /^en[-_]US/i.test(v.lang) && /Samantha|Google US English|Aria|Jenny|Zira/i.test(v.name))
       || vs.find(v => /^en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
   },
-  say(text, queue = false) {   // queue: wait for whatever is being said instead of cutting it off
-    if (Sound.muted || !window.speechSynthesis) return;
+  say(key, queue = false) {   // queue: wait for whatever is being said instead of cutting it off
+    if (Sound.muted) return;
+    const name = 'say-' + key;
+    if (!Sound.ctx || !Sound.decoded[name]) { this.tts(LINES[key] || key, queue); return; }
+    if (!queue) this.gen++;   // a new line cuts in: anything still waiting from before is dropped
+    const gen = this.gen;
+    // lines take turns in the order they were said, so a clip still decoding (right after the first tap)
+    // can't jump ahead of a later line or cut it off
+    this.chain = this.chain.then(() => Sound.decoded[name]).then(buf => {
+      if (gen !== this.gen || Sound.muted) return;
+      if (buf) this.play(name, queue); else this.tts(LINES[key], queue);
+    });
+  },
+  play(name, queue) {
+    const ctx = Sound.ctx, buf = Sound.clips[name];
+    if (!queue) this.cut();
+    const at = Math.max(ctx.currentTime, queue ? this.endAt : 0);
+    const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; g.gain.value = VOICE_VOL;
+    s.connect(g).connect(ctx.destination); s.start(at);
+    this.srcs.push(s); this.endAt = at + buf.duration; Music.duck(true);
+    s.onended = () => { this.srcs = this.srcs.filter(x => x !== s); if (!this.srcs.length) Music.duck(false); };
+  },
+  stop() { this.gen++; this.cut(); },   // silence now, and drop lines still waiting their turn (mute, back to the map)
+  cut() {   // silence whatever is playing
+    for (const s of this.srcs) { try { s.stop(); } catch {} }
+    this.srcs = []; this.endAt = 0;
+    if (window.speechSynthesis) speechSynthesis.cancel();
+  },
+  tts(text, queue) {
+    if (!window.speechSynthesis || !text) return;
     if (!queue) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US'; u.rate = 0.95; u.pitch = 1.15; if (this.voice) u.voice = this.voice;
@@ -1067,24 +1298,97 @@ if (window.speechSynthesis) { Speech.pickVoice(); speechSynthesis.onvoiceschange
 
 /* ======== music ======== */
 // Synthesized, after Robot Spy's Music: a lookahead scheduler queues each 16th note ~0.15 s ahead of the audio clock.
-// Three moods: gentle while building, bouncy with drums during a wave, minor and heavier while the King Germ is out.
-// Only clean tones, no noise loops. It dips while the voice is talking.
-const MUSIC_VOL = 0.15;         // overall music level
+// Every body part has its own little 8-bar tune, plus one for the map and one for the King Germ. A tune is played
+// calm while building (slower, no drums, the melody resting every other time round) and busy during a wave
+// (drums, a bouncier bass, and a harmony line every other time round). Only clean tones, no noise loops.
+// It dips while the voice is talking.
+const MUSIC_VOL = 0.22;         // overall music level
 const MUSIC_DUCK = 0.35;        // music level (fraction) while the voice talks
-const MAJOR = [{ bass: 48, arp: [60, 64, 67, 72] }, { bass: 45, arp: [57, 60, 64, 69] }, { bass: 41, arp: [57, 60, 65, 69] }, { bass: 43, arp: [55, 59, 62, 67] }];   // C Am F G
-const MINOR = [{ bass: 45, arp: [57, 60, 64, 69] }, { bass: 41, arp: [57, 60, 65, 69] }, { bass: 38, arp: [57, 62, 65, 69] }, { bass: 40, arp: [56, 59, 64, 68] }];   // Am F Dm E
-const MUSIC_MOODS = {           // tempo, chords, melody notes (MIDI), drums, how busy the melody is (0-1)
-  build: { bpm: 92,  bars: MAJOR, tune: [72, 74, 76, 79, 81], drums: false, busy: 0.22, bass: [0, 8] },
-  wave:  { bpm: 124, bars: MAJOR, tune: [72, 74, 76, 79, 81, 84], drums: true, busy: 0.4, bass: [0, 3, 6, 8, 11, 14] },
-  boss:  { bpm: 110, bars: MINOR, tune: [69, 71, 72, 76, 77], drums: true, busy: 0.35, bass: [0, 2, 4, 8, 10, 12] },
+const SCALES = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10], dorian: [0, 2, 3, 5, 7, 9, 10] };
+// A tune: key (MIDI note of degree 1), scale, tempo, lead sound, bass and drum patterns, one chord per bar
+// (scale degree) and the melody, one bar per string, eight eighth notes per bar:
+// a number is a scale degree (8 = an octave up, 0 = the note below 1), "-" holds the last note, "." is a rest.
+const SONGS = {
+  map:   { key: 60, scale: 'major', bpm: 100, lead: 'bell', bass: 'bounce', drums: 'beat', chords: [1, 4, 1, 5, 6, 4, 5, 1], tune: [
+    '5 . 5 6 5 - 3 .', '4 . 4 5 6 - 4 .', '3 . 3 5 8 - 5 .', '7 - 9 - 5 - . .',
+    '6 . 6 8 6 - 3 .', '4 . 6 4 1 - 4 .', '2 . 5 4 2 - 0 .', '1 - 3 - 1 - . .'] },
+  knee:  { key: 60, scale: 'major', bpm: 116, lead: 'chip', bass: 'bounce', drums: 'beat', chords: [1, 6, 4, 5, 1, 6, 4, 5], tune: [
+    '1 3 5 3 8 - 5 .', '6 - 5 3 6 - . .', '4 6 8 6 4 - 6 .', '5 - 7 - 9 - . .',
+    '8 7 8 5 3 - 5 .', '6 5 6 8 10 - 8 .', '11 - 10 8 6 - 4 .', '5 7 9 7 5 - - .'] },
+  nose:  { key: 65, scale: 'major', bpm: 108, lead: 'pluck', bass: 'walk', drums: 'beat', chords: [1, 4, 1, 5, 1, 4, 5, 1], tune: [
+    '1 . 3 . 5 . 3 .', '4 . 6 . 8 - 6 .', '5 . 3 . 1 . 3 5', '2 - . . 5 - . .',
+    '8 . 8 . 7 . 5 .', '6 . 4 . 6 8 6 .', '5 . 7 . 9 . 7 .', '8 - . 5 1 - . .'] },
+  tummy: { key: 62, scale: 'major', bpm: 100, lead: 'wobble', bass: 'polka', drums: 'beat', chords: [1, 5, 1, 5, 4, 1, 5, 1], tune: [
+    '1 - 3 - 5 - 3 -', '2 - 4 - 5 - . .', '3 - 5 - 8 - 5 3', '2 - - - 0 - . .',
+    '4 - 6 - 8 - 6 4', '3 - 5 - 3 - 1 -', '2 3 4 5 7 - 5 .', '8 - 5 - 1 - . .'] },
+  lungs: { key: 67, scale: 'major', bpm: 96, lead: 'flute', bass: 'calm', drums: 'beat', chords: [1, 6, 4, 5, 1, 6, 2, 5], tune: [
+    '5 - - 6 5 - 3 -', '3 - - 2 1 - 3 -', '4 - - 6 8 - 6 -', '5 - - - 2 - - -',
+    '5 - 8 - 7 - 5 -', '6 - 5 - 3 - - -', '2 - 4 - 6 - 4 -', '5 - - - - - . .'] },
+  eye:   { key: 64, scale: 'major', bpm: 104, lead: 'twinkle', bass: 'pulse', drums: 'beat', chords: [1, 4, 1, 5, 6, 4, 5, 1], tune: [
+    '8 . 5 . 8 . 10 .', '11 . 8 . 6 . 8 .', '10 . 8 . 5 . 3 .', '2 . 5 . 7 - - .',
+    '6 . 8 . 10 . 8 .', '11 . 10 . 8 . 6 .', '5 . 7 . 9 . 7 .', '8 - - . . . . .'] },
+  ear:   { key: 69, scale: 'major', bpm: 98, lead: 'echo', bass: 'pulse', drums: 'beat', chords: [1, 4, 5, 1, 1, 4, 5, 1], tune: [
+    '1 . 3 . 5 - . .', '4 . 6 . 8 - . .', '5 . 7 . 9 - . .', '8 - 5 - 3 - . .',
+    '3 5 8 . 3 5 8 .', '4 6 8 . 6 - 4 .', '5 . 4 . 2 . 7 .', '1 - - - . . . .'] },
+  fever: { key: 62, scale: 'dorian', bpm: 120, lead: 'chip', bass: 'skip', drums: 'skip', chords: [1, 4, 1, 7, 1, 4, 7, 1], tune: [
+    '1 . 3 5 . 5 4 3', '4 . 6 8 . 8 6 4', '5 . 3 1 . 3 5 .', '7 - 9 - 7 - . .',
+    '8 . 8 7 8 - 5 .', '6 . 6 5 4 - 2 .', '7 . 9 . 11 - 9 .', '8 - 5 - 1 - . .'] },
+  king:  { key: 57, scale: 'minor', bpm: 112, lead: 'brass', bass: 'march', drums: 'march', chords: [1, 6, 7, 1, 1, 6, 5, 1], tune: [
+    '1 . 1 . 3 . 1 .', '6 . 6 . 8 . 6 .', '7 . 7 . 9 . 7 .', '8 - 7 - 5 - 3 -',
+    '1 3 5 3 1 3 5 3', '6 8 10 8 6 8 10 8', '5 7 9 7 5 - 2 -', '1 - - - 1 . . .'] },
+};
+const LEADS = {                 // wave shape, loudness, octave, filter, vibrato, attack, longest note, an echo
+  bell:    { type: 'sine', v: 0.09, shimmer: 0.25 },
+  chip:    { type: 'square', v: 0.035, cutoff: 2200 },
+  pluck:   { type: 'triangle', v: 0.1, max: 0.18 },
+  wobble:  { type: 'triangle', v: 0.1, vib: 0.025, rate: 5 },
+  flute:   { type: 'sine', v: 0.1, vib: 0.008, rate: 5.5, attack: 0.06 },
+  twinkle: { type: 'sine', v: 0.07, oct: 12, shimmer: 0.3, max: 0.25, echo: 0.3 },
+  echo:    { type: 'triangle', v: 0.09, max: 0.3, echo: 0.35 },
+  brass:   { type: 'sawtooth', v: 0.04, cutoff: 1400 },
+};
+const BASSES = {                // 16th steps in a bar and the chord note on each: 0 root, 2 third, 4 fifth, 7 octave
+  calm:   [[0, 0], [8, 4]],
+  pulse:  [[0, 0], [4, 0], [8, 4], [12, 0]],
+  bounce: [[0, 0], [6, 0], [8, 7], [14, 4]],
+  walk:   [[0, 0], [4, 2], [8, 4], [12, 2]],
+  polka:  [[0, 0], [4, 4], [8, 0], [12, 4]],
+  skip:   [[0, 0], [3, 0], [6, 4], [8, 7], [11, 4], [14, 2]],
+  march:  [[0, 0], [2, 0], [4, 0], [6, 0], [8, 0], [10, 0], [12, 4], [14, 2]],
+};
+const DRUMS = {                 // 16th steps for the kick, a soft tonal snare and a tick
+  beat:  { kick: [0, 8, 10], snare: [4, 12], tick: [2, 6, 10, 14] },
+  skip:  { kick: [0, 6, 8], snare: [4, 12], tick: [2, 3, 10, 14, 15] },
+  march: { kick: [0, 4, 8, 12], snare: [4, 12, 14], tick: [] },
 };
 const midiHz = m => 440 * 2 ** ((m - 69) / 12);
+const degNote = (song, d) => {  // scale degree (1 = the key, 8 = an octave up, 0 = one below) to a MIDI note
+  const sc = SCALES[song.scale], i = d - 1;
+  return song.key + sc[((i % 7) + 7) % 7] + 12 * Math.floor(i / 7);
+};
+for (const song of Object.values(SONGS)) {   // turn the melody strings into notes with lengths, in eighths
+  song.bars = song.tune.map(bar => {
+    const toks = bar.trim().split(/\s+/), notes = [];
+    toks.forEach((tk, i) => {
+      if (tk === '-' || tk === '.') return;
+      let len = 1; while (toks[i + len] === '-') len++;
+      notes[i] = { deg: +tk, len };
+    });
+    if (toks.length !== 8) throw new Error('music: a bar needs 8 eighths: ' + bar);
+    return notes;
+  });
+}
 const Music = {
-  out: null, timer: 0, step: 0, next: 0, on: false, tune: [], mood: null, ducked: false,
-  set(mood) {   // switch mood (null = silence)
+  out: null, timer: 0, step: 0, next: 0, on: false, mood: null, song: null, busy: false, ducked: false,
+  enabled: store.get('music', true),
+  set(mood) {   // 'map', 'build:<level>', 'wave:<level>', 'boss', or null for silence
     if (mood === this.mood) return;
     this.mood = mood;
-    if (!mood) this.stop(); else this.start();
+    if (!mood) { this.stop(); return; }
+    const [kind, id] = mood.split(':');
+    this.song = SONGS[kind === 'boss' ? 'king' : kind === 'map' ? 'map' : id] || SONGS.knee;
+    this.busy = kind === 'wave' || kind === 'boss';
+    if (this.on) this.step = 0; else this.start();   // a new tune starts from its first bar
   },
   start() {
     const ctx = Sound.ctx; if (this.on || Sound.muted || !ctx || ctx.state !== 'running') { if (!this.on) this.mood = null; return; }
@@ -1103,35 +1407,74 @@ const Music = {
     g.cancelScheduledValues(t); g.setValueAtTime(Math.max(0.0001, g.value), t); g.exponentialRampToValueAtTime(Math.max(0.0001, v), t + secs);
   },
   duck(on) { this.ducked = on; if (this.on) this.ramp(this.level(), on ? 0.15 : 0.8); },
+  sixteenth() { return 60 / (this.song.bpm * (this.busy ? 1 : 0.82)) / 4; },
   schedule() {
-    const ctx = Sound.ctx, m = MUSIC_MOODS[this.mood]; if (!m) return;
+    const ctx = Sound.ctx; if (!this.song) return;
     if (this.next < ctx.currentTime - 0.05) this.next = ctx.currentTime + 0.05;   // timer was held up: skip missed notes
-    while (this.next < ctx.currentTime + 0.15) { this.play(m, this.step, this.next); this.next += 60 / m.bpm / 4; this.step++; }
+    while (this.next < ctx.currentTime + 0.15) { this.play(this.step, this.next); this.next += this.sixteenth(); this.step++; }
   },
-  play(m, i, t) {
-    const s = i % 16, bar = m.bars[Math.floor(i / 16) % m.bars.length];
-    if (s === 0) this.tune = Array.from({ length: 8 }, () => Math.random() < m.busy ? pick(m.tune) : 0);   // a new little melody each bar
-    if (m.drums && (s === 0 || s === 8)) this.note(130, t, 0.15, 'sine', 0.5, 0, 45);          // soft kick
-    if (m.drums && (s === 4 || s === 12)) this.note(2400, t, 0.03, 'triangle', 0.03);          // tick
-    if (m.bass.includes(s)) this.note(midiHz(bar.bass), t, m.drums ? 0.14 : 0.4, 'triangle', 0.2, 900);
-    if (s % (m.drums ? 2 : 4) === 0) this.note(midiHz(bar.arp[(s / (m.drums ? 2 : 4)) % 4] + (s >= 8 ? 12 : 0)), t, 0.12, 'triangle', 0.05);
-    if (s % 2 === 0 && this.tune[s / 2]) { const f = midiHz(this.tune[s / 2]); this.note(f, t, 0.3, 'sine', 0.07); this.note(f * 2, t, 0.12, 'sine', 0.015); }   // a little bell
+  play(i, t) {
+    const song = this.song, busy = this.busy, s = i % 16, b = Math.floor(i / 16) % song.bars.length;
+    const round = Math.floor(i / 16 / song.bars.length) % 2, sx = this.sixteenth();
+    const root = song.chords[b], chordNote = k => degNote(song, root + k);
+    // bass: the chord's root, third, fifth or octave, low and soft
+    for (const [at, iv] of busy ? BASSES[song.bass] : BASSES.calm) {
+      if (at !== s) continue;
+      this.note(midiHz(chordNote(iv) - 24), t, busy ? sx * 1.8 : sx * 7, 'triangle', 0.22, 900);
+    }
+    // the chord, broken up: every eighth in a wave, every quarter while building
+    if (s % (busy ? 2 : 4) === 0) this.note(midiHz(chordNote([0, 2, 4, 7][(s / (busy ? 2 : 4)) % 4]) - 12), t, sx * 1.6, 'triangle', 0.045);
+    // drums only in a wave
+    if (busy) {
+      const d = DRUMS[song.drums];
+      if (d.kick.includes(s)) this.note(130, t, 0.15, 'sine', 0.5, 0, 45);
+      if (d.snare.includes(s)) { this.note(240, t, 0.09, 'triangle', 0.14, 0, 130); this.note(1900, t, 0.03, 'triangle', 0.03); }
+      if (d.tick.includes(s)) this.note(2400, t, 0.03, 'triangle', 0.025);
+    }
+    // the melody; while building it rests for the first half every other time round
+    const n = s % 2 === 0 && song.bars[b][s / 2];
+    if (!n || (!busy && round === 1 && b < 4)) return;
+    const L = LEADS[song.lead], f = midiHz(degNote(song, n.deg) + (L.oct || 0)), v = L.v * (busy ? 1 : 0.7);
+    const dur = Math.min(n.len * sx * 2 * 0.92, L.max || 9);
+    this.note(f, t, dur, L.type, v, L.cutoff, 0, L.vib, L.rate, L.attack);
+    if (L.shimmer) this.note(f * 2, t, Math.min(dur, 0.15), 'sine', v * L.shimmer);
+    if (L.echo) this.note(f, t + sx * 3, dur, L.type, v * L.echo, L.cutoff);
+    if (busy && round === 1) this.note(midiHz(degNote(song, n.deg + 2) + (L.oct || 0)), t, dur, L.type, v * 0.4, L.cutoff);   // a harmony a third up
   },
-  note(f, t, d, type, v, cutoff = 0, f2 = 0) {
+  note(f, t, d, type, v, cutoff = 0, f2 = 0, vib = 0, rate = 5, attack = 0.01) {
     const ctx = Sound.ctx, o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    if (vib) {   // a gentle wobble in pitch
+      const lfo = ctx.createOscillator(), depth = ctx.createGain();
+      lfo.frequency.value = rate; depth.gain.value = f * vib; lfo.connect(depth).connect(o.frequency); lfo.start(t); lfo.stop(t + d + 0.03);
+    }
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(attack, d / 2)); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
     let node = o;
     if (cutoff) { const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = cutoff; o.connect(lp); node = lp; }
     node.connect(g).connect(this.out); o.start(t); o.stop(t + d + 0.03);
   },
 };
 function wantedMood() {
-  if (game.state === 'won' || game.state === 'lost') return null;
-  if (game.state === 'wave') return game.germs.some(g => g.k.kind === 'king') ? 'boss' : 'wave';
-  return 'build';
+  if (!Music.enabled || game.state === 'won' || game.state === 'lost') return null;
+  if (game.state === 'title') return 'map';
+  if (game.state === 'wave') return game.germs.some(g => g.k.kind === 'king') ? 'boss' : 'wave:' + LEVEL.id;
+  return 'build:' + LEVEL.id;
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden && Music.on) Music.stop(0.2); });   // background tabs throttle timers
+
+/* ======== progress ======== */
+// Best stars are saved per level id, so levels can be added or reordered without mixing anything up.
+// A level is open once the one before it has been won (or it has stars of its own).
+function loadStars() {
+  const saved = store.get('stars', {});
+  if (!Array.isArray(saved)) return saved;
+  const old = ['knee', 'nose', 'tummy', 'lungs', 'fever'], stars = {};   // the first published version saved a list in this order
+  saved.forEach((n, i) => { if (n) stars[old[i]] = n; });
+  store.set('stars', stars);
+  return stars;
+}
+const isOpen = i => game.cheat || i === 0 || !!game.stars[LEVELS[i - 1].id] || !!game.stars[LEVELS[i].id];
+const newestOpen = () => { let i = 0; while (i + 1 < LEVELS.length && isOpen(i + 1)) i++; return i; };
 
 /* ======== game state ======== */
 const game = {
@@ -1139,8 +1482,8 @@ const game = {
   queue: [], waveT: 0, germs: [], towers: [], troops: [], shots: [], drops: [], fx: [],
   menuSpot: null, tutorial: true, time: 0, timeScale: 1, instant: false, traps: [], sneezeCd: 0, sneezeAt: 0, sneezeHint: 0, sneezeHinted: false,
   seen: new Set(),
-  unlocked: Math.min(store.get('unlocked', 0), LEVELS.length - 1),
-  stars: store.get('stars', []),   // best stars per level
+  stars: loadStars(),   // best stars per level id
+  cheat: false, fast: store.get('fast', false), spotHint: null,
 };
 
 function clearField() {   // everything that moves: germs, shots, drops, bits
@@ -1157,8 +1500,12 @@ function clearStructures() {
 }
 function resetLevelState() {
   Object.assign(game, { run: game.run + 1, energy: LEVEL.startEnergy, sparkles: HEART_SPARKLES, wave: 0, state: 'build', sneezeCd: 0, sneezeAt: 0, sneezeHint: 0 });
-  for (const p of board.pads) { p.tower = null; p.plus.visible = p.ring.visible = true; }
-  heart.plaster.visible = false;
+  for (const p of board.pads) {   // later building spots stay hidden until their wave comes round
+    p.tower = null; p.locked = p.unlock > 0; p.born = 1;
+    p.plate.visible = p.plus.visible = p.ring.visible = !p.locked;
+    p.plate.scale.setScalar(1); p.plus.scale.setScalar(1); p.ring.scale.setScalar(1);
+  }
+  showHeartHealth();
   updateHud(); showPreview();
 }
 function startLevel() {   // play the loaded level from the beginning
@@ -1173,28 +1520,49 @@ function startWave() {
   game.waveT = 0; game.state = 'wave'; game.tutorial = false;
   closeMenu(); updateHud(); showPreview();
   Sound.go();
-  Speech.say(game.wave === LEVEL.waves.length - 1 ? 'Last wave! Here they come!' : 'Here they come!');
+  Speech.say(game.wave === LEVEL.waves.length - 1 ? 'go-last' : 'go');
 }
 function waveCleared() {
   game.wave++;
+  if (game.wave < LEVEL.waves.length) for (const p of board.pads) if (p.locked && p.unlock <= game.wave) openSpot(p);
   for (let i = 0; i < WAVE_BONUS; i++) spawnDrop(heartPos, 1.4 + i * 0.15);
   if (game.wave >= LEVEL.waves.length) {
-    game.state = 'won'; Sound.win(); Speech.say(LEVEL.win);
-    if (levelIndex + 1 < LEVELS.length && game.unlocked <= levelIndex) { game.unlocked = levelIndex + 1; store.set('unlocked', game.unlocked); }
-    if (starsFor(game.sparkles) > (game.stars[levelIndex] || 0)) { game.stars[levelIndex] = starsFor(game.sparkles); store.set('stars', game.stars); }
+    game.state = 'won'; Sound.win(); Speech.say('win-' + LEVEL.id);
+    if (starsFor(game.sparkles) > (game.stars[LEVEL.id] || 0)) { game.stars[LEVEL.id] = starsFor(game.sparkles); store.set('stars', game.stars); }
     const run = game.run; setTimeout(() => run === game.run && showEnd('won'), 2600);
   } else {
-    game.state = 'build'; Sound.cleared(); Speech.say('Great job! Build more, then tap Go.');
+    game.state = 'build'; Sound.cleared(); Speech.say('cleared');
     showPreview();
   }
   updateHud();
 }
+function openSpot(p) {   // a new building spot pops up between waves, and the hand points at it
+  p.locked = false; p.born = 0;
+  p.plate.visible = p.plus.visible = p.ring.visible = true;
+  burst(new THREE.Vector3(p.x, p.top + 0.3, p.z), 14, 0.35, [MAT.gold, MAT.star], 3);
+  Sound.newSpot(); game.spotHint = { pad: p, t: 6 };
+}
+function showHeartHealth() {   // plasters and a face that match how many hearts are left
+  const lost = HEART_SPARKLES - game.sparkles;
+  heart.plasters.forEach((pl, i) => { pl.visible = i < lost; });
+  const mood = game.sparkles >= HEART_SPARKLES - 1 ? 'smile' : game.sparkles >= 2 ? 'flat' : 'frown';
+  for (const [k, m] of Object.entries(heart.mouths)) m.visible = k === mood;
+}
+function floatDamage(amount) {   // "💔 -1" floats up from the heart
+  const p = toScreen(heartPos.x, heartPos.y + 0.9, heartPos.z), el = document.createElement('div');
+  el.className = 'dmg'; el.textContent = '💔 -' + amount;
+  el.style.transform = `translate(${p.x}px,${p.y}px) translate(-50%,-50%)`;
+  document.body.append(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transform = `translate(${p.x}px,${p.y - 70}px) translate(-50%,-50%) scale(1.2)`; el.style.opacity = '0'; }));
+  setTimeout(() => el.remove(), 1100);
+}
 function heartHit(amount = 1) {
   if (game.state !== 'wave') return;
-  game.sparkles = Math.max(0, game.sparkles - amount); heart.hit = 1; view.shake = Math.max(view.shake, amount > 1 ? 1 : 0.6); heart.plaster.visible = true; Sound.ouch();
+  game.sparkles = Math.max(0, game.sparkles - amount); heart.hit = 1; view.shake = Math.max(view.shake, amount > 1 ? 1 : 0.6); Sound.ouch();
+  showHeartHealth(); floatDamage(amount);
   updateHud();
   if (game.sparkles <= 0) {
-    game.state = 'lost'; Sound.lose(); Speech.say('Achoo! The germs got through. Let\'s try that wave again!');
+    game.state = 'lost'; Sound.lose(); Speech.say('lost');
     const run = game.run; setTimeout(() => run === game.run && showEnd('lost'), 1600);
   }
 }
@@ -1202,7 +1570,7 @@ function retryWave() {   // keep every defender and the drops, refill the heart,
   for (const d of [...game.drops]) collectDrop(d);
   clearField();
   for (const b of game.troops) { b.foe = null; b.stamina = stats(b.nest).stamina; b.state = 'walk'; b.mesh.visible = true; }
-  game.sparkles = HEART_SPARKLES; game.state = 'build';
+  game.sparkles = HEART_SPARKLES; game.state = 'build'; showHeartHealth();
   updateHud(); showPreview();
 }
 
@@ -1210,7 +1578,8 @@ function retryWave() {   // keep every defender and the drops, refill the heart,
 function spawnGerm(kind, path, dist = 0, at = null) {   // at: start above ground at this point (germs that split off), else rise out of the entry
   const k = GERMS[kind], m = makeGerm(k);
   if (k.hurts > 1 && !at) { Sound.boss(); view.shake = 0.7; }
-  const g = { k, ...m, hp: k.hp, path, end: path.length - 1.6, dist, off: (Math.random() - 0.5) * 0.26, heldBy: null, tagged: false, abIncoming: false, blow: null,
+  const maxHp = k.hp * (LEVEL.toughness || 1);   // some levels have tougher germs
+  const g = { k, ...m, hp: maxHp, maxHp, path, end: path.length - 1.6, dist, off: (Math.random() - 0.5) * 0.26, heldBy: null, tagged: false, abIncoming: false, blow: null,
     rise: at ? 1 : 0, phase: Math.random() * 6, flash: 0, clink: 0, leaving: -1, from: new THREE.Vector3(), target: new THREE.Vector3() };
   if (at) g.mesh.position.copy(at).setY(ROAD_Y); else g.mesh.position.set(path[0].x, ROAD_Y - 0.6, path[0].z);
   g.mesh.rotation.y = view.yaw;
@@ -1233,7 +1602,7 @@ function updateGerms(dt) {
     if (g.heldBy && g.heldBy.foe !== g) g.heldBy = null;
     g.phase += dt * 10 * g.k.speed;
     g.flash = Math.max(0, g.flash - dt * 6); g.mat.emissiveIntensity = g.flash * 0.7;
-    const shrink = 0.7 + 0.3 * Math.max(0, g.hp) / g.k.hp;
+    const shrink = 0.7 + 0.3 * Math.max(0, g.hp) / g.maxHp;
     if (g.leaving >= 0) {   // jumping into the heart
       g.leaving = Math.min(1, g.leaving + dt * 2.4);
       const t = g.leaving;
@@ -1274,7 +1643,7 @@ function damageGerm(g, dmg) {
     if (g.clink <= 0) { g.clink = 1; Sound.clink(); burst(g.mesh.position.clone().setY(g.mesh.position.y + g.k.size * 1.6), 3, 0.25, [MAT.spark], 1.5); }
     if (!game.spikyHinted) {   // the first bounce on a level: say what to do about it
       game.spikyHinted = true;
-      Speech.say(game.towers.some(t => t.kind === 'antibody') ? 'Bonk! Wait for an antibody to stick on the spiky germ.' : 'Bonk! Spiky germs need an antibody maker!');
+      Speech.say(game.towers.some(t => t.kind === 'antibody') ? 'bonk-wait' : 'bonk');
     }
     return;
   }
@@ -1320,31 +1689,78 @@ function updateFx(dt) {
 /* ======== defenders: zappers and nests ======== */
 function buildStruct(pad, kind) {
   const m = kind === 'nest' ? makeNest() : kind === 'antibody' ? makeFactory() : makeZapper();
-  const t = { kind, level: 1, pad, ...m, ranks: [], cool: 0.4, born: 0, kick: 0, trainQ: 0, trainT: 0 };
+  const t = { kind, ups: Object.fromEntries(Object.keys(BUILDS[kind].tracks).map(k => [k, 0])), pad, ...m, extras: null, halo: null, chimney: null, cool: 0.4, born: 0, kick: 0, trainQ: 0, trainT: 0, spent: BUILDS[kind].cost };
   t.group.position.set(pad.x, pad.top + 0.08, pad.z);
   t.aim.rotation.y = view.yaw; t.group.scale.setScalar(0.01);
   pad.tower = t; pad.plus.visible = pad.ring.visible = false;
   scene.add(t.group); game.towers.push(t);
-  if (kind === 'nest') { choosePost(t); t.trainQ = 1; }
+  if (kind === 'nest') { choosePosts(t); t.trainQ = 1; }
   burst(new THREE.Vector3(pad.x, pad.top + 0.3, pad.z), 8, 0.3, [MAT.shot], 2.5);
 }
-function upgradeStruct(t) {
-  t.level++; t.born = 0.45; t.kick = 1;
-  const rank = new THREE.Mesh(RANK_GEO, MAT.gold); rank.position.y = 0.07 + 0.09 * (t.level - 2); t.group.add(rank); t.ranks.push(rank);
+function upgradeTrack(t, track, cost) {   // one step along one of its two upgrade paths
+  t.spent += cost; t.ups[track]++; t.born = 0.45; t.kick = 1;
+  dressUp(t);
   if (t.kind === 'nest') for (const b of game.troops) if (b.nest === t) { b.stamina = stats(t).stamina; b.mesh.scale.setScalar(troopScale(t)); }
-  burst(t.group.position.clone().setY(t.pad.top + 0.6), 12, 0.3, [MAT.gold], 3);
+  burst(t.group.position.clone().setY(t.pad.top + 0.6), 12, 0.3, [track === 'reach' ? MAT.reach : MAT.gold], 3);
 }
-function choosePost(t) {   // the vessel tile the nest's blobs guard: close by, preferring tiles where paths merge
-  let best = null, bestScore = Infinity;
-  for (const c of board.land) {
-    if (!c.paths || c.ch === 'H' || isEntry(c.ch)) continue;
-    const d = Math.hypot(c.x - t.pad.x, c.z - t.pad.z);
-    if (d > stats(t).reach) continue;
-    const score = d - 0.6 * (c.paths - 1);
-    if (score < bestScore) { bestScore = score; best = c; }
+function dressUp(t) {   // every upgrade shows: the base turns silver then gold, stars circle overhead, and each path grows something
+  const ups = upgradesOf(t), u = t.ups;
+  t.mound.material = ups >= 3 ? MAT.gold : ups >= 1 ? MAT.moundSilver : MAT.mound;
+  if (t.extras) t.body.remove(t.extras);
+  if (t.extrasOnGroup) { t.group.remove(t.extrasOnGroup); t.extrasOnGroup = null; }
+  if (t.halo) t.group.remove(t.halo);
+  const x = t.extras = new THREE.Group(); t.body.add(x);
+  t.halo = new THREE.Group(); t.halo.position.y = 1.18; t.group.add(t.halo);   // one star per upgrade
+  for (let i = 0; i < ups; i++) {
+    const a = i / ups * Math.PI * 2, star = new THREE.Mesh(STAR_GEO, MAT.star);
+    star.position.set(Math.cos(a) * 0.34, 0, Math.sin(a) * 0.34); star.rotation.y = -a; t.halo.add(star);
   }
-  if (!best) best = board.land.filter(c => c.paths).reduce((a, c) => (Math.hypot(c.x - t.pad.x, c.z - t.pad.z) < Math.hypot(a.x - t.pad.x, a.z - t.pad.z) ? c : a));
-  t.post = new THREE.Vector3(best.x, 0, best.z);
+  t.chimney = null; t.rings = null; t.flag = null;
+  if (u.reach) {   // Reach (zappers and antibody makers): glowing blue rings round the base that pulse like sonar
+    t.rings = new THREE.Group(); t.group.add(t.rings); t.extrasOnGroup = t.rings;
+    for (let i = 0; i < u.reach; i++) { const ring = new THREE.Mesh(REACH_GEO, MAT.reach); ring.position.y = 0.06 + 0.1 * i; ring.scale.setScalar(1 + 0.18 * i); t.rings.add(ring); }
+  }
+  if (t.kind === 'zapper') {   // Power: more purple lobes, then a soft glow all round
+    const lobes = u.power ? [[-0.27, 0.5, -0.03, 0.11], [0.27, 0.5, -0.03, 0.11]] : [];
+    if (u.power === 2) lobes.push([-0.09, 0.72, -0.05, 0.1], [0.09, 0.72, -0.05, 0.1]);
+    for (const [px, py, pz, r] of lobes) x.add(ball(MAT.lobe, r, px, py, pz));
+    if (u.power === 2) { const aura = ball(MAT.aura, 1, 0, 0.36, 0, false); aura.scale.set(0.5, 0.48, 0.5); x.add(aura); }
+  } else if (t.kind === 'nest') {   // Bite: a flag on the roof (red, then gold); Energy: a chimney, then puffing smoke
+    if (u.bite) {
+      const pole = new THREE.Mesh(POLE_GEO, MAT.pole); pole.position.set(0, 0.38, 0); x.add(pole);
+      const flag = new THREE.Mesh(FLAG_GEO, u.bite === 2 ? MAT.gold : MAT.flag); flag.position.set(0, 0.66, 0); flag.castShadow = true; x.add(flag); t.flag = flag;
+    }
+    if (u.energy) {
+      const ch = new THREE.Mesh(CHIMNEY_GEO, MAT.chimney); ch.position.set(0.22, 0.32, -0.12); ch.castShadow = true; x.add(ch);
+      if (u.energy === 2) t.chimney = ch;   // the smoke
+    }
+  } else if (t.kind === 'antibody') {   // Speed: more antibody antennae, then a golden glow
+    const ys = u.speed ? [[0, 0.66, -0.06, 0]] : [];
+    if (u.speed === 2) ys.push([-0.3, 0.5, -0.04, 0.6], [0.3, 0.5, -0.04, -0.6]);
+    for (const [px, py, pz, rz] of ys) { const y = makeY(MAT.ab, 1.4); y.position.set(px, py, pz); y.rotation.z = rz; x.add(y); }
+    if (u.speed === 2) { const aura = ball(MAT.auraGold, 1, 0, 0.36, 0, false); aura.scale.set(0.5, 0.48, 0.5); x.add(aura); }
+  }
+}
+function choosePosts(t) {   // the vessel tiles the nest's blobs guard, one per blob, spread over different stretches
+  const reach = stats(t).reach, dist = c => Math.hypot(c.x - t.pad.x, c.z - t.pad.z);
+  let cands = board.land.filter(c => c.paths && c.ch !== 'H' && !isEntry(c.ch) && dist(c) <= reach);
+  if (!cands.length) cands = [board.land.filter(c => c.paths).reduce((a, c) => (dist(c) < dist(a) ? c : a))];   // nothing in reach: the nearest vessel tile
+  const posts = [];
+  while (posts.length < TROOPS_PER_NEST) {
+    let best = null, bestVal = -Infinity;
+    for (const c of cands) {
+      if (posts.includes(c)) continue;
+      const apart = posts.length ? Math.min(...posts.map(q => Math.hypot(q.x - c.x, q.z - c.z))) : 0;
+      if (posts.length && apart < TROOP_SPREAD) continue;
+      const newLane = posts.length && !posts.some(q => q.lanes === c.lanes) ? 1.5 : 0;   // a different vessel than the others guard
+      // close to the nest, on a tile where paths merge, away from the other blobs, on a lane nobody covers yet
+      const val = -dist(c) + 0.6 * (c.paths - 1) + 0.5 * apart + newLane;
+      if (val > bestVal) { bestVal = val; best = c; }
+    }
+    if (!best) break;
+    posts.push(best);
+  }
+  t.posts = posts.map(c => new THREE.Vector3(c.x, 0, c.z));
   setDoor(t);
 }
 function setDoor(t) {   // the nest's door faces the viewer; blobs come out and go home through it
@@ -1353,12 +1769,29 @@ function setDoor(t) {   // the nest's door faces the viewer; blobs come out and 
 }
 function buildTrap(cell) {
   const mesh = makeTrap(); mesh.position.set(cell.x, ROAD_Y, cell.z); mesh.scale.setScalar(0.01);
-  const tr = { cell, mesh, born: 0 }; cell.trap = tr;
+  const tr = { cell, mesh, born: 0, spent: MUCUS_COST }; cell.trap = tr;
   scene.add(mesh); game.traps.push(tr);
   burst(new THREE.Vector3(cell.x, ROAD_Y + 0.3, cell.z), 8, 0.3, [MAT.mucus], 2);
 }
+function sellStruct(t) {   // poof: it's gone, and most of its drops pop back out
+  for (const b of game.troops.filter(b => b.nest === t)) {
+    if (b.foe && b.foe.heldBy === b) b.foe.heldBy = null;
+    scene.remove(b.mesh); game.troops.splice(game.troops.indexOf(b), 1);
+  }
+  const at = t.group.position.clone().setY(t.pad.top + 0.5);
+  for (let i = 0; i < refund(t); i++) spawnDrop(at, 0.9 + i * 0.08);
+  scene.remove(t.group); game.towers.splice(game.towers.indexOf(t), 1);
+  t.pad.tower = null; t.pad.plus.visible = t.pad.ring.visible = true;
+  burst(at, 12, 0.4, [MAT.puff], 2.5); Sound.sell();
+}
+function sellTrap(tr) {
+  const at = new THREE.Vector3(tr.cell.x, ROAD_Y + 0.4, tr.cell.z);
+  for (let i = 0; i < refund(tr); i++) spawnDrop(at, 0.9 + i * 0.08);
+  scene.remove(tr.mesh); game.traps.splice(game.traps.indexOf(tr), 1); tr.cell.trap = null;
+  burst(at, 8, 0.3, [MAT.mucus], 2); Sound.sell();
+}
 const TROOP_SLOTS = [[0, 0], [0.34, 0.2], [-0.28, 0.3]];
-const troopScale = nest => 1.3 * (1 + 0.12 * (nest.level - 1));
+const troopScale = nest => 1.3 * (1 + 0.12 * growOf(nest));
 function spawnTroop(nest) {
   const m = makeTroop(), slot = game.troops.filter(b => b.nest === nest).length;
   const b = { nest, ...m, slot, state: 'walk', stamina: stats(nest).stamina, foe: null, chompT: 0, chomp: 0, restT: 0, phase: Math.random() * 6 };
@@ -1367,7 +1800,10 @@ function spawnTroop(nest) {
   scene.add(b.mesh); game.troops.push(b);
   burst(b.mesh.position.clone().setY(b.mesh.position.y + 0.3), 6, 0.25, [MAT.troop], 2);
 }
-function postOf(b) { const [dx, dz] = TROOP_SLOTS[b.slot % 3]; return new THREE.Vector3(b.nest.post.x + dx, 0, b.nest.post.z + dz); }
+function postOf(b) {   // each blob has its own spot; if there are fewer spots than blobs, they share and stand side by side
+  const posts = b.nest.posts, post = posts[b.slot % posts.length], [dx, dz] = TROOP_SLOTS[Math.floor(b.slot / posts.length) % 3];
+  return new THREE.Vector3(post.x + dx, 0, post.z + dz);
+}
 function moveTo(b, target, speed, dt) {   // walk towards a point; true once there
   const p = b.mesh.position, dx = target.x - p.x, dz = target.z - p.z, d = Math.hypot(dx, dz), step = speed * dt;
   if (d > 0.02) b.mesh.rotation.y = lerpAngle(b.mesh.rotation.y, Math.atan2(dx, dz), damp(10, dt));
@@ -1386,7 +1822,9 @@ function updateTroops(dt) {
       if (fighting) {   // grab the nearest free germ near the post
         const post = postOf(b); let foe = null, fd = TROOP_GUARD_R;
         for (const g of game.germs) {
-          if (g.heldBy || g.leaving >= 0 || g.rise < 0.6 || g.blow || g.k.slippery) continue;
+          // skip germs it can't hold (corkscrews) or can't hurt (a spiky with no antibody on it yet: holding that forever
+          // would stop the wave from ever ending)
+          if (g.heldBy || g.leaving >= 0 || g.rise < 0.6 || g.blow || g.k.slippery || (g.k.armour && !g.tagged)) continue;
           const d = Math.hypot(g.mesh.position.x - post.x, g.mesh.position.z - post.z);
           if (d < fd) { fd = d; foe = g; }
         }
@@ -1394,7 +1832,7 @@ function updateTroops(dt) {
       }
     } else if (b.state === 'fight') {
       const g = b.foe;
-      if (!g || !game.germs.includes(g) || g.leaving >= 0 || !fighting) { if (g && g.heldBy === b) g.heldBy = null; b.foe = null; b.state = 'walk'; }
+      if (!g || !game.germs.includes(g) || g.leaving >= 0 || !fighting || (g.k.armour && !g.tagged)) { if (g && g.heldBy === b) g.heldBy = null; b.foe = null; b.state = 'walk'; }
       else {
         const gp = g.mesh.position, post = postOf(b), away = new THREE.Vector3(post.x - gp.x, 0, post.z - gp.z);
         if (away.lengthSq() < 0.01) away.set(Math.sin(view.yaw), 0, Math.cos(view.yaw));
@@ -1426,8 +1864,16 @@ function updateTowers(dt) {
   for (const t of game.towers) {
     t.born = Math.min(1, t.born + dt * 1.8); t.group.scale.setScalar(Math.max(0.01, elasticOut(t.born)));
     t.kick = Math.max(0, t.kick - dt * 5);
-    const lv = 1 + 0.12 * (t.level - 1), bob = Math.sin(game.time * 3 + t.pad.c) * 0.02;
+    const lv = 1 + 0.12 * growOf(t), bob = Math.sin(game.time * 3 + t.pad.c) * 0.02;
     t.body.scale.set(lv * (1 + 0.14 * t.kick), lv * (1 - 0.16 * t.kick + bob), lv * (1 + 0.14 * t.kick));
+    if (t.halo) { t.halo.rotation.y += dt * 1.8; t.halo.position.y = 1.18 + 0.12 * growOf(t) + Math.sin(game.time * 2.5 + t.pad.r) * 0.04; }
+    if (t.rings) t.rings.children.forEach((ring, i) => ring.scale.setScalar((1 + 0.18 * i) * (1 + 0.05 * Math.sin(game.time * 4 - i))));   // a gentle sonar pulse
+    if (t.flag) t.flag.rotation.y = Math.sin(game.time * 5 + t.pad.c) * 0.35;
+    if (t.chimney && Math.random() < dt * 2) {
+      const at = t.chimney.getWorldPosition(new THREE.Vector3()); at.y += 0.12;
+      const m = ball(MAT.puff, 0.06 + Math.random() * 0.04, at.x, at.y, at.z, false);
+      game.fx.push({ mesh: m, vel: new THREE.Vector3((Math.random() - 0.5) * 0.15, 0.55, (Math.random() - 0.5) * 0.15), life: 1.3, t: 0, s: m.scale.x, grav: 0 }); scene.add(m);
+    }
     if (t.kind === 'nest') {
       if (t.trainQ > 0 && (t.trainT += dt) >= TRAIN_S) { t.trainT = 0; t.trainQ--; t.kick = 1; spawnTroop(t); Sound.train(); }
       continue;
@@ -1485,11 +1931,13 @@ function updateShots(dt) {
 /* ======== sneeze ======== */
 function sneeze() {
   if (!LEVEL.sneeze || game.state !== 'wave' || game.sneezeCd > 0) return;
-  game.sneezeCd = SNEEZE_COOLDOWN; game.sneezeAt = game.time + 0.75; game.sneezeHint = 0; heart.sneeze = 0.001;
+  const peak = Sound.clips['sfx-sneeze'] && !Sound.muted ? SNEEZE_PEAK : 0.75;
+  game.sneezeCd = SNEEZE_COOLDOWN; game.sneezeAt = game.time + peak; game.sneezeHint = 0; heart.sneeze = 0.001; heart.sneezeIn = peak;
   Sound.sneeze(); updateHud();
 }
 function blowBack() {   // every germ on the vessels tumbles back towards where it came in
   view.shake = 0.8;
+  firstTime('meet-sneeze', () => Speech.say('meet-sneeze'));
   for (const g of game.germs) {
     if (g.leaving >= 0) continue;
     if (g.heldBy) { g.heldBy.foe = null; g.heldBy.state = 'walk'; g.heldBy = null; }
@@ -1550,49 +1998,131 @@ $('mute').textContent = Sound.muted ? '🔇' : '🔊';
 
 function updateHud() {
   $('energy').textContent = game.energy;
-  $('hearts').innerHTML = Array.from({ length: HEART_SPARKLES }, (_, i) => SVG.heart.replace('<svg', `<svg class="${i < game.sparkles ? '' : 'lost'}"`)).join('');
+  const hearts = Array.from({ length: HEART_SPARKLES }, (_, i) => SVG.heart.replace('<svg', `<svg class="${i < game.sparkles ? '' : 'lost'}"`)).join('');
+  const low = game.sparkles <= 1 && (game.state === 'wave' || game.state === 'build');   // one hit from losing the wave
+  $('hearts').innerHTML = $('heartTagBody').innerHTML = hearts;
+  $('hearts').classList.toggle('low', low); $('heartTagBody').classList.toggle('low', low);
+  $('heartTag').hidden = game.state === 'title';
   $('waves').innerHTML = LEVEL.waves.map((_, i) => `<i class="${i < game.wave ? 'done' : i === game.wave && game.state !== 'won' ? 'now' : ''}"></i>`).join('');
   $('go').classList.toggle('off', game.state !== 'build');
   $('sneeze').classList.toggle('off', !(game.state === 'wave' && LEVEL.sneeze));
+  $('speed').hidden = game.state !== 'wave';   // only matters while germs are moving
+  $('speed').classList.toggle('on', game.fast); $('speed').setAttribute('aria-pressed', game.fast);
   for (const o of $('opts').children) o.classList.toggle('poor', game.energy < +o.dataset.cost);
 }
 function showPreview() {   // which germs come next out of each entry, shown while building
   const on = game.state === 'build';
+  // introductions only once the child is actually playing (the level loaded behind the map at start-up mustn't use them up)
+  const introduce = on && $('title').hidden;
+  if (introduce) for (const d of NEW_IN[levelIndex].defenders) firstTime('card-' + d, () => queueTip(defenderTip(d)));
   entryFx.forEach((fx, i) => {
     const counts = {};
     if (on) for (const gr of LEVEL.waves[game.wave]) if ((gr.from || 0) === i) counts[gr.kind] = (counts[gr.kind] || 0) + gr.n;
     const any = Object.keys(counts).length > 0;
     fx.arrow.visible = any; fx.label.hidden = !any;
-    if (on) for (const k of Object.keys(counts)) if (!game.seen.has(k)) { game.seen.add(k); if (GERM_HELLO[k]) Speech.say(GERM_HELLO[k], true); }
+    if (introduce) for (const k of Object.keys(counts)) firstTime('germ-' + k, () => {
+      if (GERM_HELLO[k]) Speech.say('hello-' + k, true);
+      if (GERM_TIP[k] && NEW_IN[levelIndex].germs.includes(k)) queueTip(germTip(k));
+    });
     fx.label.firstElementChild.innerHTML = Object.entries(counts).map(([k, n]) => `${germIcon(k)}<span>×${n}</span>`).join('&nbsp;');
   });
 }
+/* ======== tip cards ======== */
+// A picture card the first time (each visit) a level brings a new defender or a new germ, shown between waves only.
+// Defender cards show what it does; germ cards show, for each defender on this level, whether it works on that germ.
+const DEFENDER_TIP = {
+  zapper:   { strip: () => `${SVG.zapper()}<i class="arrow">➜</i><i class="fx">🫧</i><i class="arrow">➜</i>${SVG.bloop()}<i class="fx">💥</i>`, text: 'Shoots bubbles that pop germs.' },
+  nest:     { strip: () => `${SVG.nest()}<i class="arrow">➜</i>${SVG.troop()}<i class="arrow">➜</i>${SVG.bloop()}<i class="fx">😋</i>`, text: 'Its blobs walk to the vessel, grab germs and gobble them up.' },
+  antibody: { strip: () => `${SVG.antibody()}<i class="arrow">➜</i><i class="y">Y</i><i class="arrow">➜</i>${SVG.bloop()}<i class="fx">🐢</i>`, text: 'Throws antibodies that stick on germs. Then they slow down and pop faster.' },
+  mucus:    { strip: () => `${SVG.mucus()}<i class="arrow">➜</i>${SVG.bloop()}<i class="fx">🐢</i>`, text: 'Tap the vessel to drop sticky snot. Germs get stuck in it and slow down.' },
+};
+const GERM_TIP = {   // the germ's name, what's special, and any extra picture
+  big:       { name: 'Big Bloop', text: 'Big and tough: it takes lots of hits.' },
+  wiggler:   { name: 'Wiggler', text: 'Small, but very fast!' },
+  corkscrew: { name: 'Corkscrew', text: 'A slippery, spinning germ.' },
+  chunky:    { name: 'Chunky', text: 'When it pops, it breaks into 3 little germs!', strip: () => `${SVG.chunky()}<i class="arrow">➜</i>${SVG.bloop()}${SVG.bloop()}${SVG.bloop()}` },
+  spiky:     { name: 'Spiky', text: 'It has armour! An antibody has to stick on it first.' },
+  king:      { name: 'King Germ', text: 'The boss! Huge and tough, and it costs 3 hearts if it reaches the heart.' },
+};
+const HOW = {   // what each defender does to each germ: mark (yes, no, star) and a few words; `any` covers the rest
+  zapper:   { any: ['yes', 'pops it'], spiky: ['no', 'bounces off, until an antibody sticks'] },
+  nest:     { any: ['yes', 'grabs it and gobbles it'], corkscrew: ['no', 'too wiggly to grab'], spiky: ['no', "won't grab it until an antibody sticks"],
+              big: ['yes', 'grabs it, but gets tired fast'], king: ['yes', 'grabs it, but gets tired very fast'] },
+  antibody: { any: ['yes', 'slows it down and makes it weaker'], spiky: ['star', 'breaks its armour!'] },
+  mucus:    { any: ['yes', 'slows it down'] },
+};
+const MARK = { yes: '✓', no: '✗', star: '⭐' };
+// what each level brings that no earlier level had: only those get a card (so a child who jumps ahead isn't buried in cards)
+const defendersOf = L => [...L.builds, ...(L.mucus ? ['mucus'] : [])];
+const germsOf = L => new Set(L.waves.flat().map(g => g.kind));
+const NEW_IN = LEVELS.map((L, i) => {
+  const before = LEVELS.slice(0, i);
+  return {
+    defenders: defendersOf(L).filter(d => !before.some(B => defendersOf(B).includes(d))),
+    germs: [...germsOf(L)].filter(k => !before.some(B => germsOf(B).has(k))),
+  };
+});
+const tips = [];
+function queueTip(html) { tips.push(html); if ($('tip').hidden) nextTip(); }
+function nextTip() {   // show the next waiting card, or close
+  const html = tips.shift();
+  $('tip').hidden = !html;
+  if (html) $('tipBody').innerHTML = html;
+}
+function defenderTip(kind) {
+  const d = DEFENDER_TIP[kind];
+  return `<div class="tip-head">${SVG[kind]()}<h2>New: ${NAMES[kind]}</h2></div>`
+    + `<div class="tip-strip">${d.strip()}</div><p class="tip-cap">${d.text}</p>`;
+}
+function germTip(kind) {
+  const g = GERM_TIP[kind], defenders = defendersOf(LEVEL);
+  return `<div class="tip-head">${germIcon(kind)}<h2>New germ: ${g.name}<small>${g.text}</small></h2></div>`
+    + (g.strip ? `<div class="tip-strip">${g.strip()}</div>` : '')
+    + `<div class="tip-rows">${defenders.map(d => {
+      const [mark, words] = HOW[d][kind] || HOW[d].any;
+      return `<div class="tip-row">${SVG[d]()}<i class="mark ${mark}">${MARK[mark]}</i><span>${words}</span></div>`;
+    }).join('')}</div>`;
+}
+$('tipOk').addEventListener('click', () => { Sound.init(); Sound.tap(); nextTip(); });
+
 function menuOptions(pad) {   // the choices for a pad: build something, or improve what's there; on a vessel tile, snot
   if (pad.ch !== 'o') {
+    if (pad.trap) return [{ act: 'sell', kind: '', cost: 0, gain: refund(pad.trap), pic: SVG.mucus('pic'), badge: '✕' }];
     const left = MUCUS_MAX - game.traps.length;
-    return LEVEL.mucus && !pad.trap && left > 0 ? [{ act: 'build', kind: 'mucus', cost: MUCUS_COST, pic: SVG.mucus('pic'), pips: '🟢'.repeat(left) }] : [];
+    return LEVEL.mucus && left > 0 ? [{ act: 'build', kind: 'mucus', cost: MUCUS_COST, pic: SVG.mucus('pic'), pips: '🟢'.repeat(left), name: NAMES.mucus }] : [];
   }
   const t = pad.tower;
-  if (!t) return LEVEL.builds.map(kind => ({ act: 'build', kind, cost: BUILDS[kind].cost, pic: SVG[kind]('pic') }));
+  if (!t) return LEVEL.builds.map(kind => ({ act: 'build', kind, cost: BUILDS[kind].cost, pic: SVG[kind]('pic'), name: NAMES[kind] }));
   const opts = [];
   if (t.kind === 'nest' && game.troops.filter(b => b.nest === t).length + t.trainQ < TROOPS_PER_NEST) {
     opts.push({ act: 'train', kind: '', cost: TROOP_COST, pic: SVG.troop('pic'), badge: '+' });
   }
-  if (t.level < 3) opts.push({ act: 'upgrade', kind: '', cost: UPGRADE_COSTS[t.level - 1], pic: SVG[t.kind]('pic'), badge: '▲', pips: '⭐'.repeat(t.level) });
+  for (const [k, tr] of Object.entries(BUILDS[t.kind].tracks)) {   // two ways to grow, each up to twice
+    if (t.ups[k] < 2) opts.push({ act: 'up', kind: k, cost: tr.costs[t.ups[k]], pic: SVG[t.kind]('pic'), badge: tr.badge, pips: tr.pip.repeat(t.ups[k]), name: tr.label });
+  }
+  opts.push({ act: 'sell', kind: '', cost: 0, gain: refund(t), pic: SVG[t.kind]('pic'), badge: '✕' });
   return opts;
+}
+const refund = thing => Math.floor(thing.spent * SELL_REFUND);
+function firstTime(key, fn) { if (!game.seen.has(key)) { game.seen.add(key); fn(); } }   // once per visit, like the germ introductions
+function nameTag(text, x, y, z) {   // the real name floats over something new for a few seconds
+  $('nametag').firstElementChild.textContent = text; $('nametag').hidden = false;
+  game.tag = { x, y, z, until: performance.now() + 5000 };
 }
 function openMenu(pad, refresh = false) {
   const opts = menuOptions(pad);
   if (!opts.length) { closeMenu(); return false; }
   game.menuSpot = pad; $('menu').hidden = false;
-  $('opts').innerHTML = opts.map(o => `<button class="opt" data-act="${o.act}" data-kind="${o.kind}" data-cost="${o.cost}" aria-label="${o.act} ${o.kind}">`
+  $('opts').innerHTML = opts.map(o => `<button class="opt ${o.act === 'sell' ? 'sell' : ''}" data-act="${o.act}" data-kind="${o.kind}" data-cost="${o.cost}" aria-label="${o.act} ${o.kind}">`
     + (o.pips ? `<span class="pips">${o.pips}</span>` : '') + o.pic + (o.badge ? `<span class="badge">${o.badge}</span>` : '')
-    + `<span class="cost">${SVG.drop.repeat(o.cost)}</span></button>`).join('');
+    + (o.name ? `<span class="name">${o.name}</span>` : '')
+    + `<span class="cost">${SVG.drop.repeat(o.act === 'sell' ? o.gain : o.cost)}</span></button>`).join('');
   $('opts').classList.toggle('many', opts.length > 2);
+  $('opts').classList.toggle('tight', opts.length > 3);   // a nest can show Train, Bite, Energy and Sell
   const t = pad.tower;
   if (pad.ch !== 'o') showRing(pad.x, ROAD_Y + 0.03, pad.z, MUCUS_R);
-  else if (t && t.kind === 'nest') showRing(t.post.x, groundY(t.post.x, t.post.z) + 0.04, t.post.z, TROOP_GUARD_R);
-  else showRing(pad.x, pad.top + 0.06, pad.z, (t ? stats(t) : BUILDS.zapper.levels[0]).range);
+  else if (t && t.kind === 'nest') showRing(pad.x, pad.top + 0.06, pad.z, stats(t).reach + TROOP_GUARD_R * 0.5);   // where its blobs go
+  else showRing(pad.x, pad.top + 0.06, pad.z, stats(t || { kind: 'zapper' }).range);
   updateHud(); if (!refresh) Sound.tap();
   return true;
 }
@@ -1603,19 +2133,27 @@ function act(button) {
   if (game.energy < cost) {
     button.classList.remove('shake'); void button.offsetWidth; button.classList.add('shake');
     Sound.nope();
-    if (game.time - Speech.lastNope > 5) { Speech.lastNope = game.time; Speech.say('Pop germs to get more drops!'); }
+    if (game.time - Speech.lastNope > 5) { Speech.lastNope = game.time; Speech.say('nope'); }
     return;
+  }
+  if (action === 'sell') {   // two taps: the first asks "sure?", the second sells
+    if (!button.classList.contains('sure')) { button.classList.add('sure'); button.querySelector('.badge').textContent = '?'; Sound.tap(); Speech.say('sell'); return; }
+    if (pad.trap) sellTrap(pad.trap); else sellStruct(pad.tower);
+    closeMenu(); updateHud(); return;
   }
   game.energy -= cost;
   if (action === 'build' && kind === 'mucus') {
     buildTrap(pad); closeMenu(); Sound.splat();
+    firstTime('meet-mucus', () => { Speech.say('meet-mucus'); nameTag(NAMES.mucus, pad.x, ROAD_Y + 0.9, pad.z); });
   } else if (action === 'build') {
     buildStruct(pad, kind); closeMenu(); Sound.build();
-    if (game.tutorial && game.towers.length === 1) Speech.say(kind === 'nest' ? 'A blob nest! Its blobs will wait by the vessel. Tap Go when you\'re ready.' : 'Great! Tap Go when you\'re ready.');
-  } else if (action === 'upgrade') {
-    upgradeStruct(pad.tower); Sound.upgrade(); openMenu(pad, true);
+    firstTime('meet-' + kind, () => { Speech.say('meet-' + kind); nameTag(NAMES[kind], pad.x, pad.top + 1.5, pad.z); });
+    if (game.tutorial && game.towers.length === 1) Speech.say('first-build', true);
+  } else if (action === 'up') {
+    upgradeTrack(pad.tower, kind, cost); Sound.upgrade(); openMenu(pad, true);
+    firstTime('upgrade-' + kind, () => { if (LINES['upgrade-' + kind]) Speech.say('upgrade-' + kind); });
   } else if (action === 'train') {
-    pad.tower.trainQ++; pad.tower.kick = 1; Sound.tap(); openMenu(pad, true);
+    pad.tower.trainQ++; pad.tower.spent += cost; pad.tower.kick = 1; Sound.tap(); openMenu(pad, true);
   }
   updateHud();
 }
@@ -1629,26 +2167,29 @@ function showEnd(kind) {
   $('endTitle').textContent = won ? LEVEL.winTitle : 'Achoo! Germs got through.';
   $('stars').hidden = !won;
   $('stars').innerHTML = [0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}">⭐</span>`).join('');
+  $('endFact').hidden = !won;
+  if (won) { $('endFact').innerHTML = '<b>Did you know?</b> ' + LEVEL.fact.replace(/^Did you know\? /, ''); Speech.say('fact-' + LEVEL.id, true); }
   $('endBtn').innerHTML = next ? SVG.play + 'Next' : won ? SVG.again() + 'Again' : SVG.again() + 'Try again';
   $('endBtn').dataset.do = next ? 'next' : won ? 'again' : 'retry';
   $('againBtn').hidden = !next;
   $('mapBtn').hidden = false;
   $('end').hidden = false;
 }
-// The level map: a child's outline with a spot where each level happens (knee, nose, tummy, lungs, and a thermometer for the fever)
-const MAP_SPOTS = [[78, 222], [100, 54], [100, 154], [100, 112], [160, 26]];
+// The level map: a child's outline with a spot where each level happens. Spots that would crowd the head sit
+// outside it with a dotted line to the place (the eye, the ear, and a thermometer for the fever).
 const BODY_SVG = `<svg class="body" viewBox="0 0 200 260" aria-hidden="true">
+  <circle cx="66" cy="48" r="9" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/><circle cx="134" cy="48" r="9" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
   <g stroke="#e9a48c" stroke-width="20" stroke-linecap="round"><path d="M67 96 38 150M133 96l29 54M86 168l-6 72M114 168l6 72"/></g>
   <g stroke="#ffd9c7" stroke-width="14" stroke-linecap="round"><path d="M67 96 38 150M133 96l29 54M86 168l-6 72M114 168l6 72"/></g>
   <rect x="62" y="80" width="76" height="96" rx="30" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
   <circle cx="100" cy="44" r="34" fill="#ffd9c7" stroke="#e9a48c" stroke-width="3"/>
   <path d="M112 104s-9-6-9-12a5 5 0 0 1 9-2 5 5 0 0 1 9 2c0 6-9 12-9 12z" fill="#ff8fa6" opacity=".55"/>
-  <path d="M128 36q14-10 22-12" stroke="#e9a48c" stroke-width="3" stroke-dasharray="4 5" fill="none" stroke-linecap="round"/>
+  ${LEVELS.filter(L => L.link).map(L => `<path d="M${L.link[0]} ${L.link[1]}L${L.spot[0]} ${L.spot[1]}" stroke="#e9a48c" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/>`).join('')}
 </svg>`;
 function renderMap() {
-  const next = Math.min(game.unlocked, LEVELS.length - 1);
+  const next = newestOpen();
   $('bodymap').innerHTML = BODY_SVG + LEVELS.map((L, i) => {
-    const [x, y] = MAP_SPOTS[i], locked = i > game.unlocked, got = game.stars[i] || 0;
+    const [x, y] = L.spot, locked = !isOpen(i), got = game.stars[L.id] || 0;
     const stars = locked ? '' : `<span class="st">${[0, 1, 2].map(k => k < got ? '⭐' : '<i>⭐</i>').join('')}</span>`;
     return `<button class="spot ${locked ? 'locked' : ''} ${i === next && !got ? 'next' : ''}" style="left:${x / 2}%;top:${y / 2.6}%" data-i="${i}" aria-label="Level ${i + 1}: ${L.name}">`
       + `${locked ? '🔒' : L.icon}<b>${i + 1}</b>${stars}</button>`;
@@ -1656,24 +2197,25 @@ function renderMap() {
 }
 function playLevel(i) {   // from the map: load a level and start it
   Sound.init(); $('title').hidden = true; $('end').hidden = true;
-  Speech.say(LEVELS[i].intro);
+  Speech.say('intro-' + LEVELS[i].id);
   if (i !== levelIndex) loadLevel(i); else startLevel();
 }
 $('bodymap').addEventListener('click', e => {
   const b = e.target.closest('.spot'); if (!b) return;
   const i = +b.dataset.i;
-  if (i > game.unlocked) { Sound.init(); Sound.nope(); return; }
+  if (!isOpen(i)) { Sound.init(); Sound.nope(); return; }
   playLevel(i);
 });
 function goHome() {   // back to the map; the level in progress is dropped
   game.run++; clearField(); clearStructures(); closeMenu();
   game.state = 'title'; showPreview(); updateHud();
-  if (window.speechSynthesis) speechSynthesis.cancel();
+  Speech.stop(); tips.length = 0; nextTip();
   $('end').hidden = true; renderMap(); $('title').hidden = false;
 }
 function hintTarget() {   // the pointing hand: the sneeze button when germs get close, the first build of a level, then (level 1) Go
-  if (!$('end').hidden || !$('title').hidden) return null;
+  if (!$('end').hidden || !$('title').hidden || !$('tip').hidden) return null;
   if (game.sneezeHint > 0 && game.state === 'wave') { const r = $('sneeze').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top - 6, up: false }; }
+  if (game.spotHint && game.state === 'build' && game.menuSpot !== game.spotHint.pad) { const sp = game.spotHint.pad, p = toScreen(sp.x, sp.top, sp.z); return { x: p.x + 6, y: p.y + 12, up: true }; }
   if (game.state !== 'build' || game.wave !== 0) return null;
   if (game.towers.length + game.traps.length === 0) {
     const [hc, hr, kind] = LEVEL.hint || [bestPad.c, bestPad.r, 'zapper'];
@@ -1688,12 +2230,29 @@ function hintTarget() {   // the pointing hand: the sneeze button when germs get
   return null;
 }
 function updateAnchors() {
+  const tags = [];
   for (const fx of entryFx) {
     if (fx.label.hidden) continue;
-    const p = toScreen(fx.cell.x, 1.75, fx.cell.z), box = fx.label.firstElementChild, half = box.offsetWidth / 2 + 6;
+    const p = toScreen(fx.cell.x, 1.75, fx.cell.z), box = fx.label.firstElementChild;
     const minY = (document.body.classList.contains('wide') ? 0 : $('bar').getBoundingClientRect().bottom) + box.offsetHeight + 6;
-    const x = Math.max(half, Math.min(innerWidth - half, p.x)), y = Math.max(minY, p.y);   // keep it on screen, clear of the HUD
-    fx.label.style.transform = `translate(${x}px,${y}px)`;
+    tags.push({ fx, x: p.x, y: Math.max(minY, p.y), w: box.offsetWidth + 8, h: box.offsetHeight + 6 });
+  }
+  for (let pass = 0; pass < 3; pass++) for (const a of tags) for (const b of tags) {   // entries close together: push their labels apart sideways
+    if (a === b || Math.abs(a.y - b.y) >= (a.h + b.h) / 2) continue;
+    const need = (a.w + b.w) / 2 + 12 - Math.abs(a.x - b.x);
+    if (need > 0) { const dir = a.x <= b.x ? -1 : 1; a.x += dir * need / 2; b.x -= dir * need / 2; }
+  }
+  for (const t of tags) {   // keep it on screen, clear of the HUD
+    const x = Math.max(t.w / 2 + 2, Math.min(innerWidth - t.w / 2 - 2, t.x));
+    t.fx.label.style.transform = `translate(${x}px,${t.y}px)`;
+  }
+  if (!$('heartTag').hidden) {   // how many hearts are left, floating over the heart itself
+    const p = toScreen(heartPos.x, heartPos.y + 0.95, heartPos.z), box = $('heartTagBody');
+    $('heartTag').style.transform = `translate(${Math.max(box.offsetWidth / 2 + 4, Math.min(innerWidth - box.offsetWidth / 2 - 4, p.x))}px,${p.y}px)`;
+  }
+  if (game.tag) {   // the name tag over something just built
+    if (performance.now() > game.tag.until || game.state === 'title') { game.tag = null; $('nametag').hidden = true; }
+    else { const p = toScreen(game.tag.x, game.tag.y, game.tag.z); $('nametag').style.transform = `translate(${p.x}px,${p.y}px)`; }
   }
   const sz = $('sneeze');
   if (!sz.classList.contains('off')) { sz.style.setProperty('--cd', Math.max(0, game.sneezeCd) / SNEEZE_COOLDOWN); sz.classList.toggle('ready', game.sneezeCd <= 0); }
@@ -1711,7 +2270,7 @@ function updateAnchors() {
 }
 
 /* ======== input ======== */
-let press = null, ringTimer = 0;
+let press = null;
 const raycaster = new THREE.Raycaster(), roadPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -ROAD_Y);
 function groundAt(x, y) {   // the point on the vessel floor under a screen position
   raycaster.setFromCamera(new THREE.Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1), camera);
@@ -1736,6 +2295,7 @@ function onTap(x, y) {
   const padR = Math.max(42, view.ppu * 0.8);
   let best = null, bestD = padR;
   for (const pad of board.pads) {
+    if (pad.locked) continue;
     const p = toScreen(pad.x, pad.top + 0.2, pad.z), d = Math.hypot(p.x - x, p.y - y);
     if (d < bestD) { best = pad; bestD = d; }
   }
@@ -1749,33 +2309,39 @@ function onTap(x, y) {
   }
   if (!best || game.menuSpot === best) { closeMenu(); return; }
   if (best.tower) best.tower.kick = 1;
-  if (!openMenu(best)) {   // a fully upgraded zapper: just show its reach and give a happy wiggle
-    Sound.tap(); showRing(best.x, best.top + 0.06, best.z, stats(best.tower).range);
-    clearTimeout(ringTimer); ringTimer = setTimeout(() => { if (!game.menuSpot) rangeRing.visible = false; }, 1200);
-  }
+  openMenu(best);
 }
 $('go').addEventListener('click', () => { Sound.init(); startWave(); });
+$('speed').addEventListener('click', () => { Sound.init(); game.fast = !game.fast; store.set('fast', game.fast); Sound.tap(); updateHud(); });
 $('sneeze').addEventListener('click', () => { Sound.init(); if (game.sneezeCd > 0) Sound.nope(); else sneeze(); });
-$('play').addEventListener('click', () => playLevel(Math.min(game.unlocked, LEVELS.length - 1)));
+$('play').addEventListener('click', () => playLevel(newestOpen()));
 $('home').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
 $('mapBtn').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
 $('endBtn').addEventListener('click', () => {
   Sound.init(); $('end').hidden = true;
   const what = $('endBtn').dataset.do;
   if (what === 'next') playLevel(levelIndex + 1);
-  else if (what === 'again') { startLevel(); Speech.say('Here we go again!'); }
-  else { retryWave(); Speech.say('Build more, then tap Go.'); }
+  else if (what === 'again') { startLevel(); Speech.say('again'); }
+  else { retryWave(); Speech.say('retry'); }
 });
-$('againBtn').addEventListener('click', () => { Sound.init(); $('end').hidden = true; startLevel(); Speech.say('Here we go again!'); });
+$('againBtn').addEventListener('click', () => { Sound.init(); $('end').hidden = true; startLevel(); Speech.say('again'); });
 if (Haptics.supported) {
   const vibe = $('vibe'), show = () => vibe.classList.toggle('off', !Haptics.isOn());
   vibe.hidden = false; show();
   vibe.addEventListener('click', () => { Haptics.setOn(!Haptics.isOn()); show(); Haptics.buzz('build'); Sound.init(); Sound.tap(); });
 }
+{
+  const btn = $('music'), show = () => btn.classList.toggle('off', !Music.enabled);
+  show();
+  btn.addEventListener('click', () => {
+    Music.enabled = !Music.enabled; store.set('music', Music.enabled); show();
+    Sound.init(); Sound.tap();
+  });
+}
 $('mute').addEventListener('click', () => {
   Sound.muted = !Sound.muted; store.set('muted', Sound.muted);
   $('mute').textContent = Sound.muted ? '🔇' : '🔊';
-  if (Sound.muted && window.speechSynthesis) speechSynthesis.cancel();
+  if (Sound.muted) Speech.stop();
   if (Sound.muted) Music.stop(0.2);
   Sound.init(); Sound.tap();
 });
@@ -1789,32 +2355,39 @@ function updateWorld(dt) {
     while (game.queue.length && game.queue[0].t <= game.waveT) { const q = game.queue.shift(); spawnGerm(q.kind, board.entries[q.from].path); }
     // the first time germs get most of the way on a sneeze level, point at the sneeze button
     if (LEVEL.sneeze && !game.sneezeHinted && game.sneezeCd <= 0 && game.germs.some(g => g.dist > g.path.length * 0.6)) {
-      game.sneezeHinted = true; game.sneezeHint = 5; Speech.say('Quick! Press the sneeze button!');
+      game.sneezeHinted = true; game.sneezeHint = 5; Speech.say('sneeze-hint');
     }
   }
   if (game.state !== 'title') game.sneezeCd = Math.max(0, game.sneezeCd - dt);
   game.sneezeHint = Math.max(0, game.sneezeHint - dt);
   if (game.sneezeAt && game.time >= game.sneezeAt) { game.sneezeAt = 0; blowBack(); }
   if (LEVEL.fever && game.state !== 'title' && Math.random() < dt * 4) {   // heat shimmer: little wisps rising off the hot tissue
-    const c = board.land[Math.floor(Math.random() * board.land.length)], m = ball(MAT.steam, 0.1 + Math.random() * 0.08, c.x, c.top + 0.1, c.z, false);
-    game.fx.push({ mesh: m, vel: new THREE.Vector3((Math.random() - 0.5) * 0.2, 0.7, (Math.random() - 0.5) * 0.2), life: 1.6, t: 0, s: m.scale.x, grav: 0 }); scene.add(m);
+    const c = board.land[Math.floor(Math.random() * board.land.length)];
+    if (Math.hypot(c.x - board.heart.x, c.z - board.heart.z) > 1.6) {   // not right by the heart, where it would look like smoke
+      const m = ball(MAT.steam, 0.1 + Math.random() * 0.08, c.x, c.top + 0.1, c.z, false);
+      game.fx.push({ mesh: m, vel: new THREE.Vector3((Math.random() - 0.5) * 0.2, 0.7, (Math.random() - 0.5) * 0.2), life: 1.6, t: 0, s: m.scale.x, grav: 0 }); scene.add(m);
+    }
   }
   for (const tr of game.traps) { tr.born = Math.min(1, tr.born + dt * 2); tr.mesh.scale.set(elasticOut(tr.born), 1 + 0.08 * Math.sin(game.time * 3 + tr.cell.c), elasticOut(tr.born)); }
   updateGerms(dt); updateTowers(dt); updateTroops(dt); updateShots(dt); updateDrops(dt); updateFx(dt);
   if (game.state === 'wave' && !game.queue.length && !game.germs.length) waveCleared();
 
   // heart: lub-dub, flinch when hit, jump for joy at the end
-  const ph = game.time % 0.9, beat = Math.exp(-(ph ** 2) / 0.003) + 0.6 * Math.exp(-((ph - 0.22) ** 2) / 0.003);
+  const ph = game.time % (game.sparkles <= 1 && game.state === 'wave' ? 0.5 : 0.9), beat = Math.exp(-(ph ** 2) / 0.003) + 0.6 * Math.exp(-((ph - 0.22) ** 2) / 0.003);
   heart.hit = Math.max(0, heart.hit - dt * 2.5);
   heart.mat.emissiveIntensity = heart.hit * 0.5;
   heart.body.scale.setScalar(1 + 0.07 * beat - 0.12 * heart.hit);
+  if (heart.fever.visible) for (const d of heart.fever.children) {   // sweat slides down, then a new drop forms
+    const k = (game.time * 0.45 + d.userData.phase) % 1;
+    d.position.y = d.userData.y - k * 0.3; d.scale.setScalar(1.6 * Math.min(1, k * 6, (1 - k) * 5));
+  }
   if (heart.sneeze) {   // breathe in (stretch, lean back)... then ACHOO (squash forward)
     heart.sneeze += dt;
-    const t = heart.sneeze, k = t < 0.75 ? t / 0.75 : Math.max(0, 1 - (t - 0.75) / 0.5);
-    const stretch = t < 0.75 ? 1 + 0.15 * k : 1 - 0.2 * k;
+    const t = heart.sneeze, inT = heart.sneezeIn || 0.75, k = t < inT ? t / inT : Math.max(0, 1 - (t - inT) / 0.5);
+    const stretch = t < inT ? 1 + 0.15 * k : 1 - 0.2 * k;
     heart.body.scale.set(heart.body.scale.x * (2 - stretch), heart.body.scale.y * stretch, heart.body.scale.z);
-    heart.body.rotation.x = t < 0.75 ? -0.35 * k : 0.4 * k;
-    if (t > 1.25) { heart.sneeze = 0; heart.body.rotation.x = 0; }
+    heart.body.rotation.x = t < inT ? -0.35 * k : 0.4 * k;
+    if (t > inT + 0.5) { heart.sneeze = 0; heart.body.rotation.x = 0; }
   }
   heart.body.position.x = Math.sin(game.time * 60) * 0.06 * heart.hit;
   heart.body.position.y = game.state === 'won' ? Math.abs(Math.sin(game.time * 6)) * 0.35 : 0;
@@ -1822,7 +2395,14 @@ function updateWorld(dt) {
   // pads glow when something can be afforded
   const cheapest = Math.min(...LEVEL.builds.map(k => BUILDS[k].cost));
   const afford = game.energy >= cheapest, glow = 0.35 + 0.35 * (0.5 + 0.5 * Math.sin(game.time * 4));
-  for (const p of board.pads) if (!p.tower) p.ring.material.opacity = afford ? glow : 0.18;
+  for (const p of board.pads) {
+    if (!p.tower) p.ring.material.opacity = afford ? glow : 0.18;
+    if (p.born < 1) {   // a new spot springs up
+      p.born = Math.min(1, p.born + dt * 1.5); const k = Math.max(0.01, elasticOut(p.born));
+      p.plate.scale.setScalar(k); p.plus.scale.setScalar(k); p.ring.scale.setScalar(k);
+    }
+  }
+  if (game.spotHint) { game.spotHint.t -= dt; if (game.spotHint.t <= 0 || game.state !== 'build' || game.spotHint.pad.tower) game.spotHint = null; }
   for (const fx of entryFx) fx.arrow.position.y = 1.35 + Math.sin(game.time * 4) * 0.12;
 
   // red blood cells
@@ -1839,7 +2419,8 @@ function updateWorld(dt) {
 }
 let last = performance.now();
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000) * game.timeScale; last = now;
+  const fast = game.fast && game.state === 'wave' ? FAST_SPEED : 1;   // the 2× button speeds up waves only
+  const dt = Math.min(0.05, (now - last) / 1000) * game.timeScale * fast; last = now;
   updateWorld(dt);
   if (view.shake > 0) {   // a little screen shake when the heart gets hit, on a sneeze, and when the King Germ arrives
     view.shake = Math.max(0, view.shake - dt * 2.5);
@@ -1854,17 +2435,21 @@ function frame(now) {
 
 /* ======== boot ======== */
 addEventListener('resize', placeCamera);
-loadLevel(game.unlocked); game.state = 'title'; showPreview(); updateHud(); renderMap();
+loadLevel(newestOpen()); game.state = 'title'; showPreview(); updateHud(); renderMap();
 requestAnimationFrame(frame);
 // #debug exposes a console handle for testing: gg.build(padIndex, kind), gg.step(seconds) runs the game without waiting for frames
 if (location.hash === '#debug') window.gg = {
   game, get board() { return board; }, startWave, loadLevel, startLevel,
   build: (i, kind = 'zapper') => { const p = board.pads[i]; if (!p.tower) buildStruct(p, kind); },
-  upgrade: i => { const t = board.pads[i].tower; if (t && t.level < 3) upgradeStruct(t); },
+  upgrade: (i, track) => {   // one step on a path ('reach', 'power', 'bite', 'energy', 'speed'); by default the one that grows it
+    const t = board.pads[i].tower; if (!t) return;
+    const k = track || BUILDS[t.kind].grow;
+    if (t.ups[k] < 2) upgradeTrack(t, k, BUILDS[t.kind].tracks[k].costs[t.ups[k]]);
+  },
   train: i => { const t = board.pads[i].tower; if (t && t.kind === 'nest') t.trainQ++; },
   trap: (c, r) => { const cell = board.cells.get(c + ',' + r); if (cell && cell.ch === '#' && !cell.trap) buildTrap(cell); },
-  sneeze, goHome, Music, Haptics,
-  unlockAll: () => { game.unlocked = LEVELS.length - 1; store.set('unlocked', game.unlocked); renderMap(); },
+  sneeze, goHome, Music, Haptics, Sound, Speech, openMenu, BUILDS, get level() { return LEVEL; },
+  unlockAll: () => { game.cheat = true; renderMap(); },
   spawn: (kind, entry = 0, dist = 0) => spawnGerm(kind, board.entries[entry].path, dist, dist ? board.entries[entry].path[Math.floor(dist)] : null),
   step: secs => { for (let t = 0; t < secs; t += 1 / 30) updateWorld(1 / 30); renderer.render(scene, camera); updateAnchors(); },
 };
