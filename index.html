@@ -229,9 +229,20 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 @keyframes bobdown{to{transform:translate(-50%,calc(-100% - 12px))}}
 @keyframes popin{from{transform:scale(.6);opacity:0}}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* ======== home button (back to all games) ======== */
+#home{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:50;
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#2a2140;background:rgba(255,255,255,.82);
+  box-shadow:0 3px 0 rgba(0,0,0,.18);touch-action:manipulation;-webkit-tap-highlight-color:transparent;text-decoration:none}
+#home svg{width:24px;height:24px}
+#home:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+@media (max-width:539px){   /* a phone held upright: the top bar fills the width, so the button sits just under it */
+  body:not(.wide) #home{top:calc(env(safe-area-inset-top,0px) + 66px)}
+}
 </style>
 </head>
 <body>
+<a id="home" href="../index.html" aria-label="All games" title="All games"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9.8V20h12V9.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 20v-5.5h4V20" fill="currentColor"/></svg></a>
 <canvas id="scene"></canvas>
 <div id="safe"></div>
 
@@ -244,7 +255,7 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
   <button class="go" id="go" aria-label="Send the next wave">Go!</button>
   <button class="go sneeze off" id="sneeze" aria-label="Sneeze the germs away">🤧</button>
   <button class="round" id="mute" aria-label="Sound on or off">🔊</button>
-  <button class="round home" id="home" aria-label="Back to the map"></button>
+  <button class="round home" id="mapHome" aria-label="Back to the map"></button>
   <button class="round speed" id="speed" aria-label="Play faster" aria-pressed="false" hidden>2×</button>
 </div>
 
@@ -1993,7 +2004,7 @@ function collectDrop(d) {
 $('energyIcon').innerHTML = SVG.drop;
 $('play').innerHTML = SVG.play + 'Play';
 $('againBtn').innerHTML = SVG.again('#c2456c');
-$('mapBtn').innerHTML = $('home').innerHTML = SVG.home('#c2456c');
+$('mapBtn').innerHTML = $('mapHome').innerHTML = SVG.home('#c2456c');
 $('mute').textContent = Sound.muted ? '🔇' : '🔊';
 
 function updateHud() {
@@ -2315,7 +2326,7 @@ $('go').addEventListener('click', () => { Sound.init(); startWave(); });
 $('speed').addEventListener('click', () => { Sound.init(); game.fast = !game.fast; store.set('fast', game.fast); Sound.tap(); updateHud(); });
 $('sneeze').addEventListener('click', () => { Sound.init(); if (game.sneezeCd > 0) Sound.nope(); else sneeze(); });
 $('play').addEventListener('click', () => playLevel(newestOpen()));
-$('home').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
+$('mapHome').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
 $('mapBtn').addEventListener('click', () => { Sound.init(); Sound.tap(); goHome(); });
 $('endBtn').addEventListener('click', () => {
   Sound.init(); $('end').hidden = true;

@@ -131,6 +131,7 @@ The first time a new kind shows up in a wave, the voice says what's special abou
 - If all 5 are gone: "Achoo!" and **Try again** replays that wave. Every defender and drop is kept and the heart is refilled.
 - Clear all 5 waves to win. You get 1 to 3 stars depending on how many hearts are left.
 - A pointing hand and a spoken voice show where to tap first on each level.
+- 🏠 in the corner goes back to the list of all games.
 
 ## Sound, music and vibration
 
