@@ -238,12 +238,21 @@ body.wide .go{min-width:0;width:100%;padding:0;font-size:32px}
 #home:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 @media (max-width:539px){   /* a phone held upright: the top bar fills the width, so the button sits just under it */
   body:not(.wide) #home{top:calc(env(safe-area-inset-top,0px) + 66px)}
+  body:not(.wide) #fit{top:calc(env(safe-area-inset-top,0px) + 120px)}
 }
+/* zoom back out to the whole board, under the home button; only there while zoomed in */
+#fit{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:5;
+  width:44px;height:44px;border-radius:50%;border:0;padding:0;display:grid;place-items:center;color:#2a2140;background:rgba(255,255,255,.82);
+  box-shadow:0 3px 0 rgba(0,0,0,.18);-webkit-tap-highlight-color:transparent}
+#fit[hidden]{display:none}
+#fit svg{width:24px;height:24px}
+#fit:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 </style>
 </head>
 <body>
 <a id="home" href="../index.html" aria-label="All games" title="All games"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9.8V20h12V9.8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 20v-5.5h4V20" fill="currentColor"/></svg></a>
 <canvas id="scene"></canvas>
+<button id="fit" aria-label="See the whole board" title="See the whole board" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15 15l5.5 5.5M7 10h6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
 <div id="safe"></div>
 
 <div class="bar" id="bar">
@@ -362,6 +371,9 @@ const GERM_HELLO = {            // said the first time each kind shows up in a w
 };
 for (const [kind, k] of Object.entries(GERMS)) k.kind = kind;
 const CAM_PITCH = 38;           // camera angle above the ground in degrees (true isometric is 35.3)
+const ZOOM_MIN_TILE = 20;       // a board whose tiles would show smaller than this (pixels) starts zoomed in; scroll to see the rest
+const ZOOM_MAX_TILE = 130;      // zooming in stops when a tile is this many pixels wide
+const DRAG_START = 12;          // how far (pixels) a finger moves before a tap turns into scrolling the board
 
 /* ======== levels ======== */
 // Map key: ' ' nothing, '.' tissue, '#' blood vessel, '1'-'9' where germs get in, 'H' the heart, 'o' build pad.
@@ -371,22 +383,29 @@ const LEVELS = [
   {
     id: 'knee', spot: [78, 222], name: 'Scraped Knee', icon: '🦵', seed: 7, entry: 'scratch', startEnergy: 10, toughness: 1.35, builds: ['zapper'],
     map: [
-      ' ..1...         ',
-      ' ..#....        ',
-      ' ..#.o...       ',
-      ' ..#.....o      ',
-      ' ..######..     ',
-      '  ......#...    ',
-      '   ...o.#....   ',
-      '    ....#.o...  ',
-      '     ...#...c.. ',
-      '      ..######..',
-      '       o.....#..',
-      '        ...o.#e.',
-      '         ....#..',
-      '          ...H..',
-      '           .....',
-      '            ....',
+      '.......          ',
+      '.......          ',
+      '.......          ',
+      '...1...          ',
+      '...#...          ',
+      '...#....         ',
+      '..o#.....        ',
+      '...#......       ',
+      '...#.o.....      ',
+      '...#.....o..     ',
+      '...######....    ',
+      '........#.....   ',
+      ' .....o.#......  ',
+      '  ......#.o..... ',
+      '   .....#...c....',
+      '    ....######...',
+      '     ..o.....#...',
+      '      .....o.#e..',
+      '       ......#...',
+      '        .....H...',
+      '         ........',
+      '          .......',
+      '           ......',
     ],
     waves: [
       [{ kind: 'bloop', n: 6,  gap: 1.6 }],
@@ -400,25 +419,28 @@ const LEVELS = [
     fact: "Did you know? When you scrape your knee, white blood cells rush there to fight the germs. That's why a cut gets a bit red and warm.",
   },
   {
-    id: 'nose', spot: [100, 54], name: 'Runny Nose', icon: '👃', seed: 11, entry: 'nostril', startEnergy: 14, toughness: 1.25, builds: ['zapper', 'nest'], sneeze: true, hint: [8, 8, 'nest'],
+    id: 'nose', spot: [100, 54], name: 'Runny Nose', icon: '👃', seed: 11, entry: 'nostril', startEnergy: 14, toughness: 1.25, builds: ['zapper', 'nest'], sneeze: true, hint: [10, 10, 'nest'],
     map: [
-      '    ...          ',
-      '   .2##.         ',
-      '  ....#.o        ',
-      ' .....#...       ',
-      '.1....####.      ',
-      '.#...o...#..     ',
-      '.####...e#..     ',
-      ' ...#....#..     ',
-      '  o.#c..o#....   ',
-      '   .######....   ',
-      '    .....#.o...  ',
-      '     ..o.#.....  ',
-      '      ...####..  ',
-      '       .....#..  ',
-      '        ....H..  ',
-      '          .....  ',
-      '          .....  ',
+      '..........        ',
+      '..........        ',
+      '...........       ',
+      '...2#####...      ',
+      '......o.#.o..     ',
+      '...1....#.....    ',
+      '...#....####...   ',
+      '...#o..o...#...   ',
+      '...####...e#...   ',
+      '......#....#..... ',
+      '  ..o.#c..o#..... ',
+      '   ...######......',
+      '    .......#.o....',
+      '     ....o.#......',
+      '      .....####...',
+      '       .......#...',
+      '        ......H...',
+      '         .........',
+      '           .......',
+      '           .......',
     ],
     waves: [
       [{ kind: 'bloop', n: 4, gap: 1.8, from: 0 }, { kind: 'bloop', n: 4, gap: 1.8, delay: 0.9, from: 1 }],
@@ -433,27 +455,34 @@ const LEVELS = [
     fact: "Did you know? Snot traps germs before they can get inside you. A runny nose is your body cleaning itself!",
   },
   {
-    id: 'tummy', spot: [100, 154], name: 'Tummy Ache', icon: '🍔', seed: 5, entry: 'mouth', palette: 'tummy', startEnergy: 16, toughness: 1.1, builds: ['zapper', 'nest', 'antibody'], sneeze: true, hint: [9, 7, 'antibody'],
+    id: 'tummy', spot: [100, 154], name: 'Tummy Ache', icon: '🍔', seed: 5, entry: 'mouth', palette: 'tummy', startEnergy: 16, toughness: 1.1, builds: ['zapper', 'nest', 'antibody'], sneeze: true, hint: [10, 13, 'antibody'],
     map: [
-      '  1....         ',
-      ' .#.....        ',
-      '..#.o....       ',
-      '..#####...      ',
-      '......#.o..     ',
-      '.....c#.....    ',
-      '    ..#####..   ',
-      '    .....o#.o.  ',
-      '   ....o..#.... ',
-      '   ......e#####.',
-      '    .2#####...#.',
-      '     ......o..#.',
-      '      .o......H.',
-      '       .........',
-      '        ..  ....',
+      '.......           ',
+      '.......           ',
+      '.......           ',
+      '...1...           ',
+      '...#...           ',
+      '...#.....         ',
+      '...#......        ',
+      '..o#.......       ',
+      '...#.o......      ',
+      '...#####.....     ',
+      '.......#.o....    ',
+      '......c#.......   ',
+      '.......#####....  ',
+      '..........o#.o... ',
+      '........o..#......',
+      '..........e#####..',
+      '...2########...#..',
+      '.....o......o..#..',
+      '........o......H..',
+      '..................',
+      '       ...........',
+      '        ..........',
     ],
     waves: [
-      [{ kind: 'bloop', n: 6, gap: 1.5, from: 0 }, { kind: 'wiggler', n: 3, gap: 1.5, delay: 4, from: 1 }],
-      [{ kind: 'bloop', n: 8, gap: 1.1, from: 0 }, { kind: 'wiggler', n: 5, gap: 1.0, delay: 3, from: 1 }],
+      [{ kind: 'bloop', n: 6, gap: 1.5, from: 0 }, { kind: 'wiggler', n: 3, gap: 1.8, delay: 7, from: 1 }],
+      [{ kind: 'bloop', n: 8, gap: 1.1, from: 0 }, { kind: 'wiggler', n: 5, gap: 1.2, delay: 5, from: 1 }],
       [{ kind: 'chunky', n: 2, gap: 5, from: 0 }, { kind: 'bloop', n: 6, gap: 1.2, delay: 2, from: 1 }, { kind: 'wiggler', n: 6, gap: 0.7, delay: 8, from: 0 }],
       [{ kind: 'bloop', n: 15, gap: 0.7, from: 0 }, { kind: 'wiggler', n: 10, gap: 0.5, delay: 4, from: 1 }, { kind: 'chunky', n: 3, gap: 3.5, delay: 6, from: 1 }],
       [{ kind: 'chunky', n: 4, gap: 3.5, from: 0 }, { kind: 'bloop', n: 18, gap: 0.6, delay: 1, from: 1 }, { kind: 'wiggler', n: 13, gap: 0.45, delay: 6, from: 0 },
@@ -464,24 +493,27 @@ const LEVELS = [
     fact: "Did you know? Your tummy has acid that kills lots of germs in your food. Washing your hands before you eat helps too!",
   },
   {
-    id: 'lungs', spot: [100, 112], name: 'Lungs', icon: '🫁', seed: 3, entry: 'airway', palette: 'lungs', startEnergy: 18, builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, hint: [7, 7, 'mucus'],
+    id: 'lungs', spot: [100, 112], name: 'Lungs', icon: '🫁', seed: 3, entry: 'airway', palette: 'lungs', startEnergy: 18, builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, hint: [12, 9, 'mucus'],
     map: [
-      '  ....          ',
-      ' 2##....        ',
-      '...#.......     ',
-      '...#.o......    ',
-      ' ..#......3..   ',
-      '...#####.o#..   ',
-      '.....o.#..#..   ',
-      '..1#####.o#...  ',
-      ' .....e#..#c..  ',
-      '  ..o..#####....',
-      '   ........#....',
-      '    .....o.#.o..',
-      '       ....#....',
-      '       ....##H..',
-      '         .......',
-      '         .......',
+      '...................   ',
+      '...................   ',
+      '...................   ',
+      '...2#####......3...   ',
+      '......o.#......#o..   ',
+      '........#.o....#...   ',
+      '........#......#...   ',
+      ' .......#####.o#...   ',
+      ' ......o..o.#..#....  ',
+      ' ...1########.o#....  ',
+      ' ..........e#..#c.....',
+      ' ........o..#####.....',
+      ' ...............#.....',
+      '       .......o.#.o...',
+      '        ........#.....',
+      '           .....##H...',
+      '           ...........',
+      '             .........',
+      '             .........',
     ],
     waves: [
       [{ kind: 'bloop', n: 6, gap: 1.4, from: 1 }, { kind: 'corkscrew', n: 3, gap: 2, delay: 3, from: 0 }],
@@ -497,24 +529,26 @@ const LEVELS = [
     fact: "Did you know? Tiny hairs in your airways sweep sticky mucus up and out, and the germs go with it.",
   },
   {
-    id: 'eye', name: 'Itchy Eye', icon: '👁️', seed: 21, entry: 'tear', palette: 'eye', iris: [5.5, 5.5], startEnergy: 18,
+    id: 'eye', name: 'Itchy Eye', icon: '👁️', seed: 21, entry: 'tear', palette: 'eye', iris: [6.5, 6.5], startEnergy: 20,
     builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, spot: [34, 30], link: [88, 38],
     map: [
-      ' .....o..      ',
-      '..........     ',
-      '...1######.    ',
-      '..2......#..   ',
-      '..#.o...c#.o.  ',
-      '..#......#.... ',
-      'o.#......#.... ',
-      '..#....o.#.... ',
-      '..#......#.... ',
-      ' .########.o.. ',
-      '  ......e#.... ',
-      '   .o....###.. ',
-      '    ....o..#.. ',
-      '     ......H.. ',
-      '      ........ ',
+      ' ..........     ',
+      '.......o....    ',
+      '.............   ',
+      '....1######...  ',
+      '...2......#.... ',
+      '...#.o...c#.o...',
+      '...#......#.....',
+      '.o.#......#.....',
+      '...#....o.#.....',
+      '...#......#.....',
+      '...########.o...',
+      ' ........e#.....',
+      '  ...o....###...',
+      '   ......o..#...',
+      '    ........H...',
+      '     ...........',
+      '      ..........',
     ],
     waves: [
       [{ kind: 'bloop', n: 6, gap: 1.3, from: 0 }, { kind: 'bloop', n: 6, gap: 1.3, delay: 0.6, from: 1 }],
@@ -532,18 +566,21 @@ const LEVELS = [
     id: 'ear', name: 'Earache', icon: '👂', seed: 17, entry: 'ear', palette: 'ear', startEnergy: 16, toughness: 1.6,
     builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true, spot: [172, 84], link: [136, 50],
     map: [
-      '.........   ',
-      '.1########  ',
-      '....o....#. ',
-      '.#######c#..',
-      '.#....o#.#..',
-      '.#.##H.#o#..',
-      '.#o#o..#.#..',
-      '.#.#####e#o.',
-      '.#...o...#..',
-      ' #########..',
-      '  ..........',
-      '   .........',
+      '..........        ',
+      '...............   ',
+      '................  ',
+      '...1###########.. ',
+      '......o..o....#...',
+      '......#######c#...',
+      '......#....o#.#...',
+      '    ..#.##H.#o#...',
+      '    ..#o#o..#.#...',
+      '    ..#.#####e#o..',
+      '    ..#...o...#...',
+      '    ..#########...',
+      '     .............',
+      '      ............',
+      '       ...........',
     ],
     waves: [
       [{ kind: 'bloop', n: 10, gap: 0.9 }],
@@ -558,25 +595,29 @@ const LEVELS = [
     fact: "Did you know? Earwax is sticky, so it catches dust and germs before they get deep into your ear.",
   },
   {
-    id: 'fever', spot: [164, 24], link: [128, 36], name: 'Big Fever', icon: '🤒', seed: 9, entry: ['nostril', 'mouth', 'scratch'], palette: 'fever', fever: true, startEnergy: 23,
+    id: 'fever', spot: [164, 24], link: [128, 36], name: 'Big Fever', icon: '🤒', seed: 9, entry: ['nostril', 'mouth', 'scratch'], palette: 'fever', fever: true, startEnergy: 25,
     builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true,
     map: [
-      '  .....          ',
-      ' 2###.....       ',
-      '....#......      ',
-      '....#.o...3.     ',
-      ' ...#...c.#..    ',
-      ' ...#####.#...   ',
-      '...o....#o#.o..  ',
-      '......o.#.#....  ',
-      '.1#######e#....  ',
-      ' .......#####....',
-      '  ..........#....',
-      '      ....o.#.o..',
-      '        ....#....',
-      '        ....##H..',
-      '          .......',
-      '          .......',
+      '            .......    ',
+      '...................    ',
+      '...................    ',
+      '...............3...    ',
+      '...2######.....#...    ',
+      '.......o.#.....#...    ',
+      '.........#.o...#o..    ',
+      '.........#...c.#....   ',
+      '.........#####.#.....  ',
+      '........o....#o#.o...  ',
+      '...........o.#.#.....  ',
+      '...1##########e#.......',
+      '......o......#####.....',
+      '.................#.....',
+      '...............o.#.o...',
+      '          .......#.....',
+      '            .....##H...',
+      '            ...........',
+      '              .........',
+      '              .........',
     ],
     waves: [
       [{ kind: 'bloop', n: 6, gap: 1.4, from: 1 }, { kind: 'wiggler', n: 4, gap: 1.1, delay: 4, from: 0 }, { kind: 'spiky', n: 1, gap: 3, delay: 8, from: 2 }],
@@ -590,6 +631,140 @@ const LEVELS = [
     intro: 'Oh no, a big fever! Germs are coming from the nose, the mouth and a scratch, all at once. Use everything you have!',
     win: 'You did it! The fever is gone. You beat all the germs!', winTitle: 'Fever gone! You beat them all!',
     fact: "Did you know? A fever is your body turning up the heat to make it hard for germs to grow. Rest and drink water to help!",
+  },
+  {
+    id: 'finger', spot: [38, 152], name: 'Cut Finger', icon: '✋', seed: 31, entry: 'scratch', startEnergy: 18, toughness: 2.15,
+    builds: ['zapper', 'nest', 'antibody'], sneeze: true,
+    map: [
+      ' .....              ',
+      ' ..1..              ',
+      ' ..#..              ',
+      ' ..#o.......        ',
+      ' ..#...o....        ',
+      ' ..#######..        ',
+      ' ........#..        ',
+      '.....o..c#.o....... ',
+      '.........#......... ',
+      '.2###############.. ',
+      '.......o..o.....#.. ',
+      '..............e.#.. ',
+      '       ..########.. ',
+      '       .o#.o........',
+      '       ..#.....o....',
+      '       ..#########..',
+      '       ..........#..',
+      '       .........o#..',
+      '               ..H..',
+      '               .....',
+      '               .....',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 8, gap: 1.2, from: 0 }, { kind: 'wiggler', n: 5, gap: 0.9, delay: 3, from: 1 }],
+      [{ kind: 'big', n: 3, gap: 3, from: 1 }, { kind: 'bloop', n: 10, gap: 0.8, delay: 2, from: 0 }, { kind: 'corkscrew', n: 5, gap: 1, delay: 5, from: 1 }],
+      [{ kind: 'chunky', n: 3, gap: 4, from: 0 }, { kind: 'spiky', n: 4, gap: 2.5, delay: 3, from: 1 }, { kind: 'wiggler', n: 10, gap: 0.5, delay: 6, from: 0 }],
+      [{ kind: 'bloop', n: 20, gap: 0.5, from: 0 }, { kind: 'bloop', n: 20, gap: 0.5, delay: 0.3, from: 1 }, { kind: 'big', n: 5, gap: 2.4, delay: 6, from: 0 },
+       { kind: 'spiky', n: 5, gap: 2.2, delay: 8, from: 1 }],
+      [{ kind: 'chunky', n: 7, gap: 2.5, from: 1 }, { kind: 'corkscrew', n: 16, gap: 0.5, delay: 2, from: 0 }, { kind: 'wiggler', n: 20, gap: 0.35, delay: 5, from: 1 },
+       { kind: 'spiky', n: 7, gap: 1.8, delay: 8, from: 0 }, { kind: 'big', n: 6, gap: 2.5, delay: 12, from: 1 }],
+    ],
+    intro: 'Ouch, a cut on the finger! Germs are getting in through two little cuts. The way to the heart is long, so build all along it!',
+    win: 'Hooray! The finger is all healed!', winTitle: 'All healed!',
+    fact: "Did you know? When you cut yourself, tiny bits in your blood called platelets stick together like a plug. That stops the bleeding and keeps germs out!",
+  },
+  {
+    id: 'throat', spot: [24, 96], link: [92, 80], name: 'Sore Throat', icon: '😮', seed: 47, entry: ['mouth', 'mouth', 'nostril'], palette: 'lungs',
+    startEnergy: 22, toughness: 1.5, builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true,
+    map: [
+      '.....     .....         ',
+      '..1..     ..2..         ',
+      '..#..     ..#..         ',
+      '..#o.......o#..         ',
+      '..#.....o...#..         ',
+      '..###########..         ',
+      '.....o.#.......         ',
+      '.......#e..........     ',
+      '     ..#...........     ',
+      '     ..##########..     ',
+      '     ...o.......#..     ',
+      '     ......o..o.#..     ',
+      '      ..#########..     ',
+      '.......o#..........     ',
+      '........#..........     ',
+      '.3#######..             ',
+      '.......c#............   ',
+      '........#.o..........   ',
+      '      ..###########..   ',
+      '      ..........o.#o....',
+      '      ............#.....',
+      '                ..####..',
+      '                ...o.H..',
+      '                ........',
+      '                   .....',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 7, gap: 1.2, from: 0 }, { kind: 'bloop', n: 7, gap: 1.2, delay: 1, from: 1 }, { kind: 'wiggler', n: 4, gap: 1, delay: 5, from: 0 }],
+      [{ kind: 'corkscrew', n: 8, gap: 0.8, from: 1 }, { kind: 'chunky', n: 3, gap: 4, delay: 2, from: 0 }, { kind: 'spiky', n: 3, gap: 3, delay: 4, from: 0 },
+       { kind: 'bloop', n: 5, gap: 1.4, delay: 8, from: 2 }],
+      [{ kind: 'big', n: 4, gap: 3, from: 2 }, { kind: 'wiggler', n: 14, gap: 0.42, delay: 2, from: 0 }, { kind: 'spiky', n: 4, gap: 2.5, delay: 5, from: 1 },
+       { kind: 'bloop', n: 14, gap: 0.55, delay: 6, from: 2 }],
+      [{ kind: 'chunky', n: 6, gap: 2.6, from: 0 }, { kind: 'corkscrew', n: 16, gap: 0.5, delay: 2, from: 1 }, { kind: 'spiky', n: 8, gap: 1.8, delay: 4, from: 2 },
+       { kind: 'bloop', n: 26, gap: 0.4, delay: 6, from: 0 }],
+      [{ kind: 'big', n: 7, gap: 2.2, from: 1 }, { kind: 'spiky', n: 8, gap: 1.8, delay: 2, from: 0 }, { kind: 'wiggler', n: 22, gap: 0.3, delay: 4, from: 2 },
+       { kind: 'corkscrew', n: 16, gap: 0.45, delay: 7, from: 1 }, { kind: 'chunky', n: 7, gap: 2.5, delay: 10, from: 0 }],
+    ],
+    intro: 'Ow, a sore throat! Germs are coming in through the mouth, and soon through the nose too. Sticky snot helps here as well!',
+    win: 'Hooray! The throat feels much better!', winTitle: 'Happy throat!',
+    fact: "Did you know? Your tonsils, at the back of your throat, are like guards that catch germs you breathe in or swallow.",
+  },
+  {
+    id: 'pox', spot: [150, 134], name: 'Chickenpox', icon: '🐔', seed: 59, entry: 'scratch', startEnergy: 28, toughness: 1.4,
+    builds: ['zapper', 'nest', 'antibody'], mucus: true, sneeze: true,
+    map: [
+      '.....                   .....',
+      '..1..                   ..2..',
+      '..#..                   ..#..',
+      '..#......................o#..',
+      '..#.o.....................#..',
+      '..#########################..',
+      '........o...c.#o.............',
+      '..............#..............',
+      '    ..#########..            ',
+      '    ..#.o........            ',
+      '    ..#.....o....            ',
+      '    ..########...            ',
+      '    .........#...            ',
+      '    ........o##...           ',
+      '           ...H...           ',
+      '           ...##o........    ',
+      '            ...#.........    ',
+      '            ...########..    ',
+      '            .....o....#..    ',
+      '            ........e.#..    ',
+      '            ..#########..    ',
+      '..............#.o............',
+      '.............o#....o.........',
+      '..#########################..',
+      '..#.....................o.#..',
+      '..#o......................#..',
+      '..#..                   ..#..',
+      '..3..                   ..4..',
+      '.....                   .....',
+    ],
+    waves: [
+      [{ kind: 'bloop', n: 8, gap: 1.2, from: 0 }, { kind: 'bloop', n: 8, gap: 1.2, delay: 1, from: 1 }, { kind: 'bloop', n: 8, gap: 1.2, delay: 2, from: 2 },
+       { kind: 'wiggler', n: 6, gap: 0.8, delay: 4, from: 3 }],
+      [{ kind: 'chunky', n: 3, gap: 4, from: 0 }, { kind: 'corkscrew', n: 8, gap: 0.8, delay: 2, from: 3 }, { kind: 'spiky', n: 3, gap: 3, delay: 3, from: 1 },
+       { kind: 'big', n: 3, gap: 3, delay: 5, from: 2 }],
+      [{ kind: 'spiky', n: 6, gap: 2.4, from: 2 }, { kind: 'wiggler', n: 16, gap: 0.38, delay: 2, from: 1 }, { kind: 'chunky', n: 4, gap: 3, delay: 4, from: 3 },
+       { kind: 'bloop', n: 18, gap: 0.48, delay: 6, from: 0 }],
+      [{ kind: 'big', n: 6, gap: 2.5, from: 3 }, { kind: 'corkscrew', n: 14, gap: 0.5, delay: 2, from: 0 }, { kind: 'spiky', n: 6, gap: 2, delay: 4, from: 1 },
+       { kind: 'chunky', n: 5, gap: 3, delay: 6, from: 2 }, { kind: 'wiggler', n: 16, gap: 0.35, delay: 9, from: 3 }],
+      [{ kind: 'king', n: 1, gap: 1, from: 0 }, { kind: 'king', n: 1, gap: 1, delay: 30, from: 3 }, { kind: 'bloop', n: 12, gap: 0.7, delay: 4, from: 1 },
+       { kind: 'spiky', n: 5, gap: 2.2, delay: 6, from: 2 }, { kind: 'wiggler', n: 12, gap: 0.4, delay: 10, from: 1 }, { kind: 'big', n: 3, gap: 3, delay: 14, from: 2 }],
+    ],
+    intro: 'Itchy, itchy! Chickenpox spots everywhere, and germs are coming from all four sides. The heart is in the middle. Two King Germs are coming, so get ready!',
+    win: 'You did it! The spots are gone, and you beat the biggest germ army ever!', winTitle: 'Spots gone!',
+    fact: "Did you know? After your body beats chickenpox, it remembers that germ. So if it comes back, your body knows how to beat it straight away!",
   },
 ];
 
@@ -699,7 +874,11 @@ const isEntry = ch => ch >= '1' && ch <= '9';
 
 let LEVEL = LEVELS[0], levelIndex = 0, board = null, world = null, entryFx = [], rbcs = [], rbcMesh = null, bestPad = null;
 const heartPos = new THREE.Vector3(), boundsPts = [];
-const view = { ppu: 40, yaw: 0, center: new THREE.Vector3(), g: new THREE.Vector3(1, 0, 1), base: new THREE.Vector3(), shake: 0 };
+const view = {
+  ppu: 40, yaw: 0, center: new THREE.Vector3(), g: new THREE.Vector3(1, 0, 1), base: new THREE.Vector3(), shake: 0,
+  // zoom 1 fits the whole board; focus is the world point shown in the middle of the free space; glide eases towards a goal
+  zoom: 1, focus: new THREE.Vector3(), fit: null, toCam: new THREE.Matrix4(), toWorld: new THREE.Matrix4(), glide: null,
+};
 
 function parseBoard(map) {
   const b = { cells: new Map(), land: [], pads: [], entries: [], heart: null };
@@ -848,8 +1027,12 @@ function loadLevel(i) {
     boundsPts.push(new THREE.Vector3(c.x + dx, c.top + 0.1, c.z + dz), new THREE.Vector3(c.x + dx, c.top - TILE_H, c.z + dz));
   }
   boundsPts.push(heartPos.clone().setY(2.0), ...board.entries.map(e => new THREE.Vector3(e.x, 2.3, e.z)));
+  // the sun's shadow box grows with the board
+  const reach = Math.max(...board.land.map(c => Math.hypot(c.x - view.center.x, c.z - view.center.z))) + 2.5;
+  Object.assign(sun.shadow.camera, { left: -reach, right: reach, top: reach, bottom: -reach, far: Math.max(50, 2 * reach + 20) });
+  sun.shadow.camera.updateProjectionMatrix();
   resetLevelState();
-  placeCamera();
+  placeCamera(true);
 }
 
 /* ======== heart ======== */
@@ -1065,15 +1248,58 @@ function makeDrop() {   // a raindrop: sphere with a cone on top
 }
 
 /* ======== camera ======== */
-function placeCamera() {
+function placeCamera(fresh = false) {   // fresh: a new level, so start from the starting view instead of keeping the zoom
   // landscape screens try both layouts and keep the one that shows the board bigger
   // (a phone on its side wants the side column; a 4:3 tablet on its side often fits the tall board better)
   renderer.setSize(innerWidth, innerHeight, false);
   const wide = innerWidth > innerHeight && aimCamera(true) > aimCamera(false);
   aimCamera(wide);
+  if (fresh) {   // a big board starts zoomed in on the first spot to build on
+    view.zoom = Math.max(1, ZOOM_MIN_TILE / view.fit.s); view.glide = null;
+    const pad = hintPad(); view.focus.copy(view.zoom > 1 ? new THREE.Vector3(pad.x, pad.top, pad.z) : view.center);
+  }
+  view.zoom = Math.max(1, Math.min(maxZoom(), view.zoom));
+  applyView();
 }
-function aimCamera(wide) {   // turns the camera for the layout, fits the board into the free space, returns pixels per tile
-  const W = innerWidth, H = innerHeight;
+const maxZoom = () => Math.max(1, ZOOM_MAX_TILE / view.fit.s, ZOOM_MIN_TILE / view.fit.s);
+function applyView() {   // sets the camera for the zoom and focus, keeping the board on screen
+  const f = view.fit, S = f.s * view.zoom, p = view.focus.clone().applyMatrix4(view.toCam);
+  const hw = f.r.w / 2 / S, hh = f.r.h / 2 / S, m = 30 / S;   // half the free space, in world units, and a small margin
+  // bigger than the free space: scroll, but stop at the edges; smaller: keep it in the middle
+  const keep = (v, lo, hi, half) => (hi - lo > 2 * half ? Math.max(lo + half - m, Math.min(hi - half + m, v)) : (lo + hi) / 2);
+  p.x = keep(p.x, f.x0, f.x1, hw); p.y = keep(p.y, f.y0, f.y1, hh);
+  view.focus.copy(p).applyMatrix4(view.toWorld);
+  camera.left = p.x - (f.r.x + f.r.w / 2) / S; camera.right = camera.left + innerWidth / S;
+  camera.top = p.y + (f.r.y + f.r.h / 2) / S; camera.bottom = camera.top - innerHeight / S;
+  camera.updateProjectionMatrix();
+  view.ppu = S;
+}
+function panBy(dx, dy) {   // drag the board by screen pixels
+  const S = view.fit.s * view.zoom, p = view.focus.clone().applyMatrix4(view.toCam);
+  p.x -= dx / S; p.y += dy / S;
+  view.focus.copy(p).applyMatrix4(view.toWorld); applyView();
+}
+function zoomAt(px, py, zoom) {   // zoom, keeping the point under the finger or mouse where it is
+  const f = view.fit, z = Math.max(1, Math.min(maxZoom(), zoom)), k = 1 / (f.s * view.zoom) - 1 / (f.s * z);
+  const p = view.focus.clone().applyMatrix4(view.toCam);
+  p.x += (px - (f.r.x + f.r.w / 2)) * k; p.y -= (py - (f.r.y + f.r.h / 2)) * k;
+  view.focus.copy(p).applyMatrix4(view.toWorld); view.zoom = z; applyView();
+}
+function showSpot(x, y, z) {   // glide over to a place if it's off screen (a new building spot, say)
+  const p = toScreen(x, y, z), r = view.fit.r, m = 50;
+  if (p.x < r.x + m || p.x > r.x + r.w - m || p.y < r.y + m || p.y > r.y + r.h - m) view.glide = { focus: new THREE.Vector3(x, y, z) };
+}
+function updateGlide(dt) {
+  const g = view.glide; if (!g) return;
+  const k = 1 - Math.exp(-dt * 6), before = view.focus.clone(), z0 = view.zoom;
+  view.focus.lerp(g.focus, k); if (g.zoom) view.zoom += (g.zoom - view.zoom) * k;
+  applyView();
+  if (view.focus.distanceTo(before) < 0.002 && Math.abs(view.zoom - z0) < 0.002) {   // there, or held at an edge
+    if (g.zoom) { view.zoom = g.zoom; applyView(); }
+    view.glide = null;
+  }
+}
+function aimCamera(wide) {   // turns the camera for the layout, works out the fit for the free space, returns pixels per tile
   document.body.classList.toggle('wide', wide);
   const pitch = CAM_PITCH * Math.PI / 180, c = view.center, g = view.g;
   const entryMid = board.entries.reduce((v, e) => v.add(e.path[0]), new THREE.Vector3()).divideScalar(board.entries.length);
@@ -1095,11 +1321,11 @@ function aimCamera(wide) {   // turns the camera for the layout, fits the board 
   const r = wide
     ? { x: safe.left + 8, y: safe.top + 8, w: Math.min(bar.left, dock.left) - safe.left - 16, h: safe.height - 16 }
     : { x: safe.left + 6, y: bar.bottom + 6, w: safe.width - 12, h: dock.top - bar.bottom - 12 };
-  const s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0)), bx = (x0 + x1) / 2, by = (y0 + y1) / 2;
-  camera.left = bx - (r.x + r.w / 2) / s; camera.right = camera.left + W / s;
-  camera.top = by + (r.y + r.h / 2) / s; camera.bottom = camera.top - H / s;
-  camera.updateProjectionMatrix();
-  view.ppu = s; view.base.copy(camera.position);
+  r.w = Math.max(r.w, 60); r.h = Math.max(r.h, 60);   // a tiny window (or one still opening) still gets a sane view
+  const s = Math.min(r.w / (x1 - x0), r.h / (y1 - y0));
+  view.fit = { s, x0, x1, y0, y1, r };   // the scale that fits the whole board, which is zoom 1
+  view.toCam.copy(camera.matrixWorldInverse); view.toWorld.copy(camera.matrixWorld);
+  view.base.copy(camera.position);
   // light from the upper left of the screen, behind the board, so shadows fall towards the viewer
   const right = new THREE.Vector3(g.z, 0, -g.x);
   sun.position.copy(c).addScaledVector(right, -7).addScaledVector(g, -5).setY(16);
@@ -1552,7 +1778,7 @@ function openSpot(p) {   // a new building spot pops up between waves, and the h
   p.locked = false; p.born = 0;
   p.plate.visible = p.plus.visible = p.ring.visible = true;
   burst(new THREE.Vector3(p.x, p.top + 0.3, p.z), 14, 0.35, [MAT.gold, MAT.star], 3);
-  Sound.newSpot(); game.spotHint = { pad: p, t: 6 };
+  Sound.newSpot(); game.spotHint = { pad: p, t: 6 }; showSpot(p.x, p.top, p.z);
 }
 function showHeartHealth() {   // plasters and a face that match how many hearts are left
   const lost = HEART_SPARKLES - game.sparkles;
@@ -2224,14 +2450,17 @@ function goHome() {   // back to the map; the level in progress is dropped
   Speech.stop(); tips.length = 0; nextTip();
   $('end').hidden = true; renderMap(); $('title').hidden = false;
 }
+function hintPad() {   // the spot the hand points at first on each level
+  const [hc, hr] = LEVEL.hint || [bestPad.c, bestPad.r];
+  return board.cells.get(hc + ',' + hr) || bestPad;
+}
 function hintTarget() {   // the pointing hand: the sneeze button when germs get close, the first build of a level, then (level 1) Go
   if (!$('end').hidden || !$('title').hidden || !$('tip').hidden) return null;
   if (game.sneezeHint > 0 && game.state === 'wave') { const r = $('sneeze').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top - 6, up: false }; }
   if (game.spotHint && game.state === 'build' && game.menuSpot !== game.spotHint.pad) { const sp = game.spotHint.pad, p = toScreen(sp.x, sp.top, sp.z); return { x: p.x + 6, y: p.y + 12, up: true }; }
   if (game.state !== 'build' || game.wave !== 0) return null;
   if (game.towers.length + game.traps.length === 0) {
-    const [hc, hr, kind] = LEVEL.hint || [bestPad.c, bestPad.r, 'zapper'];
-    const pad = board.cells.get(hc + ',' + hr) || bestPad;
+    const kind = LEVEL.hint ? LEVEL.hint[2] : 'zapper', pad = hintPad();
     if (game.menuSpot === pad) {
       const o = [...$('opts').children].find(b => b.dataset.kind === kind) || $('opts').firstElementChild;
       const r = o.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.bottom + 6, up: true };
@@ -2245,9 +2474,9 @@ function updateAnchors() {
   const tags = [];
   for (const fx of entryFx) {
     if (fx.label.hidden) continue;
-    const p = toScreen(fx.cell.x, 1.75, fx.cell.z), box = fx.label.firstElementChild;
+    const p = toScreen(fx.cell.x, 1.75, fx.cell.z), box = fx.label.firstElementChild, r = view.fit.r;
     const minY = (document.body.classList.contains('wide') ? 0 : $('bar').getBoundingClientRect().bottom) + box.offsetHeight + 6;
-    tags.push({ fx, x: p.x, y: Math.max(minY, p.y), w: box.offsetWidth + 8, h: box.offsetHeight + 6 });
+    tags.push({ fx, x: p.x, y: Math.max(minY, Math.min(r.y + r.h, p.y)), w: box.offsetWidth + 8, h: box.offsetHeight + 6 });
   }
   for (let pass = 0; pass < 3; pass++) for (const a of tags) for (const b of tags) {   // entries close together: push their labels apart sideways
     if (a === b || Math.abs(a.y - b.y) >= (a.h + b.h) / 2) continue;
@@ -2255,11 +2484,13 @@ function updateAnchors() {
     if (need > 0) { const dir = a.x <= b.x ? -1 : 1; a.x += dir * need / 2; b.x -= dir * need / 2; }
   }
   for (const t of tags) {   // keep it on screen, clear of the HUD
-    const x = Math.max(t.w / 2 + 2, Math.min(innerWidth - t.w / 2 - 2, t.x));
+    const r = view.fit.r, left = t.y - t.h < Math.max($('home').getBoundingClientRect().bottom, $('fit').getBoundingClientRect().bottom) + 4 ? 62 : 2;   // clear of the home and zoom buttons
+    const x = Math.max(t.w / 2 + left, Math.min(r.x + r.w - t.w / 2, t.x));
     t.fx.label.style.transform = `translate(${x}px,${t.y}px)`;
   }
   if (!$('heartTag').hidden) {   // how many hearts are left, floating over the heart itself
-    const p = toScreen(heartPos.x, heartPos.y + 0.95, heartPos.z), box = $('heartTagBody');
+    const p = toScreen(heartPos.x, heartPos.y + 0.95, heartPos.z), box = $('heartTagBody'), r = view.fit.r;
+    $('heartTag').style.visibility = p.x < r.x || p.x > r.x + r.w || p.y < r.y || p.y > r.y + r.h + 40 ? 'hidden' : '';   // scrolled away: the top bar still shows them
     $('heartTag').style.transform = `translate(${Math.max(box.offsetWidth / 2 + 4, Math.min(innerWidth - box.offsetWidth / 2 - 4, p.x))}px,${p.y}px)`;
   }
   if (game.tag) {   // the name tag over something just built
@@ -2273,6 +2504,7 @@ function updateAnchors() {
     const x = Math.max(half, Math.min(innerWidth - half, p.x)), y = Math.max(150, p.y);
     $('menu').style.transform = `translate(${x}px,${y}px)`;
   }
+  $('fit').hidden = view.zoom < 1.02 || game.state === 'title';
   const hint = hintTarget();
   $('hand').hidden = !hint;
   if (hint) {
@@ -2282,19 +2514,51 @@ function updateAnchors() {
 }
 
 /* ======== input ======== */
-let press = null;
+const fingers = new Map();   // pointers that are down: where they are now and where they started
+let gesture = null;         // { tap: still could be a tap }
 const raycaster = new THREE.Raycaster(), roadPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -ROAD_Y);
 function groundAt(x, y) {   // the point on the vessel floor under a screen position
   raycaster.setFromCamera(new THREE.Vector2(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1), camera);
   return raycaster.ray.intersectPlane(roadPlane, new THREE.Vector3());
 }
-canvas.addEventListener('pointerdown', e => { press = { x: e.clientX, y: e.clientY, id: e.pointerId }; });
-canvas.addEventListener('pointercancel', () => { press = null; });
-canvas.addEventListener('pointerup', e => {
-  if (!press || press.id !== e.pointerId) return;
-  const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y); press = null;
-  if (moved < 16) onTap(e.clientX, e.clientY);
+const pinchOf = () => {   // middle and spread of the first two fingers
+  const [a, b] = [...fingers.values()];
+  return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, d: Math.max(20, Math.hypot(a.x - b.x, a.y - b.y)) };
+};
+canvas.addEventListener('pointerdown', e => {
+  try { canvas.setPointerCapture(e.pointerId); } catch {}
+  fingers.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY });
+  if (fingers.size === 1) gesture = { tap: true };
+  else { gesture.tap = false; gesture.pinch = pinchOf(); }   // a second finger: pinch
+  view.glide = null;
 });
+canvas.addEventListener('pointermove', e => {
+  const f = fingers.get(e.pointerId); if (!f || game.state === 'title') return;
+  const px = f.x, py = f.y; f.x = e.clientX; f.y = e.clientY;
+  if (fingers.size >= 2) {   // pinch to zoom, and move both fingers to scroll
+    const now = pinchOf(), was = gesture.pinch || now;
+    panBy(now.x - was.x, now.y - was.y); zoomAt(now.x, now.y, view.zoom * now.d / was.d);
+    gesture.pinch = now; return;
+  }
+  if (gesture.tap) {   // a finger that moves far enough scrolls the board instead of tapping
+    if (Math.hypot(f.x - f.x0, f.y - f.y0) < DRAG_START) return;
+    gesture.tap = false; closeMenu(); panBy(f.x - f.x0, f.y - f.y0); return;
+  }
+  panBy(f.x - px, f.y - py);
+});
+function lift(e) {
+  if (!fingers.delete(e.pointerId)) return;
+  if (fingers.size === 1) gesture.pinch = null;   // back to one finger: it carries on scrolling
+  if (e.type === 'pointerup' && gesture && gesture.tap && !fingers.size) onTap(e.clientX, e.clientY);
+}
+canvas.addEventListener('pointerup', lift);
+canvas.addEventListener('pointercancel', lift);
+canvas.addEventListener('wheel', e => {   // mouse wheel (and a trackpad pinch, which comes with ctrl) zooms
+  e.preventDefault(); if (game.state === 'title') return;
+  const step = e.deltaMode === 1 ? 0.05 : e.ctrlKey ? 0.01 : 0.0015;
+  view.glide = null; zoomAt(e.clientX, e.clientY, view.zoom * Math.exp(-e.deltaY * step));
+}, { passive: false });
+$('fit').addEventListener('click', () => { Sound.init(); Sound.tap(); view.glide = { focus: view.center.clone(), zoom: 1 }; });
 function onTap(x, y) {
   if (game.state === 'title') return;
   Sound.init();
@@ -2432,7 +2696,8 @@ function updateWorld(dt) {
 let last = performance.now();
 function frame(now) {
   const fast = game.fast && game.state === 'wave' ? FAST_SPEED : 1;   // the 2× button speeds up waves only
-  const dt = Math.min(0.05, (now - last) / 1000) * game.timeScale * fast; last = now;
+  const real = Math.min(0.05, (now - last) / 1000), dt = real * game.timeScale * fast; last = now;
+  updateGlide(real);
   updateWorld(dt);
   if (view.shake > 0) {   // a little screen shake when the heart gets hit, on a sneeze, and when the King Germ arrives
     view.shake = Math.max(0, view.shake - dt * 2.5);
@@ -2446,7 +2711,7 @@ function frame(now) {
 }
 
 /* ======== boot ======== */
-addEventListener('resize', placeCamera);
+addEventListener('resize', () => placeCamera());
 loadLevel(newestOpen()); game.state = 'title'; showPreview(); updateHud(); renderMap();
 requestAnimationFrame(frame);
 // #debug exposes a console handle for testing: gg.build(padIndex, kind), gg.step(seconds) runs the game without waiting for frames
@@ -2460,7 +2725,7 @@ if (location.hash === '#debug') window.gg = {
   },
   train: i => { const t = board.pads[i].tower; if (t && t.kind === 'nest') t.trainQ++; },
   trap: (c, r) => { const cell = board.cells.get(c + ',' + r); if (cell && cell.ch === '#' && !cell.trap) buildTrap(cell); },
-  sneeze, goHome, Music, Haptics, Sound, Speech, openMenu, BUILDS, get level() { return LEVEL; },
+  sneeze, goHome, Music, Haptics, Sound, Speech, openMenu, BUILDS, LEVELS, view, get level() { return LEVEL; },
   unlockAll: () => { game.cheat = true; renderMap(); },
   spawn: (kind, entry = 0, dist = 0) => spawnGerm(kind, board.entries[entry].path, dist, dist ? board.entries[entry].path[Math.floor(dist)] : null),
   step: secs => { for (let t = 0; t < secs; t += 1 / 30) updateWorld(1 / 30); renderer.render(scene, camera); updateAnchors(); },

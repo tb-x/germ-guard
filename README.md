@@ -4,7 +4,7 @@ A tower defence game set inside the body, for young kids (around age 5). Germs s
 and wiggle along blood vessels towards the heart. Your child builds white blood cells beside the
 vessels to stop them before they get there.
 
-It has seven levels on a body-shaped map, four ways to defend, a sneeze, and seven kinds of germ, including
+It has ten levels on a body-shaped map, four ways to defend, a sneeze, and seven kinds of germ, including
 a King Germ boss. A friendly recorded voice explains everything as you go. It has music and vibration, and it
 can be added to the Home Screen and played offline.
 
@@ -22,11 +22,23 @@ can be added to the Home Screen and played offline.
    there reaches two rings at once. The germs here are extra tough.
 7. **Big Fever** 🤒: germs pour in through the nose, the mouth and a scratch, all at once, every kind mixed together.
    The heart is sweating and heat shimmers off the tissue. The last wave brings the **King Germ**.
+8. **Cut Finger** ✋: a bigger board. Germs get in through two little cuts whose vessels join, then zigzag a long
+   way to the heart, with spots in the bends that reach two stretches at once. Every kind of germ except the King.
+9. **Sore Throat** 😮: bigger again. Two ways in from the mouth join and wind down; from wave 2 germs also come in
+   through the nose, which joins further down. Snot puddles help.
+10. **Chickenpox** 🐔: the biggest board, with the heart in the middle. Germs come from four itchy spots, two above
+   and two below, each pair joining and winding in from its side. The last wave brings **two King Germs**.
+
+Levels 8 to 10 are big enough that on a small phone they start a little zoomed in; pinch or scroll to see the rest.
+The first seven boards were also made a little bigger: each entry's vessel is three tiles longer (except the eye,
+whose entries sit in the corner of the eye), with an extra building spot beside it, and a ring of tissue around
+the edge.
 
 ## The map and saving
 
-The title screen is a map: a child's body with a glowing spot for each level (knee, nose, tummy, lungs, and next to
-the head the eye, the ear and a thermometer for the fever). Tap a spot to play it. **Play** jumps to the newest unlocked level.
+The title screen is a map: a child's body with a glowing spot for each level (knee, nose, tummy, lungs, the left
+hand for the finger, the right arm for chickenpox, and next to the head the eye, the ear, the throat and a
+thermometer for the fever). Tap a spot to play it. **Play** jumps to the newest unlocked level.
 
 - Winning a level unlocks the next spot. Locked spots show a padlock, and the next one to play glows.
 - The best stars for each level (1 to 3, from the hearts left at the end) show under its spot.
@@ -131,6 +143,11 @@ The first time a new kind shows up in a wave, the voice says what's special abou
 - If all 5 are gone: "Achoo!" and **Try again** replays that wave. Every defender and drop is kept and the heart is refilled.
 - Clear all 5 waves to win. You get 1 to 3 stars depending on how many hearts are left.
 - A pointing hand and a spoken voice show where to tap first on each level.
+- **Zoom and scroll**: pinch (or use the mouse wheel) to zoom in and out, and drag the board to scroll around it.
+  A quick tap still builds; a finger has to move a little before it scrolls instead. While zoomed in, a 🔍 button
+  under 🏠 glides back out to the whole board. Each level starts showing the whole board, unless the board is so
+  big that its tiles would be tiny: then it starts zoomed in on the first spot to build on. When a new building spot
+  opens off screen, the view glides over to it, and the bubbles for entries that are scrolled away stay at the edge.
 - 🏠 in the corner goes back to the list of all games.
 
 ## Sound, music and vibration
@@ -212,6 +229,9 @@ These are at the top of the script in `index.html`:
 | `GERM_HELLO` | what the voice says the first time each germ appears | |
 | `SELL_REFUND` | share of everything spent that selling gives back (rounded down) | 0.75 |
 | `CAM_PITCH` | camera angle above the ground, in degrees | 38 |
+| `ZOOM_MIN_TILE` | a board whose tiles would show smaller than this (pixels) starts zoomed in; every current level fits even on a small phone | 20 |
+| `ZOOM_MAX_TILE` | zooming in stops when a tile is this many pixels wide | 130 |
+| `DRAG_START` | how far a finger moves (pixels) before a tap turns into scrolling | 12 |
 | `MUSIC_VOL`, `MUSIC_DUCK` | music level, and how far it dips under the voice | 0.22, 0.35 |
 | `SONGS` | each tune: key, scale, tempo, lead sound, bass and drum pattern, a chord per bar and the melody written as scale degrees (8 eighths a bar) | 96–120 bpm |
 | `LEADS`, `BASSES`, `DRUMS` | the lead sounds, bass patterns and drum patterns the tunes pick from | |
@@ -223,10 +243,12 @@ These are at the top of the script in `index.html`:
 
 Each level in `LEVELS` has its own map, colours (`palette`), entry look (`entry`: one style, or a list with one per entry), starting drops
 (`startEnergy`), allowed defenders (`builds`, plus `mucus` and `sneeze` switches), the first-tap hint, an optional
-`toughness` that multiplies every germ's health (Knee 1.35, Nose 1.25, Tummy 1.1, Earache 1.6), its spot on the map, and `waves`.
+`toughness` that multiplies every germ's health (Knee 1.35, Nose 1.25, Tummy 1.1, Earache 1.6, Finger 2.15, Throat 1.5, Chickenpox 1.4), its spot on the map, and `waves`.
 The intro and win words are also voice lines, so changing them means recording new clips.
 A wave is a list of groups: germ kind, how many, seconds apart, an optional start delay, and which entry they
 come from (`from`, 0 = the map's `1`).
+Maps can be any size: the shadows grow with the board, and a board too big to show at a readable size on a phone
+starts zoomed in and is scrolled around (a 30 × 30 test board worked).
 
 ### Balance as tested with simulated play
 
@@ -243,18 +265,27 @@ The numbers are hearts left after each wave; ✗ is a lost wave that was tried a
 
 | Level | Thoughtful | Lazy | Zappers only |
 | --- | --- | --- | --- |
-| 1 Scraped Knee | won, 5 5 5 5 5 | lost at wave 4 | (same as thoughtful) |
-| 2 Runny Nose | won, 4 4 4 4 4 | lost at wave 2 | won, 5 5 5 5 5 |
-| 3 Tummy Ache | won after 1 retry, 3 3 3 ✗ 5 5 | lost at wave 3 | won, 4 4 4 4 4 |
-| 4 Lungs | won, 5 5 5 5 2 | lost at wave 2 | lost at wave 3 (Spikies) |
+| 1 Scraped Knee | won, 5 5 5 5 5 | lost at wave 3 | (same as thoughtful) |
+| 2 Runny Nose | won, 4 4 4 4 4 | lost at wave 3 | won, 5 5 5 5 5 |
+| 3 Tummy Ache | won, 4 4 4 4 4 | lost at wave 2 | won, 5 5 5 5 5 |
+| 4 Lungs | won, 5 5 5 5 5 | lost at wave 3 | lost at wave 3 (Spikies) |
 | 5 Itchy Eye | won, 5 4 4 4 4 | lost at wave 3 | lost at wave 4 (Spikies) |
-| 6 Earache | won, 5 5 5 5 5 | lost at wave 2 | — |
+| 6 Earache | won, 5 5 5 5 5 | lost at wave 2 | lost at wave 4 |
 | 7 Big Fever | won, 4 4 4 4 4 | lost at wave 2 | lost at wave 3 (Spikies) |
+| 8 Cut Finger | won, 5 5 5 4 4 | lost at wave 2 | lost at wave 4 |
+| 9 Sore Throat | won, 5 5 4 4 3 | lost at wave 2 | lost at wave 3 |
+| 10 Chickenpox | won, 5 5 5 5 2 | lost at wave 1 | lost at wave 3 |
 
-After the first round of testing the early levels got tougher germs and busier last waves, the Big Fever's first
-wave got gentler (with 23 starting drops instead of 20), and the King Germ went from 130 to 340 health. In the Big
-Fever the King Germ now gets about 73% of the way to the heart. The Knee is still easy on purpose, as the
-tutorial; stopping early loses everywhere, and the Spiky levels can't be won without antibodies.
+Tuning so far: the early levels got tougher germs and busier last waves, and the King Germ went from 130 to 340
+health. After the boards grew, the Itchy Eye needed 20 starting drops (was 18), the Big Fever 25 (was 23), and the
+Tummy Ache's Wigglers now come out of the short second entry a little later. In the Big Fever the King Germ gets
+about 71% of the way to the heart. In Chickenpox one of the two Kings nearly makes it (98%), and that wave usually
+costs the heart 3. The Knee is still easy on purpose, as the tutorial; stopping early loses everywhere, and the
+Spiky levels can't be won without antibodies.
+
+The new big levels first had long, separate vessels with spots that each reached only one of them, and even the
+thoughtful player lost there. Joining the entries into a shared vessel that zigzags, with spots in the bends,
+fixed that: now a defender in the right place covers two stretches, as on the first seven levels.
 The Earache's germs have `toughness: 1.6` and a gentler first wave, after the first version (2.5× health, a
 16-germ first wave) turned out to be unwinnable in wave 1.
 
@@ -273,7 +304,7 @@ covered by any licence on this game's code.
 
 Every clip is listed below.
 
-**Spoken lines** (46 clips): ElevenLabs Text to Speech, stock voice "Jessica" (Playful, Bright, Warm), model Eleven
+**Spoken lines** (55 clips): ElevenLabs Text to Speech, stock voice "Jessica" (Playful, Bright, Warm), model Eleven
 Multilingual v2, free plan, made 2026-10-09. The words are also in `LINES`, `GERM_HELLO` and each level's `intro`,
 `win` and `fact`.
 
@@ -293,6 +324,12 @@ Multilingual v2, free plan, made 2026-10-09. The words are also in `LINES`, `GER
 | `say-win-ear.mp3` | "Hooray! The earache is gone!" |
 | `say-intro-fever.mp3` | "Oh no, a big fever! Germs are coming from the nose, the mouth and a scratch, all at once. Use everything you have!" |
 | `say-win-fever.mp3` | "You did it! The fever is gone. You beat all the germs!" |
+| `say-intro-finger.mp3` | "Ouch, a cut on the finger! Germs are getting in through two little cuts. The way to the heart is long, so build all along it!" |
+| `say-win-finger.mp3` | "Hooray! The finger is all healed!" |
+| `say-intro-throat.mp3` | "Ow, a sore throat! Germs are coming in through the mouth, and soon through the nose too. Sticky snot helps here as well!" |
+| `say-win-throat.mp3` | "Hooray! The throat feels much better!" |
+| `say-intro-pox.mp3` | "Itchy, itchy! Chickenpox spots everywhere, and germs are coming from all four sides. The heart is in the middle. Two King Germs are coming, so get ready!" |
+| `say-win-pox.mp3` | "You did it! The spots are gone, and you beat the biggest germ army ever!" |
 | `say-hello-big.mp3` | "A big germ is coming! It takes lots of pops." |
 | `say-hello-wiggler.mp3` | "Watch out for the wigglers. They are fast!" |
 | `say-hello-corkscrew.mp3` | "Corkscrew germs are too wiggly for the blobs to grab!" |
@@ -325,6 +362,9 @@ Multilingual v2, free plan, made 2026-10-09. The words are also in `LINES`, `GER
 | `say-fact-eye.mp3` | "Did you know? Tears wash germs out of your eyes, and they even have germ fighters in them!" |
 | `say-fact-ear.mp3` | "Did you know? Earwax is sticky, so it catches dust and germs before they get deep into your ear." |
 | `say-fact-fever.mp3` | "Did you know? A fever is your body turning up the heat to make it hard for germs to grow. Rest and drink water to help!" |
+| `say-fact-finger.mp3` | "Did you know? When you cut yourself, tiny bits in your blood called platelets stick together like a plug. That stops the bleeding and keeps germs out!" |
+| `say-fact-throat.mp3` | "Did you know? Your tonsils, at the back of your throat, are like guards that catch germs you breathe in or swallow." |
+| `say-fact-pox.mp3` | "Did you know? After your body beats chickenpox, it remembers that germ. So if it comes back, your body knows how to beat it straight away!" |
 
 **Sound effects**: ElevenLabs Sound Effects, free plan, made 2026-10-09.
 
