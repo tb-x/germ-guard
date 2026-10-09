@@ -33,7 +33,7 @@ the head the eye, the ear and a thermometer for the fever). Tap a spot to play i
 - Progress is saved in the browser (`localStorage`): `germguard.stars` keeps the best stars per level name, so
   levels can be added or reordered later. A level opens once the one before it is won. The sound and vibration
   settings are saved too.
-- The house button in the corner during a level, and on the end card, goes back to the map.
+- The map button in the corner during a level, and on the end card, goes back to the map.
 
 ## The defenders
 
